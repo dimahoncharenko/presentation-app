@@ -1,19 +1,8 @@
 "use client";
 
-import { DroppedElement } from "@/entities/DroppedElement/model/types";
 import { BackHome } from "@/features/BackHome";
-import { Context } from "@/shared/context/DroppedElementsContext";
-import { Droppable } from "@/shared/ui/Droppable";
-import EditableText from "@/shared/ui/EditableText/ui";
-import React, {
-  CSSProperties,
-  ReactElement,
-  cloneElement,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+
+import React, { CSSProperties, ReactElement } from "react";
 
 type Props = Partial<{
   bg: CSSProperties["color"];
@@ -26,7 +15,6 @@ type Props = Partial<{
   iframeBg: string;
 }> & {
   children: ReactElement<React.HTMLAttributes<HTMLElement>>;
-  slideId: string;
 } & Partial<
     Omit<
       React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
@@ -42,7 +30,6 @@ export const Slide: React.FC<Props> = ({
   animateOnTheNextSlide,
   iframeBg,
   fragments,
-  slideId,
   enableBackHome = false,
   ...rest
 }) => {
@@ -54,7 +41,6 @@ export const Slide: React.FC<Props> = ({
 
   return (
     <>
-      {/* <Droppable id={slideId}> */}
       <section
         {...rest}
         data-background-iframe={iframeBg}
@@ -69,9 +55,7 @@ export const Slide: React.FC<Props> = ({
         {children}
         {fragments}
       </section>
-      {/* </Droppable> */}
       {animateOnTheNextSlide && (
-        // <Droppable id={slideId}>
         <section
           {...rest}
           data-background-video={videoBg}
@@ -83,7 +67,6 @@ export const Slide: React.FC<Props> = ({
           {children}
           {fragments}
         </section>
-        // </Droppable>
       )}
     </>
   );

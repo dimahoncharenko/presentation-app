@@ -8,11 +8,10 @@ import TextStyle from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
 import UnderlineExtension from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
-import { HexColorPicker } from "react-colorful";
 
 import classes from "./classes.module.css";
 
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useEffect } from "react";
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -39,8 +38,6 @@ import {
   IconAlignRight,
 } from "@tabler/icons-react";
 
-import { Button } from "@/shared/ui/common/aceternity/Button";
-import { useDebounceValue } from "usehooks-ts";
 import { ColorPicker } from "./ColorPicker";
 
 const extensions = [

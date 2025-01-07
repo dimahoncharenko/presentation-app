@@ -3,12 +3,7 @@
 import { DroppedElement } from "@/entities/DroppedElement/model/types";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  CSSProperties,
-  DetailedHTMLProps,
-  HTMLAttributes,
-  cloneElement,
-} from "react";
+import { CSSProperties, DetailedHTMLProps, HTMLAttributes } from "react";
 
 type Props = {
   id: string;

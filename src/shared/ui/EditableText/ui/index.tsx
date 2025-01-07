@@ -1,14 +1,9 @@
-import {
-  DroppedElement,
-  DroppedText,
-} from "@/entities/DroppedElement/model/types";
+import { DroppedText } from "@/entities/DroppedElement/model/types";
 import React, {
   CSSProperties,
-  MouseEvent,
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { useForm } from "react-hook-form";
@@ -105,7 +100,7 @@ function EditableText({ element, handleRemove }: Props) {
     return (
       <div
         onDoubleClick={() => {
-          setState({ ...state, type: "text-input" });
+          setState({ ...state, type: "text-node" });
           setIsFocused(true);
         }}
         className="cursor-text overflow-hidden select-none py-[6px] px-[13px] break-all"

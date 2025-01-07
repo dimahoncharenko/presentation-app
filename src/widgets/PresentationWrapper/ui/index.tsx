@@ -4,14 +4,11 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { PanelLeft } from "lucide-react";
 
 import { Slide } from "@/entities/Slide/ui";
-import { Fragment } from "@/shared/ui/Fragment";
-import { FlipWords } from "@/shared/ui/common/aceternity/FlipWords";
 
 import { cn } from "@/shared/lib/cn-merge";
 import { Button } from "@/shared/ui/common/aceternity/Button";
 import { RevealContext } from "@/shared/context/reveal-context";
 import { Context } from "@/shared/context/DroppedElementsContext";
-import { DroppedElement } from "@/entities/DroppedElement/model/types";
 import { groupBySlideId } from "@/entities/DroppedElement/lib";
 import { DraggableResizable } from "@/shared/ui/DraggableResizable";
 import { WYSWYG } from "@/widgets/WYSWYG";
@@ -24,10 +21,6 @@ export const PresentationWrapper = () => {
   const { elements, setElements } = useContext(Context);
 
   const deckDivRef = useRef<HTMLDivElement>({} as HTMLDivElement); // reference to deck container div
-
-  const handleRemoveElement = (element: DroppedElement) => {
-    setElements((prev) => prev.filter((el) => el.id !== element.id));
-  };
 
   useEffect(() => {
     setElements([
@@ -98,7 +91,6 @@ export const PresentationWrapper = () => {
                   width: "100%",
                   height: "100%",
                 }}
-                slideId={`slide-${deckRef.current?.getState().indexh}`}
                 bg={elements[0].bg}
               >
                 <>
