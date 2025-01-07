@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { PanelLeft } from "lucide-react";
 
 import { Slide } from "@/entities/Slide/ui";
@@ -10,10 +10,13 @@ import { FlipWords } from "@/shared/ui/common/aceternity/FlipWords";
 import { cn } from "@/shared/lib/cn-merge";
 import { Button } from "@/shared/ui/common/aceternity/Button";
 import { RevealContext } from "@/shared/context/reveal-context";
-import EditableText from "@/shared/ui/EditableText/ui";
 import { Context } from "@/shared/context/DroppedElementsContext";
 import { DroppedElement } from "@/entities/DroppedElement/model/types";
 import { groupBySlideId } from "@/entities/DroppedElement/lib";
+import { DraggableResizable } from "@/shared/ui/DraggableResizable";
+import { WYSWYG } from "@/widgets/WYSWYG";
+import Image from "next/image";
+import { EditableFlipWords } from "@/shared/ui/EditableFlipWords";
 
 export const PresentationWrapper = () => {
   const [openedSidebar, setOpenedSidebar] = useState(false);
@@ -36,7 +39,7 @@ export const PresentationWrapper = () => {
           x: 400,
           y: 0,
         },
-        type: "p",
+        type: "text-node",
         bg: "#dd3636",
         size: {
           width: 300,
@@ -55,7 +58,7 @@ export const PresentationWrapper = () => {
           width: 300,
           height: 100,
         },
-        type: "p",
+        type: "text-node",
         bg: "white",
       },
     ]);
@@ -71,7 +74,7 @@ export const PresentationWrapper = () => {
     <>
       <div
         className={cn(
-          "reveal transition-all duration-200 ease-in-out ml-auto",
+          "reveal transition-all duration-200 ease-in-out mr-auto",
           openedSidebar && "!w-[85vw]"
         )}
         ref={deckDivRef}
@@ -86,10 +89,8 @@ export const PresentationWrapper = () => {
           </Button>
         </div>
 
-        <div className="slides relative">
+        <div className="slides">
           {Object.entries(groupBySlideId(elements)).map(([name, elements]) => {
-            console.log(elements[0].bg);
-
             return (
               <Slide
                 key={name}
@@ -103,11 +104,41 @@ export const PresentationWrapper = () => {
                 <>
                   {elements.map((el, index) => {
                     return (
-                      <EditableText
-                        key={index}
-                        handleRemove={() => handleRemoveElement(el)}
-                        element={el}
-                      />
+                      <React.Fragment key={index}>
+                        {el.type === "image-node" ? (
+                          <DraggableResizable initialPosition={el.spacing}>
+                            <Image
+                              className="!m-0 !select-none !max-w-full !max-h-full"
+                              src={el.content}
+                              fill
+                              alt={el.id}
+                            />
+                          </DraggableResizable>
+                        ) : el.type === "text-node" ? (
+                          <DraggableResizable initialPosition={el.spacing}>
+                            <WYSWYG content={el.content} onChange={() => {}} />
+                          </DraggableResizable>
+                        ) : (
+                          <DraggableResizable initialPosition={el.spacing}>
+                            <EditableFlipWords
+                              handleSubmit={(words) => {
+                                setElements((prev) =>
+                                  prev.map((e) => {
+                                    if (e.id === el.id) {
+                                      return {
+                                        ...el,
+                                        content: words,
+                                      };
+                                    }
+
+                                    return el;
+                                  })
+                                );
+                              }}
+                            />
+                          </DraggableResizable>
+                        )}
+                      </React.Fragment>
                     );
                   })}
                 </>

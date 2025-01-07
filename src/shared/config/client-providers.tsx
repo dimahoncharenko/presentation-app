@@ -14,13 +14,15 @@ export const ClientProviders = ({ children }: Props) => {
 
   const handleDragEnd = (event: DragEndEvent) => {
     if (event.active.data.current) {
+      console.log(event);
+
       setElements([
         ...elements,
         {
           "slide-id": `slide-${event.active.data.current["slideId"] || 0}`,
-          id: `text-node-${elements.length}`,
-          type: "input",
-          content: "New Text",
+          id: `${event.active.data.current["nodeType"]}-${elements.length}`,
+          type: event.active.data.current["nodeType"],
+          content: event.active.data.current["content"],
           spacing: {
             x: 400,
             y: 0,

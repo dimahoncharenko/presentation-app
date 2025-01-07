@@ -1,7 +1,6 @@
-export interface DroppedElement {
-  id: string;
+type SharedProperties = {
   "slide-id": string;
-  type: "p" | "input";
+  id: string;
   content: string;
   spacing: {
     x: number;
@@ -12,4 +11,18 @@ export interface DroppedElement {
     height: number;
   };
   bg?: string;
-}
+};
+
+export type DroppedImage = {
+  type: "image-node";
+} & SharedProperties;
+
+export type DroppedText = {
+  type: "text-node";
+} & SharedProperties;
+
+export type DroppedFlipWords = {
+  type: "flip-words-node";
+} & SharedProperties;
+
+export type DroppedElement = DroppedText | DroppedImage | DroppedFlipWords;

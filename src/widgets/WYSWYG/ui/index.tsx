@@ -8,8 +8,11 @@ import TextStyle from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
 import UnderlineExtension from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
+import { HexColorPicker } from "react-colorful";
 
-import { memo, useEffect } from "react";
+import classes from "./classes.module.css";
+
+import { memo, useCallback, useEffect, useState } from "react";
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -35,6 +38,10 @@ import {
   IconAlignLeft,
   IconAlignRight,
 } from "@tabler/icons-react";
+
+import { Button } from "@/shared/ui/common/aceternity/Button";
+import { useDebounceValue } from "usehooks-ts";
+import { ColorPicker } from "./ColorPicker";
 
 const extensions = [
   StarterKit,
@@ -72,17 +79,25 @@ export const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
   }, [content, editor]);
 
   return (
-    <ContextMenu>
+    <ContextMenu modal>
       <ContextMenuTrigger>
-        <EditorContent editor={editor} />
+        <EditorContent className={classes.editor} editor={editor} />
       </ContextMenuTrigger>
-      <ContextMenuContent className="w-64" forceMount>
+      <ContextMenuContent className="w-64">
+        <ContextMenuSub>
+          <ContextMenuSubTrigger inset>Colors</ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <ContextMenuItem className="flex-col ">
+              {editor && <ColorPicker editor={editor} />}
+            </ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
         <ContextMenuItem inset>
           <ToggleGroup type="multiple">
             <ToggleGroupItem
               value="bold"
               aria-label="Toggle bold"
-              onMouseDown={() => editor?.commands.toggleBold()}
+              onMouseDownCapture={() => editor?.commands.toggleBold()}
               className={cn(
                 editor?.isActive("bold") && "bg-black bg-opacity-5"
               )}
@@ -92,7 +107,7 @@ export const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
             <ToggleGroupItem
               value="italic"
               aria-label="Toggle italic"
-              onMouseDown={() => {
+              onMouseDownCapture={() => {
                 editor?.commands.toggleItalic();
               }}
               className={cn(
@@ -104,7 +119,7 @@ export const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
             <ToggleGroupItem
               value="underline"
               aria-label="Toggle underline"
-              onMouseDown={() => {
+              onMouseDownCapture={() => {
                 editor?.commands.toggleUnderline();
               }}
               className={cn(
@@ -120,42 +135,42 @@ export const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
           <ContextMenuSubTrigger inset>Fonts</ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">
             <ContextMenuItem
-              onMouseDown={() => {
+              onMouseDownCapture={() => {
                 editor?.commands.setFontFamily("Arial");
               }}
             >
               Arial
             </ContextMenuItem>
             <ContextMenuItem
-              onMouseDown={() => {
+              onMouseDownCapture={() => {
                 editor?.commands.setFontFamily("monospace");
               }}
             >
               Monospace
             </ContextMenuItem>
             <ContextMenuItem
-              onMouseDown={() => {
+              onMouseDownCapture={() => {
                 editor?.commands.setFontFamily("cursive");
               }}
             >
               Cursive
             </ContextMenuItem>
             <ContextMenuItem
-              onMouseDown={() => {
+              onMouseDownCapture={() => {
                 editor?.commands.setFontFamily("fantasy");
               }}
             >
               Fantasy
             </ContextMenuItem>
             <ContextMenuItem
-              onMouseDown={() => {
+              onMouseDownCapture={() => {
                 editor?.commands.setFontFamily("sans-serif");
               }}
             >
               Sans Serif
             </ContextMenuItem>
             <ContextMenuItem
-              onMouseDown={() => {
+              onMouseDownCapture={() => {
                 editor?.commands.setFontFamily("Geist Mono");
               }}
             >

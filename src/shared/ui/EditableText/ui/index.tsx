@@ -1,4 +1,7 @@
-import { DroppedElement } from "@/entities/DroppedElement/model/types";
+import {
+  DroppedElement,
+  DroppedText,
+} from "@/entities/DroppedElement/model/types";
 import React, {
   CSSProperties,
   MouseEvent,
@@ -20,7 +23,7 @@ import DOMPurify from "dompurify";
 
 type Props = {
   handleRemove: () => void;
-  element: DroppedElement;
+  element: DroppedText;
 };
 
 export type Attributes = {
@@ -30,7 +33,6 @@ export type Attributes = {
 function EditableText({ element, handleRemove }: Props) {
   const [isFocused, setIsFocused] = useState(false);
   const [state, setState] = useState(element);
-  const fieldRef = useRef<HTMLDivElement>({} as HTMLDivElement);
 
   useDndMonitor({
     onDragEnd(event) {
@@ -78,7 +80,7 @@ function EditableText({ element, handleRemove }: Props) {
   const currentValue = form.watch("content");
 
   const handleSubmit = () => {
-    setState((prev) => ({ ...prev, content: currentValue, type: "p" }));
+    setState((prev) => ({ ...prev, content: currentValue, type: "text-node" }));
   };
 
   useClickAnyWhere((evt: globalThis.MouseEvent) => {
@@ -97,13 +99,13 @@ function EditableText({ element, handleRemove }: Props) {
     }
   });
 
-  if (state.type === "p" && currentValue.trim()) {
+  if (state.type === "text-node" && currentValue.trim()) {
     const content = DOMPurify.sanitize(state.content);
 
     return (
       <div
         onDoubleClick={() => {
-          setState({ ...state, type: "input" });
+          setState({ ...state, type: "text-input" });
           setIsFocused(true);
         }}
         className="cursor-text overflow-hidden select-none py-[6px] px-[13px] break-all"
@@ -146,7 +148,6 @@ function EditableText({ element, handleRemove }: Props) {
         render={({ field }) => (
           <Draggable id={state.id} element={state} disabled={isFocused}>
             <div
-              ref={fieldRef}
               style={{
                 position: "absolute",
                 top: state.spacing.y,

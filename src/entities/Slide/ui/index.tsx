@@ -54,36 +54,36 @@ export const Slide: React.FC<Props> = ({
 
   return (
     <>
-      <Droppable id={slideId}>
+      {/* <Droppable id={slideId}> */}
+      <section
+        {...rest}
+        data-background-iframe={iframeBg}
+        data-background-video={videoBg}
+        data-background-video-muted
+        data-background-color={bg}
+        data-state={state}
+        data-auto-animate={!!animateOnTheNextSlide}
+      >
+        {enableBackHome && <BackHome />}
+
+        {children}
+        {fragments}
+      </section>
+      {/* </Droppable> */}
+      {animateOnTheNextSlide && (
+        // <Droppable id={slideId}>
         <section
           {...rest}
-          data-background-iframe={iframeBg}
           data-background-video={videoBg}
           data-background-video-muted
           data-background-color={bg}
           data-state={state}
-          data-auto-animate={!!animateOnTheNextSlide}
+          data-auto-animate
         >
-          {enableBackHome && <BackHome />}
-
           {children}
           {fragments}
         </section>
-      </Droppable>
-      {animateOnTheNextSlide && (
-        <Droppable id={slideId}>
-          <section
-            {...rest}
-            data-background-video={videoBg}
-            data-background-video-muted
-            data-background-color={bg}
-            data-state={state}
-            data-auto-animate
-          >
-            {children}
-            {fragments}
-          </section>
-        </Droppable>
+        // </Droppable>
       )}
     </>
   );
