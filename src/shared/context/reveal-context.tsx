@@ -32,24 +32,20 @@ export const RevealProvider = ({ children, deckElRef }: Props) => {
   const [deckElRef_, setDeckElRef] =
     useState<React.RefObject<HTMLDivElement> | null>(deckElRef ?? null);
   const deckRef = useRef<Reveal.Api | null>(null);
-  const [options, setOptions] = useState<Reveal.Options>({});
+  const [options, setOptions] = useState<Reveal.Options>({
+    width: "100%",
+    height: "100%",
+    transition: "concave",
+    plugins: [window.RevealChalkboard, window.RevealCustomControls],
+  });
 
   useEffect(() => {
-    console.log("DECK EL REF", deckElRef);
-
     if (!deckElRef_?.current) return;
     if (deckRef.current) return;
 
-    deckRef.current = new Reveal({
-      navigationMode: "grid",
-    });
+    deckRef.current = new Reveal();
 
-    console.log("INIT");
-
-    deckRef.current.initialize({
-      transition: "concave",
-      plugins: [window.RevealChalkboard, window.RevealCustomControls],
-    });
+    deckRef.current.initialize(options);
 
     return () => {
       try {

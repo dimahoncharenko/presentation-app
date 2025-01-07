@@ -2,12 +2,8 @@
 
 import { DroppedElement } from "@/entities/DroppedElement/model/types";
 import { useDraggable } from "@dnd-kit/core";
-import {
-  CSSProperties,
-  DetailedHTMLProps,
-  HTMLAttributes,
-  cloneElement,
-} from "react";
+import { CSS } from "@dnd-kit/utilities";
+import { CSSProperties, DetailedHTMLProps, HTMLAttributes } from "react";
 
 type Props = {
   id: string;
@@ -16,27 +12,37 @@ type Props = {
     DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>
   >;
   disabled?: boolean;
+  style?: CSSProperties;
 };
 
-export const Draggable = ({ children, id, element, disabled }: Props) => {
+export const Draggable = ({
+  children,
+  id,
+  element,
+  disabled,
+  style,
+}: Props) => {
   const { attributes, listeners, transform, setNodeRef } = useDraggable({
     id: element?.id ?? id,
     disabled,
     data: {
       slideId: element?.["slide-id"],
+      nodeType: element?.type,
+      content: element?.content,
     },
   });
 
-  const style: CSSProperties | undefined = transform
+  const definedStyles: CSSProperties | undefined = transform
     ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-        position: "absolute",
+        transform: CSS.Translate.toString(transform),
+        position: "relative",
         zIndex: 100000,
+        ...style,
       }
-    : undefined;
+    : style;
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={definedStyles} {...attributes} {...listeners}>
       {children}
     </div>
   );

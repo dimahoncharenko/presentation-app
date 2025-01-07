@@ -34,7 +34,7 @@ export const TextField = ({
   }>({ width: initialSize?.width ?? 100, height: initialSize?.height ?? 30 });
 
   const handleResize = (
-    event: unknown,
+    _: unknown,
     {
       size,
     }: {
@@ -52,9 +52,8 @@ export const TextField = ({
     <ResizableBox
       width={size.width}
       height={size.height}
-      className="break-all relative even max-h-max"
+      className="break-all relative max-h-max"
       onResize={(evt, props) => {
-        console.log("Resizing");
         evt.stopPropagation();
         setSize({ ...props.size });
       }}
@@ -64,7 +63,6 @@ export const TextField = ({
       }}
       minConstraints={[100, 30]}
       onResizeStart={() => {
-        console.log("Canceling focus");
         setIsFocused(false);
       }}
       maxConstraints={[500, 300]}
