@@ -9,7 +9,8 @@ const inputVariants = cva(
     variants: {
       variant: {
         default: "",
-        clean: "border-0 ocus-visible:ring-0 focus-visible:ring-[transparent]",
+        clean:
+          "border-0 ocus-visible:ring-0 focus-visible:ring-[transparent] shadow-none",
       },
     },
     defaultVariants: {

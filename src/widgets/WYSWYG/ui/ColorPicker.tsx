@@ -20,6 +20,10 @@ export const ColorPicker = ({ editor }: Props) => {
   };
 
   return (
-    <HexColorPicker color={color} onChange={(color) => handleChange(color)} />
+    <HexColorPicker
+      className="absolute top-0"
+      color={color}
+      onChange={(color) => handleChange(color)}
+    />
   );
 };
