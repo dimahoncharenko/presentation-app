@@ -1,22 +1,19 @@
 "use client";
 
-import {
-  DroppedElement,
-  DroppedImage,
-} from "@/entities/DroppedElement/model/types";
+import { SlideElement } from "@/entities/DroppedElement/model/types";
 import { Draggable } from "../../Draggable/ui";
 import Image from "next/image";
 import { useDndMonitor } from "@dnd-kit/core";
 import { useContext, useEffect, useState } from "react";
-import { Context } from "@/shared/context/DroppedElementsContext";
+import { SlideElementsContext } from "@/shared/context/slide-elements-context";
 
 type Props = {
-  element: DroppedImage;
-  handleRemove: (element: DroppedElement) => void;
+  element: SlideElement;
+  handleRemove: () => void;
 };
 
 export const DraggableImage = ({ element }: Props) => {
-  const { setElements } = useContext(Context);
+  const { setElements } = useContext(SlideElementsContext);
   const [state, setState] = useState(element);
 
   useDndMonitor({

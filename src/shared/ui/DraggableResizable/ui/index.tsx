@@ -9,6 +9,7 @@ import {
   MouseEvent,
   ReactNode,
   memo,
+  useLayoutEffect,
 } from "react";
 import { useOnClickOutside } from "usehooks-ts";
 
@@ -22,6 +23,7 @@ type Props = {
 
 export const DraggableResizable = memo(
   ({ children, initialPosition }: Props) => {
+    const [initialized, setInitialized] = useState(false);
     const [grabbed, setGrabbed] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [isResizing, setIsResizing] = useState(false);
@@ -130,12 +132,14 @@ export const DraggableResizable = memo(
       }
     };
 
+    // It's used to update the styles of the draggable element while dragging
     useEffect(() => {
       if (isDragging && draggableRef.current) {
         draggableRef.current.style.transform = `translate(${position.x}px, ${position.y}px)`;
       }
-    }, [isDragging, position.x, position.y]);
+    }, [isDragging, draggableRef.current, position.x, position.y]);
 
+    // It's used to update the size of the draggable while resizing
     useEffect(() => {
       if (draggableRef.current) {
         draggableRef.current.style.width = `${size.width}px`;
@@ -143,30 +147,38 @@ export const DraggableResizable = memo(
       }
     }, [size.height, size.width]);
 
+    // It's used to calculate the natural size of the draggable only while mounting
     useEffect(() => {
-      if (
-        contentRef.current &&
-        contentRef.current.children?.length &&
-        contentRef.current.children[0].tagName === "IMG"
-      ) {
-        const img = contentRef.current.children[0] as HTMLImageElement;
-        setSize({
-          width: Math.max(img.naturalWidth, 200),
-          height: Math.max(img.naturalHeight, 50),
-        });
-      }
-    }, [contentRef.current]);
+      if (contentRef.current && draggableRef.current && !initialized) {
+        setInitialized(true);
 
-    useEffect(() => {
-      if (contentRef.current) {
-        const rect = contentRef.current.getBoundingClientRect();
+        const child = contentRef.current.children[0] as HTMLElement;
+
+        let newSize: { width: number; height: number };
+
+        if (child.tagName === "IMG") {
+          const img = child as HTMLImageElement;
+          newSize = {
+            width: img.naturalWidth,
+            height: img.naturalHeight,
+          };
+        } else {
+          const rect = child.getBoundingClientRect();
+          newSize = {
+            width: Math.max(rect.width, 150),
+            height: Math.max(rect.height, 36),
+          };
+        }
 
         setSize({
-          width: Math.max(rect.width, 200),
-          height: Math.max(rect.height, 50),
+          width: newSize.width,
+          height: newSize.height,
         });
+
+        draggableRef.current.style.width = `${newSize.width}px`;
+        draggableRef.current.style.height = `${newSize.height}px`;
       }
-    }, [contentRef.current, grabbed]);
+    }, [contentRef.current, grabbed, draggableRef.current, initialized]);
 
     return (
       <div

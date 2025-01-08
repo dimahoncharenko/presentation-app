@@ -1,35 +1,44 @@
-"use client";
+'use client'
 
-import { useContext, useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useContext, useEffect } from 'react'
+import { AppStateContext } from '@/shared/context/app-state-context'
+import { RevealContext } from '@/shared/context/reveal-context'
+import { SlideElementsContext } from '@/shared/context/slide-elements-context'
+import {
+  HighlighterIcon,
+  ImagePlusIcon,
+  ScrollTextIcon,
+  TypeIcon,
+} from 'lucide-react'
+import { Controller, useForm } from 'react-hook-form'
 
-import { Context } from "@/shared/context/DroppedElementsContext";
-import { RevealContext } from "@/shared/context/reveal-context";
-import { Button } from "@/shared/ui/common/aceternity/Button";
-import { Input } from "@/shared/ui/common/bricks/input";
-import { PresentationWrapper } from "@/widgets/PresentationWrapper";
+import { PresentationWrapper } from '@/widgets/PresentationWrapper'
+import { Button } from '@/shared/ui/common/aceternity/Button'
+import { Input } from '@/shared/ui/common/bricks/input'
+import { cn } from '@/shared/lib/cn-merge'
 
 export const HomeView = () => {
-  const { elements, setElements } = useContext(Context);
-  const { deckRef } = useContext(RevealContext);
+  const { elements, setElements } = useContext(SlideElementsContext)
+  const { deckRef } = useContext(RevealContext)
+  const { openedSidenav } = useContext(AppStateContext)
 
   const { setValue, control, watch, reset } = useForm({
     defaultValues: {
       image: null as null | File,
     },
-  });
+  })
 
-  const currentSlideIndex = deckRef.current?.getState().indexh;
-  const image = watch("image");
+  const currentSlideIndex = deckRef.current?.getState().indexh
+  const image = watch('image')
 
   useEffect(() => {
     if (image) {
       setElements([
         ...elements,
         {
-          "slide-id": `slide-${currentSlideIndex}`,
+          'slide-id': `slide-${currentSlideIndex}`,
           id: `image-node-${elements.length}`,
-          type: "image-node",
+          type: 'image-node',
           content: URL.createObjectURL(image),
           spacing: {
             x: 500,
@@ -40,26 +49,31 @@ export const HomeView = () => {
             height: 300,
           },
         },
-      ]);
-      reset();
+      ])
+      reset()
     }
-  }, [image]);
+  }, [image])
 
   return (
     <>
-      <div className="absolute flex flex-col items-start !bg-slate-100 top-0 px-4 xl:px-8 bottom-0 right-0 w-[250px]">
+      <div
+        className={cn(
+          'absolute bottom-0 right-0 top-0 flex w-[250px] flex-col items-start gap-2 !bg-slate-100 p-4 opacity-0 transition xl:px-8',
+          openedSidenav && 'opacity-1',
+        )}
+      >
         <Button
-          variant="none"
-          size="icon"
-          className="ml-2"
+          variant='none'
+          size='auto'
+          className='gap-3 text-xl'
           onClick={() => {
             setElements([
               ...elements,
               {
-                "slide-id": `slide-${currentSlideIndex}`,
-                id: `text-input-${elements.length}`,
-                type: "text-node",
-                content: "New Text",
+                'slide-id': `slide-${currentSlideIndex}`,
+                id: `text-node-${elements.length}`,
+                type: 'text-node',
+                content: 'New Text',
                 spacing: {
                   x: 500,
                   y: 250,
@@ -69,22 +83,24 @@ export const HomeView = () => {
                   height: 100,
                 },
               },
-            ]);
+            ])
           }}
         >
+          <TypeIcon className='mb-[2px] !size-6' />
           Add Text
         </Button>
 
         <Controller
           control={control}
-          name="image"
+          name='image'
           render={({ field: { name, onBlur, ref, disabled } }) => {
             return (
               <>
                 <label
-                  htmlFor="image-upload"
-                  className="text-sm cursor-pointer"
+                  htmlFor='image-upload'
+                  className='inline-flex cursor-pointer items-center gap-3 text-xl'
                 >
+                  <ImagePlusIcon className='mb-[2px] size-6' />
                   Add Image
                 </label>
                 <Input
@@ -92,30 +108,30 @@ export const HomeView = () => {
                   onBlur={onBlur}
                   ref={ref}
                   disabled={disabled}
-                  onChange={(evt) =>
-                    evt.target.files && setValue("image", evt.target.files?.[0])
+                  onChange={evt =>
+                    evt.target.files && setValue('image', evt.target.files?.[0])
                   }
-                  type="file"
-                  className="hidden"
-                  id="image-upload"
+                  type='file'
+                  className='hidden'
+                  id='image-upload'
                 />
               </>
-            );
+            )
           }}
         />
 
         <Button
-          variant="none"
-          size="icon"
-          className="ml-2"
+          variant='none'
+          size='auto'
+          className='gap-3 text-xl'
           onClick={() => {
             setElements([
               ...elements,
               {
-                "slide-id": `slide-${currentSlideIndex}`,
-                id: `flip-text-${elements.length}`,
-                type: "flip-words-node",
-                content: "",
+                'slide-id': `slide-${currentSlideIndex}`,
+                id: `flip-words-node-${elements.length}`,
+                type: 'flip-words-node',
+                content: '',
                 spacing: {
                   x: 500,
                   y: 250,
@@ -125,13 +141,42 @@ export const HomeView = () => {
                   height: 100,
                 },
               },
-            ]);
+            ])
           }}
         >
+          <ScrollTextIcon className='mb-[2px] !size-6' />
           Add flipped text
+        </Button>
+
+        <Button
+          variant='none'
+          size='auto'
+          className='gap-3 text-xl'
+          onClick={() => {
+            setElements([
+              ...elements,
+              {
+                'slide-id': `slide-${currentSlideIndex}`,
+                id: `text-highlight-node-${elements.length}`,
+                type: 'text-highlight-node',
+                content: 'Sample text',
+                spacing: {
+                  x: 500,
+                  y: 250,
+                },
+                size: {
+                  width: 300,
+                  height: 100,
+                },
+              },
+            ])
+          }}
+        >
+          <HighlighterIcon className='mb-[2px] !size-6' />
+          Add highlighted text
         </Button>
       </div>
       <PresentationWrapper />
     </>
-  );
-};
+  )
+}

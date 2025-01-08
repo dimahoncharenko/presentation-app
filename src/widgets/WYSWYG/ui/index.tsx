@@ -11,12 +11,13 @@ import TextAlign from "@tiptap/extension-text-align";
 
 import classes from "./classes.module.css";
 
-import { memo, useEffect } from "react";
+import { memo, useEffect, useRef } from "react";
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuPortal,
   ContextMenuSeparator,
   ContextMenuSub,
   ContextMenuSubContent,
@@ -76,7 +77,7 @@ export const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
   }, [content, editor]);
 
   return (
-    <ContextMenu modal>
+    <ContextMenu>
       <ContextMenuTrigger>
         <EditorContent className={classes.editor} editor={editor} />
       </ContextMenuTrigger>
@@ -84,11 +85,12 @@ export const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
         <ContextMenuSub>
           <ContextMenuSubTrigger inset>Colors</ContextMenuSubTrigger>
           <ContextMenuSubContent>
-            <ContextMenuItem className="flex-col ">
+            <ContextMenuItem className="flex-col relative">
               {editor && <ColorPicker editor={editor} />}
             </ContextMenuItem>
           </ContextMenuSubContent>
         </ContextMenuSub>
+
         <ContextMenuItem inset>
           <ToggleGroup type="multiple">
             <ToggleGroupItem
