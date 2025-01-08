@@ -52,7 +52,7 @@ export const HomeView = () => {
       ])
       reset()
     }
-  }, [image])
+  }, [image, setElements, elements, currentSlideIndex])
 
   return (
     <>

@@ -1,41 +1,42 @@
-"use client";
+'use client'
 
-import { SlideElement } from "@/entities/DroppedElement/model/types";
-import { Draggable } from "../../Draggable/ui";
-import Image from "next/image";
-import { useDndMonitor } from "@dnd-kit/core";
-import { useContext, useEffect, useState } from "react";
-import { SlideElementsContext } from "@/shared/context/slide-elements-context";
+import { useContext, useEffect, useState } from 'react'
+import Image from 'next/image'
+import { SlideElementsContext } from '@/shared/context/slide-elements-context'
+import { useDndMonitor } from '@dnd-kit/core'
+
+import { SlideElement } from '@/entities/SlideElement/model/types'
+import { Draggable } from '../../Draggable/ui'
 
 type Props = {
-  element: SlideElement;
-  handleRemove: () => void;
-};
+  element: SlideElement
+  handleRemove: () => void
+}
 
 export const DraggableImage = ({ element }: Props) => {
-  const { setElements } = useContext(SlideElementsContext);
-  const [state, setState] = useState(element);
+  const { setElements } = useContext(SlideElementsContext)
+  const [state, setState] = useState(element)
 
   useDndMonitor({
     onDragEnd(event) {
-      setElements((prev) =>
-        prev.map((el) => {
+      setElements(prev =>
+        prev.map(el => {
           if (el.id === event.active.id && event.active.id === element.id) {
             el.spacing = {
               x: el.spacing.x + event.delta.x,
               y: el.spacing.y + event.delta.y,
-            };
+            }
           }
 
-          return el;
-        })
-      );
+          return el
+        }),
+      )
     },
-  });
+  })
 
   useEffect(() => {
-    setState({ ...element });
-  }, [element.spacing.x, element.spacing.y, element.id]);
+    setState({ ...element })
+  }, [element.spacing.x, element.spacing.y, element.id])
 
   return (
     <>
@@ -57,5 +58,5 @@ export const DraggableImage = ({ element }: Props) => {
         </div>
       </Draggable>
     </>
-  );
-};
+  )
+}

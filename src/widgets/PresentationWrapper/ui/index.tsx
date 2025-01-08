@@ -62,7 +62,7 @@ export const PresentationWrapper = () => {
     if (!deckRef.current && deckDivRef.current) {
       setDeckRef(deckDivRef)
     }
-  }, [deckDivRef.current])
+  }, [deckDivRef.current, deckRef.current])
 
   const handleDelete = (id: string) => {
     setElements(prev => prev.filter(e => e.id !== id))
