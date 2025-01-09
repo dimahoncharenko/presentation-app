@@ -149,7 +149,7 @@ const DraggableResizable = memo(({ initialPosition, ...rest }: Props) => {
       draggableRef.current.style.height = `${size.height}px`
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size.height, size.width, draggableRef.current])
+  }, [size.height, size.width, draggableRef.current, rest.type])
 
   // It's used to calculate the natural size of the draggable only while mounting
   useEffect(() => {
@@ -162,15 +162,19 @@ const DraggableResizable = memo(({ initialPosition, ...rest }: Props) => {
 
       if (child.tagName === 'IMG') {
         const img = child as HTMLImageElement
+
         newSize = {
           width: img.naturalWidth,
           height: img.naturalHeight,
         }
+
+        console.log('IMG', newSize)
       } else {
         const rect = child.getBoundingClientRect()
+
         newSize = {
-          width: Math.max(rect.width, 150),
-          height: Math.max(rect.height, 36),
+          width: Math.max(rect.width, 200),
+          height: Math.max(rect.height, 50),
         }
       }
 
@@ -188,7 +192,7 @@ const DraggableResizable = memo(({ initialPosition, ...rest }: Props) => {
   return (
     <div
       ref={draggableRef}
-      className={cn('absolute inline-block overflow-hidden')}
+      className={cn('absolute inline-block')}
       aria-label='draggable-resizable'
       onDoubleClick={() => setGrabbed(true)}
       style={{
@@ -200,7 +204,12 @@ const DraggableResizable = memo(({ initialPosition, ...rest }: Props) => {
         height: `${size.height}px`,
       }}
     >
-      <div className={cn(!grabbed && 'pointer-events-none')}>
+      <div
+        className={cn(
+          'relative h-full w-full overflow-hidden',
+          !grabbed && 'pointer-events-none',
+        )}
+      >
         <div
           onMouseDown={handleMouseDown}
           className='absolute -left-2 top-1 z-10 cursor-move opacity-0 hover:opacity-100'

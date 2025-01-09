@@ -63,7 +63,7 @@ export const PresentationWrapper = () => {
       setDeckRef(deckDivRef)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deckDivRef.current])
+  }, [deckDivRef.current, deckRef.current])
 
   const handleDelete = (id: string) => {
     setElements(prev => prev.filter(e => e.id !== id))
@@ -110,7 +110,7 @@ export const PresentationWrapper = () => {
                           >
                             <Image
                               src={el.content}
-                              className='absolute !m-0 !max-h-full !max-w-full select-none'
+                              className='!m-0 !max-h-full !max-w-full select-none'
                               fill
                               alt={el.id}
                             />
