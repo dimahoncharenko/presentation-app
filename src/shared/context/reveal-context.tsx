@@ -58,7 +58,7 @@ export const RevealProvider = ({ children, deckElRef }: Props) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deckElRef_?.current, deckRef.current])
+  }, [deckElRef_?.current])
 
   useEffect(() => {
     if (deckRef.current) {

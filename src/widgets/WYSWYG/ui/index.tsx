@@ -1,6 +1,15 @@
 'use client'
 
-import { memo, useEffect } from 'react'
+import { memo, useState } from 'react'
+import {
+  IconAlignCenter,
+  IconAlignJustified,
+  IconAlignLeft,
+  IconAlignRight,
+} from '@tabler/icons-react'
+import { Editor, EditorContent } from '@tiptap/react'
+import { Bold, Italic, Underline } from 'lucide-react'
+
 import {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -16,60 +25,17 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from '@/shared/ui/bricks/common/toggle-group'
-import {
-  IconAlignCenter,
-  IconAlignJustified,
-  IconAlignLeft,
-  IconAlignRight,
-} from '@tabler/icons-react'
-import { Color } from '@tiptap/extension-color'
-import { FontFamily } from '@tiptap/extension-font-family'
-import TextAlign from '@tiptap/extension-text-align'
-import TextStyle from '@tiptap/extension-text-style'
-import UnderlineExtension from '@tiptap/extension-underline'
-import { EditorContent, useEditor, UseEditorOptions } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import { Bold, Italic, Underline } from 'lucide-react'
-
 import { cn } from '@/shared/lib/cn-merge'
-import { FontSize } from '../lib/FontSizeExtension'
 import classes from './classes.module.css'
 import { ColorPicker } from './ColorPicker'
 
-const extensions = [
-  StarterKit,
-  Color,
-  FontFamily,
-  UnderlineExtension,
-  FontSize,
-  TextAlign.configure({
-    types: ['heading', 'paragraph'],
-  }),
-  TextStyle.configure({ mergeNestedSpanStyles: true }),
-]
-
 type Props = {
   content: string
-  onChange: (content: string) => void
-} & Partial<UseEditorOptions>
+  editor: Editor | null
+}
 
-const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
-  const editor = useEditor({
-    extensions,
-    content,
-    immediatelyRender: false,
-    editable: true,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
-    },
-    ...editorProps,
-  })
-
-  useEffect(() => {
-    if (editor) {
-      editor.commands.setContent(content)
-    }
-  }, [content, editor])
+const WYSWYG = memo(({ editor }: Props) => {
+  const [paletteOpened, setPaletteOpened] = useState(true)
 
   return (
     <ContextMenu>
@@ -77,21 +43,26 @@ const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
         <EditorContent className={classes.editor} editor={editor} />
       </ContextMenuTrigger>
       <ContextMenuContent className='w-64'>
-        <ContextMenuSub>
+        <ContextMenuSub open={paletteOpened} onOpenChange={setPaletteOpened}>
           <ContextMenuSubTrigger inset>Colors</ContextMenuSubTrigger>
-          <ContextMenuSubContent>
-            <ContextMenuItem className='relative flex-col'>
+          <ContextMenuSubContent onPointerDownOutside={console.log}>
+            <ContextMenuItem
+              className='relative flex-col'
+              onSelect={e => e.preventDefault()}
+            >
               {editor && <ColorPicker editor={editor} />}
             </ContextMenuItem>
           </ContextMenuSubContent>
         </ContextMenuSub>
 
-        <ContextMenuItem inset>
+        <ContextMenuItem inset onSelect={e => e.preventDefault()}>
           <ToggleGroup type='multiple'>
             <ToggleGroupItem
               value='bold'
               aria-label='Toggle bold'
-              onMouseDownCapture={() => editor?.commands.toggleBold()}
+              onMouseDownCapture={() =>
+                editor?.chain().focus().toggleBold().run()
+              }
               className={cn(
                 editor?.isActive('bold') && 'bg-black bg-opacity-5',
               )}
@@ -102,7 +73,7 @@ const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
               value='italic'
               aria-label='Toggle italic'
               onMouseDownCapture={() => {
-                editor?.commands.toggleItalic()
+                editor?.chain().focus().toggleItalic().run()
               }}
               className={cn(
                 editor?.isActive('italic') && 'bg-black bg-opacity-5',
@@ -114,7 +85,7 @@ const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
               value='underline'
               aria-label='Toggle underline'
               onMouseDownCapture={() => {
-                editor?.commands.toggleUnderline()
+                editor?.chain().focus().toggleUnderline().run()
               }}
               className={cn(
                 editor?.isActive('underline') && 'bg-black bg-opacity-5',
@@ -129,6 +100,7 @@ const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
           <ContextMenuSubTrigger inset>Fonts</ContextMenuSubTrigger>
           <ContextMenuSubContent className='w-48'>
             <ContextMenuItem
+              onSelect={e => e.preventDefault()}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('Arial')
               }}
@@ -136,6 +108,7 @@ const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
               Arial
             </ContextMenuItem>
             <ContextMenuItem
+              onSelect={e => e.preventDefault()}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('monospace')
               }}
@@ -143,6 +116,7 @@ const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
               Monospace
             </ContextMenuItem>
             <ContextMenuItem
+              onSelect={e => e.preventDefault()}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('cursive')
               }}
@@ -150,6 +124,7 @@ const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
               Cursive
             </ContextMenuItem>
             <ContextMenuItem
+              onSelect={e => e.preventDefault()}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('fantasy')
               }}
@@ -157,6 +132,7 @@ const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
               Fantasy
             </ContextMenuItem>
             <ContextMenuItem
+              onSelect={e => e.preventDefault()}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('sans-serif')
               }}
@@ -164,6 +140,7 @@ const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
               Sans Serif
             </ContextMenuItem>
             <ContextMenuItem
+              onSelect={e => e.preventDefault()}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('Geist Mono')
               }}
@@ -173,7 +150,7 @@ const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
           </ContextMenuSubContent>
         </ContextMenuSub>
         <ContextMenuSeparator />
-        <ContextMenuCheckboxItem>
+        <ContextMenuCheckboxItem onSelect={e => e.preventDefault()}>
           <ToggleGroup
             defaultValue='left'
             type='single'

@@ -1,29 +1,27 @@
-import { Editor } from "@tiptap/react";
-import { useEffect, useState } from "react";
-import { HexColorPicker } from "react-colorful";
-import { useDebounceValue } from "usehooks-ts";
+import { useEffect, useState } from 'react'
+import { Editor } from '@tiptap/react'
+import { HexColorPicker } from 'react-colorful'
 
 type Props = {
-  editor: Editor;
-};
+  editor: Editor
+}
 
 export const ColorPicker = ({ editor }: Props) => {
-  const [color, setColor] = useState("");
-  const [debouncedColor] = useDebounceValue(color, 200);
+  const [color, setColor] = useState('')
 
   useEffect(() => {
-    editor.commands.setColor(debouncedColor);
-  }, [editor, debouncedColor]);
+    editor.chain().setColor(color).run()
+  }, [editor, color])
 
   const handleChange = (newColor: string) => {
-    setColor(newColor);
-  };
+    setColor(newColor)
+  }
 
   return (
     <HexColorPicker
-      className="absolute top-0"
+      className='absolute top-0'
       color={color}
-      onChange={(color) => handleChange(color)}
+      onChange={color => handleChange(color)}
     />
-  );
-};
+  )
+}
