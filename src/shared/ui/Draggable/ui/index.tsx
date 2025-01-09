@@ -1,19 +1,20 @@
-"use client";
+'use client'
 
-import { DroppedElement } from "@/entities/DroppedElement/model/types";
-import { useDraggable } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
-import { CSSProperties, DetailedHTMLProps, HTMLAttributes } from "react";
+import { CSSProperties, DetailedHTMLProps, HTMLAttributes } from 'react'
+import { useDraggable } from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
+
+import { SlideElement } from '@/entities/SlideElement/model/types'
 
 type Props = {
-  id: string;
-  element?: DroppedElement;
+  id: string
+  element?: SlideElement
   children: React.ReactElement<
     DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>
-  >;
-  disabled?: boolean;
-  style?: CSSProperties;
-};
+  >
+  disabled?: boolean
+  style?: CSSProperties
+}
 
 export const Draggable = ({
   children,
@@ -26,24 +27,24 @@ export const Draggable = ({
     id: element?.id ?? id,
     disabled,
     data: {
-      slideId: element?.["slide-id"],
+      slideId: element?.['slide-id'],
       nodeType: element?.type,
       content: element?.content,
     },
-  });
+  })
 
   const definedStyles: CSSProperties | undefined = transform
     ? {
         transform: CSS.Translate.toString(transform),
-        position: "relative",
+        position: 'relative',
         zIndex: 100000,
         ...style,
       }
-    : style;
+    : style
 
   return (
     <div ref={setNodeRef} style={definedStyles} {...attributes} {...listeners}>
       {children}
     </div>
-  );
-};
+  )
+}

@@ -1,15 +1,15 @@
-import { DroppedElement } from "../model/types";
+import { SlideElement } from '../model/types'
 
-export const groupBySlideId = (elements: DroppedElement[]) => {
-  const groupedSlides: { [P in string]: DroppedElement[] } = {};
+export const groupBySlideId = (elements: SlideElement[]) => {
+  const groupedSlides: { [P in string]: SlideElement[] } = {}
 
-  elements.forEach((element) => {
-    const slideId = element["slide-id"];
+  elements.forEach(element => {
+    const slideId = element['slide-id']
     if (!groupedSlides[slideId]) {
-      groupedSlides[slideId] = [];
+      groupedSlides[slideId] = []
     }
-    groupedSlides[slideId].push(element);
-  });
+    groupedSlides[slideId].push(element)
+  })
 
-  return groupedSlides;
-};
+  return groupedSlides
+}

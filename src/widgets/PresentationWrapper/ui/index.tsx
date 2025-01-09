@@ -2,18 +2,17 @@
 
 import React, { useContext, useEffect, useRef } from 'react'
 import Image from 'next/image'
+import { PanelLeft } from 'lucide-react'
+
+import { DraggableResizable } from '@/widgets/DraggableResizable'
+import { Slide } from '@/entities/Slide/ui'
+import { EditableFlipWords, EditableText } from '@/entities/SlideElement'
+import { groupBySlideId } from '@/entities/SlideElement/lib'
+import { Button } from '@/shared/ui/bricks/common/Button'
+import { TextHighlight } from '@/shared/ui/bricks/featured/TextHighlight'
 import { AppStateContext } from '@/shared/context/app-state-context'
 import { RevealContext } from '@/shared/context/reveal-context'
 import { SlideElementsContext } from '@/shared/context/slide-elements-context'
-import { DraggableResizable } from '@/shared/ui/DraggableResizable'
-import { EditableFlipWords } from '@/shared/ui/EditableFlipWords'
-import { EditableText } from '@/shared/ui/EditableText'
-import { PanelLeft } from 'lucide-react'
-
-import { Slide } from '@/entities/Slide/ui'
-import { groupBySlideId } from '@/entities/SlideElement/lib'
-import { Button } from '@/shared/ui/common/aceternity/Button'
-import { TextHighlight } from '@/shared/ui/common/aceternity/TextHighlight'
 import { cn } from '@/shared/lib/cn-merge'
 
 export const PresentationWrapper = () => {
@@ -56,13 +55,15 @@ export const PresentationWrapper = () => {
         bg: 'white',
       },
     ])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (!deckRef.current && deckDivRef.current) {
       setDeckRef(deckDivRef)
     }
-  }, [deckDivRef.current, deckRef.current])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deckDivRef.current])
 
   const handleDelete = (id: string) => {
     setElements(prev => prev.filter(e => e.id !== id))
@@ -103,7 +104,10 @@ export const PresentationWrapper = () => {
                     return (
                       <React.Fragment key={index}>
                         {el.type === 'image-node' ? (
-                          <DraggableResizable initialPosition={el.spacing}>
+                          <DraggableResizable
+                            type='common'
+                            initialPosition={el.spacing}
+                          >
                             <Image
                               src={el.content}
                               className='absolute !m-0 !max-h-full !max-w-full select-none'
@@ -132,13 +136,19 @@ export const PresentationWrapper = () => {
                             }}
                           />
                         ) : el.type === 'text-highlight-node' ? (
-                          <DraggableResizable initialPosition={el.spacing}>
+                          <DraggableResizable
+                            type='common'
+                            initialPosition={el.spacing}
+                          >
                             <p className='text-black'>
                               <TextHighlight>{el.content}</TextHighlight>
                             </p>
                           </DraggableResizable>
                         ) : (
-                          <DraggableResizable initialPosition={el.spacing}>
+                          <DraggableResizable
+                            type='common'
+                            initialPosition={el.spacing}
+                          >
                             <EditableFlipWords
                               initialValue={el.content}
                               handleDelete={() => {

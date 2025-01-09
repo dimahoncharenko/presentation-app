@@ -1,70 +1,71 @@
-"use client";
+'use client'
 
 import {
+  createContext,
   Dispatch,
   SetStateAction,
-  createContext,
   useEffect,
   useRef,
   useState,
-} from "react";
-import Reveal from "reveal.js";
+} from 'react'
+import Reveal from 'reveal.js'
 
-import "reveal.js/dist/reveal.css";
-import "reveal.js/dist/theme/black.css";
-import "reveal.js-plugins/chalkboard/plugin";
-import "reveal.js-plugins/customcontrols/plugin";
+import 'reveal.js/dist/reveal.css'
+import 'reveal.js/dist/theme/black.css'
+import 'reveal.js-plugins/chalkboard/plugin'
+import 'reveal.js-plugins/customcontrols/plugin'
 
 type RevealContext = {
-  deckRef: React.RefObject<Reveal.Api | null>;
-  setDeckRef: (el: React.RefObject<HTMLDivElement> | null) => void;
-  setOptions: Dispatch<SetStateAction<Reveal.Options>>;
-};
+  deckRef: React.RefObject<Reveal.Api | null>
+  setDeckRef: (el: React.RefObject<HTMLDivElement> | null) => void
+  setOptions: Dispatch<SetStateAction<Reveal.Options>>
+}
 
-export const RevealContext = createContext({} as RevealContext);
+export const RevealContext = createContext({} as RevealContext)
 
 type Props = {
-  children: React.ReactNode;
-  deckElRef?: React.RefObject<HTMLDivElement>;
-};
+  children: React.ReactNode
+  deckElRef?: React.RefObject<HTMLDivElement>
+}
 
 export const RevealProvider = ({ children, deckElRef }: Props) => {
   const [deckElRef_, setDeckElRef] =
-    useState<React.RefObject<HTMLDivElement> | null>(deckElRef ?? null);
-  const deckRef = useRef<Reveal.Api | null>(null);
+    useState<React.RefObject<HTMLDivElement> | null>(deckElRef ?? null)
+  const deckRef = useRef<Reveal.Api | null>(null)
   const [options, setOptions] = useState<Reveal.Options>({
-    width: "100%",
-    height: "100%",
-    transition: "concave",
+    width: '100%',
+    height: '100%',
+    transition: 'concave',
     plugins: [window.RevealChalkboard, window.RevealCustomControls],
-  });
+  })
 
   useEffect(() => {
-    if (!deckElRef_?.current) return;
-    if (deckRef.current) return;
+    if (!deckElRef_?.current) return
+    if (deckRef.current) return
 
-    deckRef.current = new Reveal();
+    deckRef.current = new Reveal()
 
-    deckRef.current.initialize(options);
+    deckRef.current.initialize(options)
 
     return () => {
       try {
         if (deckRef.current) {
-          deckRef.current.destroy();
-          deckRef.current = null;
+          deckRef.current.destroy()
+          deckRef.current = null
         }
       } catch (e) {
-        console.warn("Reveal.js destroy call failed: ", e);
+        console.warn('Reveal.js destroy call failed: ', e)
       }
-    };
-  }, [deckElRef_?.current]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deckElRef_?.current, deckRef.current])
 
   useEffect(() => {
     if (deckRef.current) {
-      deckRef.current.configure(options);
-      console.log("Options changed");
+      deckRef.current.configure(options)
+      console.log('Options changed')
     }
-  }, [options]);
+  }, [options])
 
   return (
     <RevealContext.Provider
@@ -72,5 +73,5 @@ export const RevealProvider = ({ children, deckElRef }: Props) => {
     >
       {children}
     </RevealContext.Provider>
-  );
-};
+  )
+}
