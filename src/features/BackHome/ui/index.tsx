@@ -1,17 +1,18 @@
-"use client";
+'use client'
 
-import { SlideLink } from "@/shared/ui/SlideLink";
-import { Button } from "@/shared/ui/common/aceternity/Button";
+import { Button } from '@/shared/ui/bricks/common/Button'
+
+import { SlideLink } from '@/entities/SlideElement/ui/slide-link'
 
 export const BackHome = () => {
   return (
-    <Button asChild variant="link">
+    <Button asChild variant='link'>
       <SlideLink
-        href="#/0"
-        className="z-10 fixed bottom-[0] left-[0] text-lg -translate-y-16"
+        href='#/0'
+        className='fixed bottom-[0] left-[0] z-10 -translate-y-16 text-lg'
       >
         Back Home
       </SlideLink>
     </Button>
-  );
-};
+  )
+}

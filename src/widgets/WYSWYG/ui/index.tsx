@@ -2,6 +2,21 @@
 
 import { memo, useEffect } from 'react'
 import {
+  ContextMenu,
+  ContextMenuCheckboxItem,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from '@/shared/ui/bricks/common/context-menu'
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from '@/shared/ui/bricks/common/toggle-group'
+import {
   IconAlignCenter,
   IconAlignJustified,
   IconAlignLeft,
@@ -16,21 +31,6 @@ import { EditorContent, useEditor, UseEditorOptions } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Bold, Italic, Underline } from 'lucide-react'
 
-import {
-  ContextMenu,
-  ContextMenuCheckboxItem,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuTrigger,
-} from '@/shared/ui/common/bricks/context-menu'
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from '@/shared/ui/common/bricks/toggle-group'
 import { cn } from '@/shared/lib/cn-merge'
 import { FontSize } from '../lib/FontSizeExtension'
 import classes from './classes.module.css'
@@ -53,7 +53,7 @@ type Props = {
   onChange: (content: string) => void
 } & Partial<UseEditorOptions>
 
-export const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
+const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
   const editor = useEditor({
     extensions,
     content,
@@ -221,3 +221,7 @@ export const WYSWYG = memo(({ content, onChange, ...editorProps }: Props) => {
     </ContextMenu>
   )
 })
+
+WYSWYG.displayName = 'WYSWYG'
+
+export { WYSWYG }
