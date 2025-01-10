@@ -105,6 +105,7 @@ export const PresentationWrapper = () => {
                       <React.Fragment key={index}>
                         {el.type === 'image-node' ? (
                           <DraggableResizable
+                            onDelete={() => handleDelete(el.id)}
                             type='common'
                             initialPosition={el.spacing}
                           >
@@ -118,6 +119,7 @@ export const PresentationWrapper = () => {
                         ) : el.type === 'text-node' ? (
                           <EditableText
                             element={el}
+                            onDelete={() => handleDelete(el.id)}
                             onChange={value => {
                               if (!value) return
 
@@ -137,6 +139,7 @@ export const PresentationWrapper = () => {
                           />
                         ) : el.type === 'text-highlight-node' ? (
                           <DraggableResizable
+                            onDelete={() => handleDelete(el.id)}
                             type='common'
                             initialPosition={el.spacing}
                           >
@@ -146,14 +149,12 @@ export const PresentationWrapper = () => {
                           </DraggableResizable>
                         ) : (
                           <DraggableResizable
+                            onDelete={() => handleDelete(el.id)}
                             type='common'
                             initialPosition={el.spacing}
                           >
                             <EditableFlipWords
                               initialValue={el.content}
-                              handleDelete={() => {
-                                handleDelete(el.id)
-                              }}
                               handleSubmit={words => {
                                 if (words.trim()) {
                                   setElements(prev =>
