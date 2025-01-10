@@ -1,16 +1,12 @@
 'use client'
 
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { PanelLeft } from 'lucide-react'
 
 import { DraggableResizable } from '@/widgets/DraggableResizable'
 import { Slide } from '@/entities/Slide/ui'
-import {
-  EditableFlipWords,
-  EditableText,
-  SlideElement,
-} from '@/entities/SlideElement'
+import { EditableFlipWords, EditableText } from '@/entities/SlideElement'
 import { groupBySlideId } from '@/entities/SlideElement/lib'
 import { Button } from '@/shared/ui/bricks/common/Button'
 import { TextHighlight } from '@/shared/ui/bricks/featured/TextHighlight'
@@ -36,6 +32,7 @@ export const PresentationWrapper = () => {
     if (deckRef.current) {
       deckRef.current.slide(0)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deckRef.current])
 
   const handleDelete = (id: string) => {
