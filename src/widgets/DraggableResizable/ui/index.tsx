@@ -215,7 +215,7 @@ const DraggableResizable = memo(
       >
         <div
           className={cn(
-            'absolute -top-4 hidden w-full rounded-t-lg bg-white',
+            'absolute -top-4 hidden w-full rounded-t-lg bg-white px-1',
             grabbed && 'flex items-center justify-between',
           )}
         >
@@ -259,7 +259,7 @@ const DraggableResizable = memo(
           <div
             onMouseDown={e => handleResizeMouseDown(e, 'sw')}
             aria-label='draggable-resizable-resizer-sw'
-            className='sw absolute -bottom-[2px] -left-[2px] z-10 size-[10px] cursor-sw-resize rounded-full'
+            className='sw absolute -bottom-[0px] -left-[8px] z-10 size-[10px] cursor-sw-resize rounded-full'
           ></div>
           <div
             ref={contentRef}
