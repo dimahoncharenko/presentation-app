@@ -22,6 +22,7 @@
     "^@/shared/config/(.*)$",
     "^@/shared/context/(.*)$",
     "^@/shared/lib/(.*)$",
+    "^@/shared/constants/(.*)$",
     "^[.]",
     "^(?!.*[.]css$)[./].*$",
     ".css$"

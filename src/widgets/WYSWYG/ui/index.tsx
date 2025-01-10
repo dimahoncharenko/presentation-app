@@ -28,10 +28,15 @@ import {
 import { cn } from '@/shared/lib/cn-merge'
 import classes from './classes.module.css'
 import { ColorPicker } from './ColorPicker'
+import { FancyRewriter } from './FancyRewriter'
 
 type Props = {
   content: string
   editor: Editor | null
+}
+
+const handleSelect = (e: Event) => {
+  e.preventDefault()
 }
 
 const WYSWYG = memo(({ editor }: Props) => {
@@ -44,18 +49,18 @@ const WYSWYG = memo(({ editor }: Props) => {
       </ContextMenuTrigger>
       <ContextMenuContent className='w-64'>
         <ContextMenuSub open={paletteOpened} onOpenChange={setPaletteOpened}>
-          <ContextMenuSubTrigger inset>Colors</ContextMenuSubTrigger>
+          <ContextMenuSubTrigger inset>Set Color</ContextMenuSubTrigger>
           <ContextMenuSubContent onPointerDownOutside={console.log}>
             <ContextMenuItem
               className='relative flex-col'
-              onSelect={e => e.preventDefault()}
+              onSelect={handleSelect}
             >
               {editor && <ColorPicker editor={editor} />}
             </ContextMenuItem>
           </ContextMenuSubContent>
         </ContextMenuSub>
 
-        <ContextMenuItem inset onSelect={e => e.preventDefault()}>
+        <ContextMenuItem inset onSelect={handleSelect}>
           <ToggleGroup type='multiple'>
             <ToggleGroupItem
               value='bold'
@@ -97,10 +102,10 @@ const WYSWYG = memo(({ editor }: Props) => {
         </ContextMenuItem>
 
         <ContextMenuSub>
-          <ContextMenuSubTrigger inset>Fonts</ContextMenuSubTrigger>
+          <ContextMenuSubTrigger inset>Set Font</ContextMenuSubTrigger>
           <ContextMenuSubContent className='w-48'>
             <ContextMenuItem
-              onSelect={e => e.preventDefault()}
+              onSelect={handleSelect}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('Arial')
               }}
@@ -108,7 +113,7 @@ const WYSWYG = memo(({ editor }: Props) => {
               Arial
             </ContextMenuItem>
             <ContextMenuItem
-              onSelect={e => e.preventDefault()}
+              onSelect={handleSelect}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('monospace')
               }}
@@ -116,7 +121,7 @@ const WYSWYG = memo(({ editor }: Props) => {
               Monospace
             </ContextMenuItem>
             <ContextMenuItem
-              onSelect={e => e.preventDefault()}
+              onSelect={handleSelect}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('cursive')
               }}
@@ -124,7 +129,7 @@ const WYSWYG = memo(({ editor }: Props) => {
               Cursive
             </ContextMenuItem>
             <ContextMenuItem
-              onSelect={e => e.preventDefault()}
+              onSelect={handleSelect}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('fantasy')
               }}
@@ -132,7 +137,7 @@ const WYSWYG = memo(({ editor }: Props) => {
               Fantasy
             </ContextMenuItem>
             <ContextMenuItem
-              onSelect={e => e.preventDefault()}
+              onSelect={handleSelect}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('sans-serif')
               }}
@@ -140,7 +145,7 @@ const WYSWYG = memo(({ editor }: Props) => {
               Sans Serif
             </ContextMenuItem>
             <ContextMenuItem
-              onSelect={e => e.preventDefault()}
+              onSelect={handleSelect}
               onMouseDownCapture={() => {
                 editor?.commands.setFontFamily('Geist Mono')
               }}
@@ -150,7 +155,7 @@ const WYSWYG = memo(({ editor }: Props) => {
           </ContextMenuSubContent>
         </ContextMenuSub>
         <ContextMenuSeparator />
-        <ContextMenuCheckboxItem onSelect={e => e.preventDefault()}>
+        <ContextMenuCheckboxItem onSelect={handleSelect}>
           <ToggleGroup
             defaultValue='left'
             type='single'
@@ -194,6 +199,10 @@ const WYSWYG = memo(({ editor }: Props) => {
             </ToggleGroupItem>
           </ToggleGroup>
         </ContextMenuCheckboxItem>
+
+        <ContextMenuItem onSelect={handleSelect}>
+          {editor && <FancyRewriter editor={editor} />}
+        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   )
