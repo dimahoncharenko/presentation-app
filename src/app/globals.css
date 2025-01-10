@@ -91,5 +91,5 @@ body {
     0.2
   ); /* Semitransparent black */
 
-  @apply break-all py-[6px] px-[13px] h-full;
+  @apply break-all px-[13px] py-[6px];
 }
