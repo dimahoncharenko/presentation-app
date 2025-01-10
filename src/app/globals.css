@@ -85,11 +85,11 @@ body {
 
 .tiptap p {
   --r-selection-background-color: rgba(
-    255,
-    255,
-    255,
-    0.2
+    0,
+    0,
+    0,
+    0.1
   ); /* Semitransparent black */
 
-  @apply break-all px-[13px] py-[6px];
+  @apply break-all px-[13px] py-[6px] text-black;
 }
