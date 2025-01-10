@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, X } from 'lucide-react'
+import { Check } from 'lucide-react'
 
 import { Button } from '../../../shared/ui/bricks/common/Button'
 import { Input } from '../../../shared/ui/bricks/common/input'
@@ -7,15 +7,10 @@ import { FlipWords } from '../../../shared/ui/bricks/featured/FlipWords'
 
 type Props = {
   handleSubmit: (value: string) => void
-  handleDelete: () => void
   initialValue: string
 }
 
-export const EditableFlipWords = ({
-  handleSubmit,
-  handleDelete,
-  initialValue,
-}: Props) => {
+export const EditableFlipWords = ({ handleSubmit, initialValue }: Props) => {
   const [editable, setEditable] = useState(true)
   const [words, setWords] = useState(initialValue)
 
@@ -31,30 +26,18 @@ export const EditableFlipWords = ({
           }}
           placeholder='Separate words by commas'
         />
-        <div className='flex flex-col justify-between p-1'>
-          <Button
-            variant='none'
-            size='auto'
-            className='hover:text-green-300'
-            onClick={() => {
-              handleSubmit(words)
-              setEditable(false)
-            }}
-          >
-            <Check className='!size-3' />
-          </Button>
-          <Button
-            variant='none'
-            size='auto'
-            className='hover:text-red-400'
-            onClick={() => {
-              handleDelete()
-              setEditable(false)
-            }}
-          >
-            <X className='!size-3' />
-          </Button>
-        </div>
+
+        <Button
+          variant='none'
+          size='auto'
+          className='hover:text-green-300'
+          onClick={() => {
+            handleSubmit(words)
+            setEditable(false)
+          }}
+        >
+          <Check className='!size-3' />
+        </Button>
       </div>
     )
   }
