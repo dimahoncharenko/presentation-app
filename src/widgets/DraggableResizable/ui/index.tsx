@@ -86,7 +86,7 @@ const DraggableResizable = memo(
           <div
             className={cn(
               'absolute h-full min-h-max w-full break-all',
-              grabbed && 'border-2 border-dashed',
+              grabbed && 'border-2 border-dashed border-opacity-85',
             )}
           >
             {/* Resize handlers (corners) */}

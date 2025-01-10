@@ -1,11 +1,6 @@
 'use client'
 
 import { useContext, useEffect } from 'react'
-import { AppStateContext } from '@/shared/context/app-state-context'
-import { RevealContext } from '@/shared/context/reveal-context'
-import { SlideElementsContext } from '@/shared/context/slide-elements-context'
-import { Button } from '@/shared/ui/bricks/common/Button'
-import { Input } from '@/shared/ui/bricks/common/input'
 import {
   HighlighterIcon,
   ImagePlusIcon,
@@ -14,6 +9,11 @@ import {
 } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 
+import { Button } from '@/shared/ui/bricks/common/Button'
+import { Input } from '@/shared/ui/bricks/common/input'
+import { AppStateContext } from '@/shared/context/app-state-context'
+import { RevealContext } from '@/shared/context/reveal-context'
+import { SlideElementsContext } from '@/shared/context/slide-elements-context'
 import { cn } from '@/shared/lib/cn-merge'
 
 export const Sidenav = () => {

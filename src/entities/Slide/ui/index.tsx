@@ -1,26 +1,25 @@
-"use client";
+'use client'
 
-import { BackHome } from "@/features/BackHome";
+import React, { CSSProperties, ReactElement } from 'react'
 
-import React, { CSSProperties, ReactElement } from "react";
+import { BackHome } from '@/features/BackHome'
 
 type Props = Partial<{
-  bg: CSSProperties["color"];
-  videoBg: string;
-  enableBackHome: boolean;
-  state: string;
-  animateOnTheNextSlide: CSSProperties;
-  fragments: React.ReactElement[];
-
-  iframeBg: string;
+  bg: CSSProperties['color']
+  videoBg: string
+  enableBackHome: boolean
+  state: string
+  animateOnTheNextSlide: CSSProperties
+  fragments: React.ReactElement[]
+  iframeBg: string
 }> & {
-  children: ReactElement<React.HTMLAttributes<HTMLElement>>;
+  children: ReactElement<React.HTMLAttributes<HTMLElement>>
 } & Partial<
     Omit<
       React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
-      "children"
+      'children'
     >
-  >;
+  >
 
 export const Slide: React.FC<Props> = ({
   bg,
@@ -33,10 +32,10 @@ export const Slide: React.FC<Props> = ({
   enableBackHome = false,
   ...rest
 }) => {
-  const activeBgs = [videoBg, bg, iframeBg].filter((bg) => !!bg);
+  const activeBgs = [videoBg, bg, iframeBg].filter(bg => !!bg)
 
   if (activeBgs.length > 1) {
-    throw new Error("Multiple backgrounds aren't supported!");
+    throw new Error("Multiple backgrounds aren't supported!")
   }
 
   return (
@@ -69,5 +68,5 @@ export const Slide: React.FC<Props> = ({
         </section>
       )}
     </>
-  );
-};
+  )
+}
