@@ -157,7 +157,7 @@ const DraggableResizable = memo(
 
     // It's used to calculate the natural size of the draggable only while mounting
     useEffect(() => {
-      if (contentRef.current && draggableRef.current && !initialized) {
+      if (contentRef.current && draggableRef.current) {
         setInitialized(true)
 
         const child = contentRef.current.children[0] as HTMLElement
@@ -171,8 +171,6 @@ const DraggableResizable = memo(
             width: img.naturalWidth,
             height: img.naturalHeight,
           }
-
-          console.log('IMG', newSize)
         } else {
           const rect = child.getBoundingClientRect()
 
@@ -237,7 +235,7 @@ const DraggableResizable = memo(
         </div>
         <div
           className={cn(
-            'relative h-full w-full overflow-hidden',
+            'relative h-full w-full',
             !grabbed && 'pointer-events-none',
           )}
         >
@@ -264,7 +262,7 @@ const DraggableResizable = memo(
           <div
             ref={contentRef}
             className={cn(
-              'absolute h-full w-full break-all',
+              'absolute h-full min-h-max w-full break-all',
               grabbed && 'border-2 border-dashed',
             )}
             aria-label='draggable-resizable-resizer-content'
