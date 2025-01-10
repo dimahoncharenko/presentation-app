@@ -1,7 +1,7 @@
 'use client'
 
 import { memo, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react'
-import { GripHorizontal, GripVertical, Trash2 } from 'lucide-react'
+import { GripHorizontal, Trash2 } from 'lucide-react'
 import { useOnClickOutside } from 'usehooks-ts'
 
 import { cn } from '@/shared/lib/cn-merge'
@@ -196,7 +196,7 @@ const DraggableResizable = memo(
     return (
       <div
         ref={draggableRef}
-        className={cn('absolute inline-block')}
+        className='absolute inline-block'
         aria-label='draggable-resizable'
         onDoubleClick={() => setGrabbed(true)}
         onKeyUp={e => {
@@ -241,22 +241,6 @@ const DraggableResizable = memo(
             !grabbed && 'pointer-events-none',
           )}
         >
-          {/* <div
-            onMouseDown={handleMouseDown}
-            className='absolute -left-1 top-0 z-10 cursor-move opacity-0 hover:opacity-100'
-            aria-label='draggable-resizable-handler'
-          >
-            <GripVertical className='opacity-50' size={24} />
-          </div>
-
-          <div
-            onMouseDown={onDelete}
-            className='absolute right-1 top-1 z-10 cursor-move opacity-0 hover:opacity-100'
-            aria-label='draggable-resizable-handler'
-          >
-            <Trash2 className='opacity-50' size={16} />
-          </div> */}
-
           <div
             onMouseDown={e => handleResizeMouseDown(e, 'nw')}
             aria-label='draggable-resizable-resizer-nw'
