@@ -1,14 +1,28 @@
 'use client'
 
-import { useContext, useEffect } from 'react'
 import {
+  useContext,
+  useEffect,
+  // useState
+} from 'react'
+import {
+  Code,
   HighlighterIcon,
   ImagePlusIcon,
+  // Palette,
   ScrollTextIcon,
   TypeIcon,
+  Wrench,
 } from 'lucide-react'
+// import { HexColorPicker } from 'react-colorful'
 import { Controller, useForm } from 'react-hook-form'
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/shared/ui/bricks/common/accordion'
 import { Button } from '@/shared/ui/bricks/common/Button'
 import { Input } from '@/shared/ui/bricks/common/input'
 import { AppStateContext } from '@/shared/context/app-state-context'
@@ -20,10 +34,12 @@ export const Sidenav = () => {
   const { elements, setElements } = useContext(SlideElementsContext)
   const { deckRef } = useContext(RevealContext)
   const { openedSidenav } = useContext(AppStateContext)
+  // const [openedColorPicker, setOpenedColorPicker] = useState(false)
 
   const { setValue, control, watch, reset } = useForm({
     defaultValues: {
       image: null as null | File,
+      slideBg: 'white',
     },
   })
 
@@ -63,7 +79,7 @@ export const Sidenav = () => {
       <Button
         variant='none'
         size='auto'
-        className='gap-3 text-xl'
+        className='gap-3 text-lg'
         onClick={() => {
           setElements([
             ...elements,
@@ -72,6 +88,7 @@ export const Sidenav = () => {
               id: `text-node-${elements.length}`,
               type: 'text-node',
               content: 'New Text',
+              bg: 'red',
               spacing: {
                 x: 500,
                 y: 250,
@@ -96,7 +113,7 @@ export const Sidenav = () => {
             <>
               <label
                 htmlFor='image-upload'
-                className='inline-flex cursor-pointer items-center gap-3 text-xl'
+                className='inline-flex cursor-pointer items-center gap-3 text-lg'
               >
                 <ImagePlusIcon className='mb-[2px] size-6' />
                 Add Image
@@ -121,7 +138,7 @@ export const Sidenav = () => {
       <Button
         variant='none'
         size='auto'
-        className='gap-3 text-xl'
+        className='gap-3 text-lg'
         onClick={() => {
           setElements([
             ...elements,
@@ -149,7 +166,7 @@ export const Sidenav = () => {
       <Button
         variant='none'
         size='auto'
-        className='gap-3 text-xl'
+        className='gap-3 text-lg'
         onClick={() => {
           setElements([
             ...elements,
@@ -172,6 +189,99 @@ export const Sidenav = () => {
       >
         <HighlighterIcon className='mb-[2px] !size-6' />
         Add highlighted text
+      </Button>
+
+      {/* <Button
+        variant='none'
+        size='auto'
+        className='gap-3 break-all text-left text-lg/[1em]'
+        onClick={() => {
+          setOpenedColorPicker(!openedColorPicker)
+        }}
+      >
+        <Palette className='mb-[2px] !size-6' />
+        Slide background color
+      </Button>
+      <Controller
+        control={control}
+        name='slideBg'
+        render={({ field: { value, onChange, onBlur } }) => {
+          return (
+            <HexColorPicker
+              className={cn(
+                '!h-0 overflow-hidden px-3 transition-all',
+                openedColorPicker && '!h-44',
+              )}
+              color={value}
+              onBlur={onBlur}
+              onChange={onChange}
+            />
+          )
+        }}
+      /> */}
+
+      <Accordion type='single' collapsible className='w-full'>
+        <AccordionItem value='tools' className='border-0'>
+          <AccordionTrigger className='py-0 hover:no-underline'>
+            <p className='flex items-center gap-3 text-lg'>
+              <Wrench className='mb-[2px] !size-6' /> Other tools
+            </p>
+          </AccordionTrigger>
+          <AccordionContent className='pl-4'>
+            <Button
+              variant='none'
+              size='auto'
+              className='text-md gap-3 py-2'
+              onClick={() => {
+                setElements([
+                  ...elements,
+                  {
+                    'slide-id': `slide-${currentSlideIndex}`,
+                    id: `text-highlight-node-${elements.length}`,
+                    type: 'text-highlight-node',
+                    content: 'Sample text',
+                    spacing: {
+                      x: 500,
+                      y: 250,
+                    },
+                    size: {
+                      width: 300,
+                      height: 100,
+                    },
+                  },
+                ])
+              }}
+            >
+              <Code className='mb-[2px] !size-6' />
+              Add code snippet
+            </Button>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+      <Button
+        onClick={() => {
+          setElements(prev => [
+            ...prev,
+            {
+              'slide-id': `slide-${(currentSlideIndex || 0) + 1}`,
+              id: `text-node-${elements.length + 1}`,
+              bg: 'red',
+              type: 'text-node',
+              content: 'New Text',
+              spacing: {
+                x: window.innerWidth / 2 - 150,
+                y: window.innerHeight / 2 - 50,
+              },
+              size: {
+                width: 300,
+                height: 100,
+              },
+            },
+          ])
+        }}
+      >
+        Create a first slide +
       </Button>
     </div>
   )

@@ -28,18 +28,18 @@ export const PresentationWrapper = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deckDivRef.current, deckRef.current])
 
+  const groupedElements = Object.entries(groupBySlideId(elements))
+
   useEffect(() => {
     if (deckRef.current) {
       deckRef.current.slide(0)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deckRef.current])
+  }, [deckRef.current, elements])
 
   const handleDelete = (id: string) => {
     setElements(prev => prev.filter(e => e.id !== id))
   }
-
-  const groupedElements = Object.entries(groupBySlideId(elements))
 
   return (
     <>
@@ -64,10 +64,12 @@ export const PresentationWrapper = () => {
 
         <div className='slides'>
           {groupedElements.length ? (
-            groupedElements.map(([name, elements], index) => {
+            groupedElements.map(([name, elements]) => {
+              console.log('elements[0].bg: ', elements)
+
               return (
                 <Slide
-                  key={name + index}
+                  key={name}
                   style={{
                     width: '100%',
                     height: '100%',
@@ -162,16 +164,15 @@ export const PresentationWrapper = () => {
                 width: '100%',
                 height: '100%',
               }}
-              bg='white'
             >
               <div className='flex h-full items-center justify-center'>
                 <Button
                   onClick={() => {
-                    setElements(() => [
+                    setElements([
                       {
                         'slide-id': 'slide-0',
                         id: 'text-node-0',
-                        bg: 'red',
+                        bg: '#00ff00',
                         type: 'text-node',
                         content: 'New Text',
                         spacing: {
