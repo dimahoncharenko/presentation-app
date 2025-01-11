@@ -41,13 +41,13 @@ export const Slide: React.FC<Props> = ({
   return (
     <>
       <section
-        {...rest}
         data-background-iframe={iframeBg}
         data-background-video={videoBg}
         data-background-video-muted
         data-background-color={bg}
         data-state={state}
         data-auto-animate={!!animateOnTheNextSlide}
+        {...rest}
       >
         {enableBackHome && <BackHome />}
 
@@ -56,12 +56,13 @@ export const Slide: React.FC<Props> = ({
       </section>
       {animateOnTheNextSlide && (
         <section
-          {...rest}
+          data-background-iframe={iframeBg}
           data-background-video={videoBg}
           data-background-video-muted
           data-background-color={bg}
           data-state={state}
           data-auto-animate
+          {...rest}
         >
           {children}
           {fragments}
