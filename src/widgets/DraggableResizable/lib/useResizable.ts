@@ -89,7 +89,6 @@ export const useResizable = ({
       const child = contentRef.current.children[0] as HTMLElement
       let newSize: { width: number; height: number }
 
-      console.log(child)
       if (child.tagName === 'IMG') {
         const img = child as HTMLImageElement
 
