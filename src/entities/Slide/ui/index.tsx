@@ -6,9 +6,7 @@ import React, {
   useContext,
   useEffect,
   useRef,
-  useState,
 } from 'react'
-import { HexColorPicker } from 'react-colorful'
 
 import { BackHome } from '@/features/BackHome'
 import { AppStateContext } from '@/shared/context/app-state-context'

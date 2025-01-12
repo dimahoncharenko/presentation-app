@@ -48,6 +48,7 @@ export const Sidenav = () => {
     if (deckRef.current) {
       deckRef.current?.sync()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deckRef.current])
 
   useEffect(() => {
@@ -87,6 +88,7 @@ export const Sidenav = () => {
         }),
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [color])
 
   return (
