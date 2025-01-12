@@ -1,8 +1,16 @@
 'use client'
 
-import React, { CSSProperties, ReactElement } from 'react'
+import React, {
+  CSSProperties,
+  ReactElement,
+  useContext,
+  useEffect,
+  useRef,
+} from 'react'
 
 import { BackHome } from '@/features/BackHome'
+import { AppStateContext } from '@/shared/context/app-state-context'
+import { RevealContext } from '@/shared/context/reveal-context'
 
 type Props = Partial<{
   bg: CSSProperties['color']
@@ -12,6 +20,7 @@ type Props = Partial<{
   animateOnTheNextSlide: CSSProperties
   fragments: React.ReactElement[]
   iframeBg: string
+  index: number
 }> & {
   children: ReactElement<React.HTMLAttributes<HTMLElement>>
 } & Partial<
@@ -30,9 +39,24 @@ export const Slide: React.FC<Props> = ({
   iframeBg,
   fragments,
   enableBackHome = false,
+  index,
   ...rest
 }) => {
+  const { selectedColor } = useContext(AppStateContext)
+  const { deckRef } = useContext(RevealContext)
+
   const activeBgs = [videoBg, bg, iframeBg].filter(bg => !!bg)
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (selectedColor.indexh === index) {
+      sectionRef.current?.setAttribute(
+        'data-background-color',
+        selectedColor.color,
+      )
+      deckRef.current?.sync()
+    }
+  }, [selectedColor])
 
   if (activeBgs.length > 1) {
     throw new Error("Multiple backgrounds aren't supported!")
@@ -41,6 +65,7 @@ export const Slide: React.FC<Props> = ({
   return (
     <>
       <section
+        ref={sectionRef}
         data-background-iframe={iframeBg}
         data-background-video={videoBg}
         data-background-video-muted
@@ -56,6 +81,7 @@ export const Slide: React.FC<Props> = ({
       </section>
       {animateOnTheNextSlide && (
         <section
+          ref={sectionRef}
           data-background-iframe={iframeBg}
           data-background-video={videoBg}
           data-background-video-muted

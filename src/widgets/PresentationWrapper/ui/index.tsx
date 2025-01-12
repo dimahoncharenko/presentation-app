@@ -2,7 +2,7 @@
 
 import React, { useContext, useEffect, useRef } from 'react'
 import Image from 'next/image'
-import { PanelLeft } from 'lucide-react'
+import { Palette, PanelLeft } from 'lucide-react'
 
 import { DraggableResizable } from '@/widgets/DraggableResizable'
 import { Slide } from '@/entities/Slide/ui'
@@ -18,7 +18,8 @@ import { cn } from '@/shared/lib/cn-merge'
 export const PresentationWrapper = () => {
   const { setDeckRef, deckRef } = useContext(RevealContext)
   const { elements, setElements } = useContext(SlideElementsContext)
-  const { openedSidenav, setOpenedSidenav } = useContext(AppStateContext)
+  const { openedSidenav, setOpenedSidenav, setSelectedColor } =
+    useContext(AppStateContext)
   const deckDivRef = useRef<HTMLDivElement>({} as HTMLDivElement) // reference to deck container div
 
   useEffect(() => {
@@ -53,6 +54,18 @@ export const PresentationWrapper = () => {
         {elements.length > 0 && (
           <div className='custom-controls absolute right-0 top-0 h-10 w-full'>
             <Button
+              className='absolute left-0 z-30'
+              variant='none'
+              onClick={() => {
+                setSelectedColor({
+                  indexh: deckRef.current!.getState().indexh,
+                  color: 'red',
+                })
+              }}
+            >
+              <Palette size={24} color='black' />
+            </Button>
+            <Button
               className='absolute right-0 z-30'
               variant='none'
               onClick={() => setOpenedSidenav(!openedSidenav)}
@@ -64,11 +77,10 @@ export const PresentationWrapper = () => {
 
         <div className='slides'>
           {groupedElements.length ? (
-            groupedElements.map(([name, elements]) => {
-              console.log('elements[0].bg: ', elements)
-
+            groupedElements.map(([name, elements], index) => {
               return (
                 <Slide
+                  index={index}
                   key={name}
                   style={{
                     width: '100%',

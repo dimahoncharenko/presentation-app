@@ -1,20 +1,16 @@
 'use client'
 
-import {
-  useContext,
-  useEffect,
-  // useState
-} from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import {
   Code,
   HighlighterIcon,
   ImagePlusIcon,
-  // Palette,
+  Palette,
   ScrollTextIcon,
   TypeIcon,
   Wrench,
 } from 'lucide-react'
-// import { HexColorPicker } from 'react-colorful'
+import { HexColorPicker } from 'react-colorful'
 import { Controller, useForm } from 'react-hook-form'
 
 import {
@@ -34,7 +30,8 @@ export const Sidenav = () => {
   const { elements, setElements } = useContext(SlideElementsContext)
   const { deckRef } = useContext(RevealContext)
   const { openedSidenav } = useContext(AppStateContext)
-  // const [openedColorPicker, setOpenedColorPicker] = useState(false)
+  const [openedColorPicker, setOpenedColorPicker] = useState(false)
+  const currentSlideIndex = useRef<number>(0)
 
   const { setValue, control, watch, reset } = useForm({
     defaultValues: {
@@ -43,8 +40,16 @@ export const Sidenav = () => {
     },
   })
 
-  const currentSlideIndex = deckRef.current?.getState().indexh
   const image = watch('image')
+  const color = watch('slideBg')
+
+  // Applies the initial slide attributes such as background color
+  useEffect(() => {
+    if (deckRef.current) {
+      deckRef.current?.sync()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deckRef.current])
 
   useEffect(() => {
     if (image) {
@@ -68,6 +73,23 @@ export const Sidenav = () => {
       reset()
     }
   }, [image, setElements, elements, currentSlideIndex, reset])
+
+  useEffect(() => {
+    if (deckRef.current && color) {
+      setElements(prev =>
+        prev.map(el => {
+          if (el['slide-id'] === `slide-${currentSlideIndex.current}`) {
+            return {
+              ...el,
+              bg: color,
+            }
+          }
+          return el
+        }),
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [color])
 
   return (
     <div
@@ -191,7 +213,7 @@ export const Sidenav = () => {
         Add highlighted text
       </Button>
 
-      {/* <Button
+      <Button
         variant='none'
         size='auto'
         className='gap-3 break-all text-left text-lg/[1em]'
@@ -218,7 +240,7 @@ export const Sidenav = () => {
             />
           )
         }}
-      /> */}
+      />
 
       <Accordion type='single' collapsible className='w-full'>
         <AccordionItem value='tools' className='border-0'>
@@ -264,7 +286,7 @@ export const Sidenav = () => {
           setElements(prev => [
             ...prev,
             {
-              'slide-id': `slide-${(currentSlideIndex || 0) + 1}`,
+              'slide-id': `slide-${(currentSlideIndex.current || 0) + 1}`,
               id: `text-node-${elements.length + 1}`,
               bg: 'red',
               type: 'text-node',
