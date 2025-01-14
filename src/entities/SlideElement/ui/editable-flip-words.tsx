@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Check } from 'lucide-react'
 
-import { Button } from '../../../shared/ui/bricks/common/Button'
-import { Input } from '../../../shared/ui/bricks/common/input'
-import { FlipWords } from '../../../shared/ui/bricks/featured/FlipWords'
+import { Button } from '@/shared/ui/bricks/common/Button'
+import { Input } from '@/shared/ui/bricks/common/input'
+import { FlipWords } from '@/shared/ui/bricks/featured/FlipWords'
 
 type Props = {
   handleSubmit: (value: string) => void

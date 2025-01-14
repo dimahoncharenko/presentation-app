@@ -31,8 +31,6 @@ export const useDraggable = ({ disabled, initialPosition }: Props) => {
     const parentEl = currentEl.parentNode?.parentNode as HTMLElement
 
     if (parentEl) {
-      // Calculate the difference between the mouse position (e.clientX, e.clientY)
-      // and the top-left corner of the controls wrapper (rect.left, rect.top).
       let rect: DOMRect
       let handlerSize: number
 
@@ -41,12 +39,10 @@ export const useDraggable = ({ disabled, initialPosition }: Props) => {
       if (parentEl.ariaLabel !== 'draggable-resizable-controls') {
         const controls = parentEl.parentNode as HTMLElement
 
-        // Calculates the width of the handler
         handlerSize = parentEl.getBoundingClientRect().width
 
         rect = controls.getBoundingClientRect()
       } else {
-        // Calculates the width of the handler
         handlerSize = (
           parentEl.children[0] as HTMLElement
         ).getBoundingClientRect().width
@@ -54,7 +50,7 @@ export const useDraggable = ({ disabled, initialPosition }: Props) => {
         rect = parentEl.getBoundingClientRect()
       }
 
-      // Sets the initial position of the draggable element: mouse position - top left corner + doubled handler size
+      // Sets the position of the draggable element: mouse position - top left corner + doubled handler size
       // Doubled handler size is used for centering the draggable element
       const offsetX = e.clientX - rect.left + handlerSize * 2
       const offsetY = e.clientY - rect.top

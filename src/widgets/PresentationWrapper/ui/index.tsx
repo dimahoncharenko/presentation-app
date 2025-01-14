@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Palette, PanelLeft } from 'lucide-react'
 
 import { DraggableResizable } from '@/widgets/DraggableResizable'
+import { AddNewSlide } from '@/features/AddNewSlide'
 import { Slide } from '@/entities/Slide/ui'
 import { EditableFlipWords, EditableText } from '@/entities/SlideElement'
 import { groupBySlideId } from '@/entities/SlideElement/lib'
@@ -33,7 +34,7 @@ export const PresentationWrapper = () => {
 
   useEffect(() => {
     if (deckRef.current) {
-      deckRef.current.slide(0)
+      deckRef.current.slide(deckRef.current.getState().indexh)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deckRef.current, elements])
@@ -96,7 +97,7 @@ export const PresentationWrapper = () => {
                             <DraggableResizable
                               onDelete={() => handleDelete(el.id)}
                               type='common'
-                              initialPosition={el.spacing}
+                              initialPosition={el.position}
                             >
                               <Image
                                 src={el.content}
@@ -130,7 +131,7 @@ export const PresentationWrapper = () => {
                             <DraggableResizable
                               onDelete={() => handleDelete(el.id)}
                               type='common'
-                              initialPosition={el.spacing}
+                              initialPosition={el.position}
                             >
                               <p className='text-black'>
                                 <TextHighlight>{el.content}</TextHighlight>
@@ -140,7 +141,7 @@ export const PresentationWrapper = () => {
                             <DraggableResizable
                               onDelete={() => handleDelete(el.id)}
                               type='common'
-                              initialPosition={el.spacing}
+                              initialPosition={el.position}
                             >
                               <EditableFlipWords
                                 initialValue={el.content}
@@ -178,29 +179,8 @@ export const PresentationWrapper = () => {
               }}
             >
               <div className='flex h-full items-center justify-center'>
-                <Button
-                  onClick={() => {
-                    setElements([
-                      {
-                        'slide-id': 'slide-0',
-                        id: 'text-node-0',
-                        bg: '#00ff00',
-                        type: 'text-node',
-                        content: 'New Text',
-                        spacing: {
-                          x: window.innerWidth / 2 - 150,
-                          y: window.innerHeight / 2 - 50,
-                        },
-                        size: {
-                          width: 300,
-                          height: 100,
-                        },
-                      },
-                    ])
-                  }}
-                >
-                  Create a first slide +
-                </Button>
+                {/* 0 is the first slide, but for now there is no slides */}
+                <AddNewSlide currentSlideIndex={-1} />
               </div>
             </Slide>
           )}

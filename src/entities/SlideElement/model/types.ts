@@ -2,7 +2,7 @@ type SharedProperties = {
   'slide-id': string
   id: string
   content: string
-  spacing: {
+  position: {
     x: number
     y: number
   }
