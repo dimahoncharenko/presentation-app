@@ -10,6 +10,7 @@ import {
   Wrench,
 } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
+import { v4 as uuidv4 } from 'uuid'
 
 import { AddNewSlide } from '@/features/AddNewSlide'
 import { SlideElement } from '@/entities/SlideElement'
@@ -81,7 +82,7 @@ export const Sidenav = () => {
         ...elements,
         {
           'slide-id': `slide-${currentSlide}`,
-          id: `${type}-${elements.length}`,
+          id: `${type}-${uuidv4()}`,
           type,
           content,
           position: position ?? placeCentered(),
