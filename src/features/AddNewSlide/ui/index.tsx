@@ -11,7 +11,7 @@ type Props = {
 }
 
 export const AddNewSlide = ({ currentSlideIndex }: Props) => {
-  const { elements, setElements } = useContext(SlideElementsContext)
+  const { setElements } = useContext(SlideElementsContext)
   const { setOpenedSidenav } = useContext(AppStateContext)
 
   return (
