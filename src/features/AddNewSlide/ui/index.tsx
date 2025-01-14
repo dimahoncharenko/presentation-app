@@ -2,6 +2,7 @@ import { useContext } from 'react'
 
 import { placeCentered } from '@/widgets/Sidenav'
 import { Button } from '@/shared/ui/bricks/common/Button'
+import { AppStateContext } from '@/shared/context/app-state-context'
 import { SlideElementsContext } from '@/shared/context/slide-elements-context'
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
 
 export const AddNewSlide = ({ currentSlideIndex }: Props) => {
   const { elements, setElements } = useContext(SlideElementsContext)
+  const { setOpenedSidenav } = useContext(AppStateContext)
 
   return (
     <Button
@@ -29,6 +31,8 @@ export const AddNewSlide = ({ currentSlideIndex }: Props) => {
             },
           },
         ])
+
+        setOpenedSidenav(false)
       }}
     >
       Create a slide +

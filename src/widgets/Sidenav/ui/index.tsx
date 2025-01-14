@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useContext, useEffect, useRef } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import {
   Code,
   HighlighterIcon,
@@ -27,11 +27,18 @@ import { SlideElementsContext } from '@/shared/context/slide-elements-context'
 import { cn } from '@/shared/lib/cn-merge'
 import { placeCentered } from '../lib'
 
+type DeckState = {
+  indexh: number
+  indexv: number
+}
+
 export const Sidenav = () => {
   const { elements, setElements } = useContext(SlideElementsContext)
-  const currentSlideIndex = useRef<number>(0)
   const { deckRef } = useContext(RevealContext)
-  const { openedSidenav } = useContext(AppStateContext)
+  const { openedSidenav, setOpenedSidenav } = useContext(AppStateContext)
+  const [currentSlide, setCurrentSlide] = useState(
+    deckRef.current?.getState().indexh || 0,
+  )
 
   const { setValue, control, watch, reset } = useForm({
     defaultValues: {
@@ -43,10 +50,20 @@ export const Sidenav = () => {
 
   // Applies the initial slide attributes such as background color
   useEffect(() => {
-    if (deckRef.current) {
-      deckRef.current?.sync()
+    const handleSlideChanged = (event: Event) => {
+      const currentSlide = event as unknown as DeckState
+      setCurrentSlide(currentSlide.indexh)
     }
-  }, [deckRef])
+
+    if (deckRef.current) {
+      deckRef.current.sync()
+    }
+    deckRef.current?.on('slidechanged', handleSlideChanged)
+
+    return () => {
+      deckRef.current?.off('slidechanged', handleSlideChanged)
+    }
+  }, [deckRef.current])
 
   const addNodeToSlide = useCallback(
     ({
@@ -63,7 +80,7 @@ export const Sidenav = () => {
       setElements([
         ...elements,
         {
-          'slide-id': `slide-${currentSlideIndex}`,
+          'slide-id': `slide-${currentSlide}`,
           id: `${type}-${elements.length}`,
           type,
           content,
@@ -74,8 +91,10 @@ export const Sidenav = () => {
           },
         },
       ])
+
+      setOpenedSidenav(false)
     },
-    [currentSlideIndex, elements, setElements],
+    [currentSlide, elements, setElements],
   )
 
   useEffect(() => {
@@ -86,7 +105,7 @@ export const Sidenav = () => {
       })
       reset()
     }
-  }, [image, setElements, elements, currentSlideIndex, reset, addNodeToSlide])
+  }, [image, setElements, elements, currentSlide, reset, addNodeToSlide])
 
   return (
     <div
@@ -203,7 +222,7 @@ export const Sidenav = () => {
         </AccordionItem>
       </Accordion>
 
-      <AddNewSlide currentSlideIndex={currentSlideIndex.current} />
+      <AddNewSlide currentSlideIndex={currentSlide} />
     </div>
   )
 }
