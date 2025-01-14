@@ -2,16 +2,14 @@
 
 import React, { useContext, useEffect, useMemo, useRef } from 'react'
 import Image from 'next/image'
-import { Palette, PanelLeft } from 'lucide-react'
 
 import { DraggableResizable } from '@/widgets/DraggableResizable'
+import { Sidenav } from '@/widgets/Sidenav'
 import { AddNewSlide } from '@/features/AddNewSlide'
 import { Slide } from '@/entities/Slide/ui'
 import { EditableFlipWords, EditableText } from '@/entities/SlideElement'
 import { groupBySlideId } from '@/entities/SlideElement/lib'
-import { Button } from '@/shared/ui/bricks/common/Button'
 import { TextHighlight } from '@/shared/ui/bricks/featured/TextHighlight'
-import { AppStateContext } from '@/shared/context/app-state-context'
 import { RevealContext } from '@/shared/context/reveal-context'
 import { SlideElementsContext } from '@/shared/context/slide-elements-context'
 import { cn } from '@/shared/lib/cn-merge'
@@ -19,8 +17,6 @@ import { cn } from '@/shared/lib/cn-merge'
 export const PresentationWrapper = () => {
   const { setDeckRef, deckRef } = useContext(RevealContext)
   const { elements, setElements } = useContext(SlideElementsContext)
-  const { openedSidenav, setOpenedSidenav, setSelectedColor } =
-    useContext(AppStateContext)
   const deckDivRef = useRef<HTMLDivElement>({} as HTMLDivElement) // reference to deck container div
 
   useEffect(() => {
@@ -51,29 +47,7 @@ export const PresentationWrapper = () => {
         className={cn('reveal mr-auto transition-all duration-200 ease-in-out')}
         ref={deckDivRef}
       >
-        {elements.length > 0 && (
-          <div className='custom-controls absolute right-0 top-0 h-10 w-full'>
-            <Button
-              className='absolute left-0 z-30'
-              variant='none'
-              onClick={() => {
-                setSelectedColor({
-                  indexh: deckRef.current!.getState().indexh,
-                  color: 'red',
-                })
-              }}
-            >
-              <Palette size={24} color='black' />
-            </Button>
-            <Button
-              className='absolute right-0 z-30'
-              variant='none'
-              onClick={() => setOpenedSidenav(!openedSidenav)}
-            >
-              <PanelLeft size={24} color='black' />
-            </Button>
-          </div>
-        )}
+        {elements.length > 0 && <Sidenav />}
 
         <div className='slides'>
           {groupedElements.length ? (

@@ -1,17 +1,19 @@
 'use client'
 
-import { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import {
+  ArrowLeft,
+  CirclePlus,
   Code,
   HighlighterIcon,
   ImagePlusIcon,
+  Palette,
   PanelLeft,
   ScrollTextIcon,
   TypeIcon,
   Wrench,
 } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
-import { useOnClickOutside } from 'usehooks-ts'
 import { v4 as uuidv4 } from 'uuid'
 
 import { AddNewSlide } from '@/features/AddNewSlide'
@@ -24,6 +26,7 @@ import {
 } from '@/shared/ui/bricks/common/accordion'
 import { Button } from '@/shared/ui/bricks/common/Button'
 import { Input } from '@/shared/ui/bricks/common/input'
+import { Sidebar, SidebarBody } from '@/shared/ui/bricks/featured/sidebar'
 import { AppStateContext } from '@/shared/context/app-state-context'
 import { RevealContext } from '@/shared/context/reveal-context'
 import { SlideElementsContext } from '@/shared/context/slide-elements-context'
@@ -37,12 +40,14 @@ type DeckState = {
 export const Sidenav = () => {
   const { elements, setElements } = useContext(SlideElementsContext)
   const { deckRef } = useContext(RevealContext)
-  const { openedSidenav, setOpenedSidenav } = useContext(AppStateContext)
+  const { openedSidenav, setSelectedColor, setOpenedSidenav } =
+    useContext(AppStateContext)
+
   const [currentSlide, setCurrentSlide] = useState(
     deckRef.current?.getState().indexh || 0,
   )
 
-  const sidenavBar = useRef<HTMLDivElement>({} as HTMLDivElement)
+  const [showedSidenav, setShowedSidenav] = useState(false)
 
   const { setValue, control, watch, reset } = useForm({
     defaultValues: {
@@ -51,10 +56,6 @@ export const Sidenav = () => {
   })
 
   const image = watch('image')
-
-  useOnClickOutside(sidenavBar, () => {
-    setOpenedSidenav(false)
-  })
 
   // Applies the initial slide attributes such as background color
   useEffect(() => {
@@ -116,129 +117,233 @@ export const Sidenav = () => {
   }, [image, setElements, elements, currentSlide, reset, addNodeToSlide])
 
   return (
-    <div
-      ref={sidenavBar}
-      className={cn(
-        'opacity-1 absolute bottom-0 right-0 top-0 z-50 flex translate-x-full flex-col items-start gap-2 !bg-slate-100 p-4 transition xl:px-8',
-        openedSidenav && 'opacity-1 translate-x-0',
-      )}
-    >
-      <Button
-        className='absolute right-0 top-0 z-30'
-        variant='none'
-        onClick={() => setOpenedSidenav(!openedSidenav)}
-      >
-        <PanelLeft size={24} color='black' />
-      </Button>
+    <div className='custom-controls absolute z-30 w-full'>
       <Button
         variant='none'
-        size='auto'
-        className='gap-3 text-lg'
+        className='absolute hidden md:block'
         onClick={() => {
-          addNodeToSlide({
-            type: 'text-node',
-            content: 'New Text',
-            size: {
-              width: 300,
-              height: 100,
-            },
-          })
+          setShowedSidenav(prev => !prev)
         }}
       >
-        <TypeIcon className='mb-[2px] !size-6' />
-        Add Text
+        <PanelLeft className='!size-6 !text-black' />
       </Button>
-
-      <Controller
-        control={control}
-        name='image'
-        render={({ field: { name, onBlur, ref, disabled } }) => {
-          return (
-            <>
-              <label
-                htmlFor='image-upload'
-                className='inline-flex cursor-pointer items-center gap-3 text-lg'
+      <Sidebar open={openedSidenav} setOpen={setOpenedSidenav} animate>
+        <SidebarBody
+          className={cn(
+            'absolute z-50 h-screen items-start justify-between gap-10 overflow-y-auto overflow-x-hidden transition-transform',
+            !showedSidenav && 'xl:-translate-x-16',
+          )}
+        >
+          <div className='flex flex-1 flex-col gap-3'>
+            <Button
+              variant='none'
+              className='items-center justify-start gap-3 p-0 text-lg text-[#a59ea0]'
+              onClick={() => {
+                setSelectedColor({
+                  indexh: deckRef.current!.getState().indexh,
+                  color: 'red',
+                })
+              }}
+            >
+              <Palette className='!size-6' />
+              <span
+                className={cn(
+                  'opacity-0 transition-opacity',
+                  openedSidenav && 'opacity-1',
+                )}
               >
-                <ImagePlusIcon className='mb-[2px] size-6' />
-                Add Image
-              </label>
-              <Input
-                name={name}
-                onBlur={onBlur}
-                ref={ref}
-                disabled={disabled}
-                onChange={evt =>
-                  evt.target.files && setValue('image', evt.target.files?.[0])
-                }
-                type='file'
-                className='hidden'
-                id='image-upload'
-              />
-            </>
-          )
-        }}
-      />
-
-      <Button
-        variant='none'
-        size='auto'
-        className='gap-3 text-lg'
-        onClick={() => {
-          addNodeToSlide({
-            type: 'flip-words-node',
-            content: '',
-            size: {
-              width: 300,
-              height: 100,
-            },
-          })
-        }}
-      >
-        <ScrollTextIcon className='mb-[2px] !size-6' />
-        Add flipped text
-      </Button>
-
-      <Button
-        variant='none'
-        size='auto'
-        className='gap-3 text-lg'
-        onClick={() => {
-          addNodeToSlide({
-            type: 'text-highlight-node',
-            content: 'Sample Text',
-            size: {
-              width: 300,
-              height: 100,
-            },
-          })
-        }}
-      >
-        <HighlighterIcon className='mb-[2px] !size-6' />
-        Add highlighted text
-      </Button>
-
-      <Accordion type='single' collapsible className='w-full'>
-        <AccordionItem value='tools' className='border-0'>
-          <AccordionTrigger className='py-0 hover:no-underline'>
-            <p className='flex items-center gap-3 text-lg'>
-              <Wrench className='mb-[2px] !size-6' /> Other tools
-            </p>
-          </AccordionTrigger>
-          <AccordionContent className='pl-4'>
+                Set Color
+              </span>
+            </Button>
             <Button
               variant='none'
               size='auto'
-              className='text-md gap-3 py-2'
-              onClick={() => {}}
+              className='items-center justify-start gap-3 p-0 text-lg text-[#a59ea0]'
+              onClick={() => {
+                addNodeToSlide({
+                  type: 'text-node',
+                  content: 'New Text',
+                  size: {
+                    width: 300,
+                    height: 100,
+                  },
+                })
+              }}
             >
-              <Code className='mb-[2px] !size-6' />
-              Add code snippet
+              <TypeIcon className='mb-[2px] !size-6' />
+              <span
+                className={cn(
+                  'opacity-0 transition-opacity',
+                  openedSidenav && 'opacity-1',
+                )}
+              >
+                Add Text
+              </span>
             </Button>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
 
-      <AddNewSlide currentSlideIndex={currentSlide} />
+            <Controller
+              control={control}
+              name='image'
+              render={({ field: { name, onBlur, ref, disabled } }) => {
+                return (
+                  <>
+                    <label
+                      htmlFor='image-upload'
+                      className='inline-flex cursor-pointer items-center gap-3 text-lg text-[#a59ea0]'
+                    >
+                      <ImagePlusIcon className='mb-[2px] size-6' />
+                      <span
+                        className={cn(
+                          'opacity-0 transition-opacity',
+                          openedSidenav && 'opacity-1',
+                        )}
+                      >
+                        Add Image
+                      </span>
+                    </label>
+                    <Input
+                      name={name}
+                      onBlur={onBlur}
+                      ref={ref}
+                      disabled={disabled}
+                      onChange={evt =>
+                        evt.target.files &&
+                        setValue('image', evt.target.files?.[0])
+                      }
+                      type='file'
+                      className='hidden'
+                      id='image-upload'
+                    />
+                  </>
+                )
+              }}
+            />
+
+            <Button
+              variant='none'
+              size='auto'
+              className='items-center justify-start gap-3 p-0 text-lg text-[#a59ea0]'
+              onClick={() => {
+                addNodeToSlide({
+                  type: 'flip-words-node',
+                  content: '',
+                  size: {
+                    width: 300,
+                    height: 100,
+                  },
+                })
+              }}
+            >
+              <ScrollTextIcon className='mb-[2px] !size-6' />
+              <span
+                className={cn(
+                  'opacity-0 transition-opacity',
+                  openedSidenav && 'opacity-1',
+                )}
+              >
+                Add flipped text
+              </span>
+            </Button>
+
+            <Button
+              variant='none'
+              size='auto'
+              className='items-center justify-start gap-3 p-0 text-lg text-[#a59ea0]'
+              onClick={() => {
+                addNodeToSlide({
+                  type: 'text-highlight-node',
+                  content: 'Sample Text',
+                  size: {
+                    width: 300,
+                    height: 100,
+                  },
+                })
+              }}
+            >
+              <HighlighterIcon className='mb-[2px] !size-6' />
+              <span
+                className={cn(
+                  'opacity-0 transition-opacity',
+                  openedSidenav && 'opacity-1',
+                )}
+              >
+                Add highlighted text
+              </span>
+            </Button>
+
+            <Accordion type='single' collapsible className='h-full w-full'>
+              <AccordionItem value='tools' className='border-0'>
+                <AccordionTrigger className='m-0 py-0 hover:no-underline'>
+                  <p className='!m-0 flex items-center gap-3 text-lg text-[#a59ea0]'>
+                    <Wrench className='mb-[2px] !size-6' />
+                    <span
+                      className={cn(
+                        'opacity-0 transition-opacity',
+                        openedSidenav && 'opacity-1',
+                      )}
+                    >
+                      Other tools
+                    </span>
+                  </p>
+                </AccordionTrigger>
+                <AccordionContent hidden={!openedSidenav} className='m-0 pl-4'>
+                  <Button
+                    variant='none'
+                    size='auto'
+                    className='text-md m-0 gap-3 py-0 text-[#a59ea0]'
+                    onClick={() => {}}
+                  >
+                    <Code className='mb-[2px] mt-0 !size-6' />
+                    <span
+                      className={cn(
+                        'opacity-0 transition-opacity',
+                        openedSidenav && 'opacity-1',
+                      )}
+                    >
+                      Add code snippet
+                    </span>
+                  </Button>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            <AddNewSlide
+              variant='none'
+              className='items-center justify-start gap-3 p-0 text-lg text-[#a59ea0]'
+              currentSlideIndex={currentSlide}
+            >
+              <CirclePlus className='mb-[2px] mt-0 !size-6 fill-black stroke-white' />
+              <span
+                className={cn(
+                  'opacity-0 transition-opacity',
+                  openedSidenav && 'opacity-1',
+                )}
+              >
+                Create next slide
+              </span>
+            </AddNewSlide>
+
+            <Button
+              variant='none'
+              className='items-center justify-start gap-3 p-0 text-lg text-[#a59ea0]'
+              onClick={() => {
+                setShowedSidenav(false)
+                setOpenedSidenav(false)
+              }}
+            >
+              <ArrowLeft className='mb-[2px] mt-0 !size-6' />
+              <span
+                className={cn(
+                  'opacity-0 transition-opacity',
+                  openedSidenav && 'opacity-1',
+                )}
+              >
+                Hide
+              </span>
+            </Button>
+          </div>
+        </SidebarBody>
+      </Sidebar>
     </div>
   )
 }

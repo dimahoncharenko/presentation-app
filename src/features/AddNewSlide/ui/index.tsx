@@ -1,20 +1,26 @@
 import { useContext } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
-import { Button } from '@/shared/ui/bricks/common/Button'
+import { Button, ButtonProps } from '@/shared/ui/bricks/common/Button'
 import { AppStateContext } from '@/shared/context/app-state-context'
 import { SlideElementsContext } from '@/shared/context/slide-elements-context'
 
 type Props = {
   currentSlideIndex: number
-}
+  children?: React.ReactNode
+} & Omit<ButtonProps, 'onClick' | 'children'>
 
-export const AddNewSlide = ({ currentSlideIndex }: Props) => {
+export const AddNewSlide = ({
+  currentSlideIndex,
+  children = 'Create a slide +',
+  ...rest
+}: Props) => {
   const { setElements } = useContext(SlideElementsContext)
   const { setOpenedSidenav } = useContext(AppStateContext)
 
   return (
     <Button
+      {...rest}
       onClick={() => {
         setElements(prev => [
           ...prev,
@@ -47,7 +53,7 @@ export const AddNewSlide = ({ currentSlideIndex }: Props) => {
         setOpenedSidenav(false)
       }}
     >
-      Create a slide +
+      {children}
     </Button>
   )
 }
