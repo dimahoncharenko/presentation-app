@@ -6,6 +6,7 @@ import './globals.css'
 import 'reveal.js/dist/theme/black.css'
 
 import Script from 'next/script'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 import { ClientProviders } from '@/shared/config/client-providers'
 
@@ -56,6 +57,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <SpeedInsights />
         <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
