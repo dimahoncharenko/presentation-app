@@ -36,8 +36,7 @@ export const useResizable = ({
           let newWidth = size.width
           let newHeight = size.height
 
-          // Resize handlers' logic
-          // Calculate new width and height and position
+          // Calculate new width, height and position
           if (direction === 'se') {
             newWidth = rect.width - (prevX - event.clientX)
             newHeight = rect.height - (prevY - event.clientY)
@@ -83,7 +82,7 @@ export const useResizable = ({
     }
   }
 
-  // It's used to calculate the natural size of the draggable only while mounting
+  // It's used to calculate the natural size of the draggable element; only while mounting
   useEffect(() => {
     if (contentRef.current && draggableRef.current && !initialized) {
       const child = contentRef.current.children[0] as HTMLElement
@@ -130,8 +129,7 @@ export const useResizable = ({
       draggableRef.current.style.width = `${newSize.width}px`
       draggableRef.current.style.height = `${newSize.height}px`
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contentRef.current, draggableRef.current, initialized])
+  }, [contentRef, draggableRef, initialized, setInitialized, setSize])
 
   // It's used to update the size of the draggable while resizing
   useEffect(() => {
@@ -139,8 +137,7 @@ export const useResizable = ({
       draggableRef.current.style.width = `${size.width}px`
       draggableRef.current.style.height = `${size.height}px`
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size.height, size.width, draggableRef.current])
+  }, [size.height, size.width, draggableRef])
 
   return {
     resizeOnMouseDown,

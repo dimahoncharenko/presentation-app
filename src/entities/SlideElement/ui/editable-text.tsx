@@ -19,7 +19,7 @@ export const EditableText = ({ element, onDelete, onChange }: Props) => {
             onDelete={onDelete}
             type='wyswyg'
             wyswygSlot={<WYSWYG content={element.content} editor={editor} />}
-            initialPosition={element.spacing}
+            initialPosition={element.position}
           />
         )
       }}

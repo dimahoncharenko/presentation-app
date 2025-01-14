@@ -21,14 +21,15 @@ type Props = Partial<{
   fragments: React.ReactElement[]
   iframeBg: string
   index: number
-}> & {
-  children: ReactElement<React.HTMLAttributes<HTMLElement>>
-} & Partial<
+}> &
+  Partial<
     Omit<
       React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
       'children'
     >
-  >
+  > & {
+    children: ReactElement<React.HTMLAttributes<HTMLElement>>
+  }
 
 export const Slide: React.FC<Props> = ({
   bg,
@@ -45,7 +46,7 @@ export const Slide: React.FC<Props> = ({
   const { selectedColor } = useContext(AppStateContext)
   const { deckRef } = useContext(RevealContext)
 
-  const activeBgs = [videoBg, bg, iframeBg].filter(bg => !!bg)
+  const totalBackgrounds = [videoBg, bg, iframeBg].filter(bg => !!bg).length
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -56,14 +57,15 @@ export const Slide: React.FC<Props> = ({
       )
       deckRef.current?.sync()
     }
-  }, [selectedColor])
+  }, [selectedColor, index, deckRef])
 
-  if (activeBgs.length > 1) {
+  if (totalBackgrounds > 1) {
     throw new Error("Multiple backgrounds aren't supported!")
   }
 
   return (
     <>
+      {/* Main slide */}
       <section
         ref={sectionRef}
         data-background-iframe={iframeBg}
@@ -75,10 +77,10 @@ export const Slide: React.FC<Props> = ({
         {...rest}
       >
         {enableBackHome && <BackHome />}
-
         {children}
         {fragments}
       </section>
+      {/* Main slide's transition */}
       {animateOnTheNextSlide && (
         <section
           ref={sectionRef}
@@ -90,6 +92,7 @@ export const Slide: React.FC<Props> = ({
           data-auto-animate
           {...rest}
         >
+          {enableBackHome && <BackHome />}
           {children}
           {fragments}
         </section>

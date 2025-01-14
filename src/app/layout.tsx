@@ -2,11 +2,10 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 
 import './globals.css'
-// Import reveal.js black theme
+// Imports reveal.js black theme
 import 'reveal.js/dist/theme/black.css'
 
 import Script from 'next/script'
-import { DroppedElementsProvider } from '@/shared/context/slide-elements-context'
 
 import { ClientProviders } from '@/shared/config/client-providers'
 
@@ -57,9 +56,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <DroppedElementsProvider>
-          <ClientProviders>{children}</ClientProviders>
-        </DroppedElementsProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   )

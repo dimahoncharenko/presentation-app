@@ -1,18 +1,18 @@
 'use client'
 
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef } from 'react'
 import {
   Code,
   HighlighterIcon,
   ImagePlusIcon,
-  Palette,
   ScrollTextIcon,
   TypeIcon,
   Wrench,
 } from 'lucide-react'
-import { HexColorPicker } from 'react-colorful'
 import { Controller, useForm } from 'react-hook-form'
 
+import { AddNewSlide } from '@/features/AddNewSlide'
+import { SlideElement } from '@/entities/SlideElement'
 import {
   Accordion,
   AccordionContent,
@@ -25,71 +25,68 @@ import { AppStateContext } from '@/shared/context/app-state-context'
 import { RevealContext } from '@/shared/context/reveal-context'
 import { SlideElementsContext } from '@/shared/context/slide-elements-context'
 import { cn } from '@/shared/lib/cn-merge'
+import { placeCentered } from '../lib'
 
 export const Sidenav = () => {
   const { elements, setElements } = useContext(SlideElementsContext)
+  const currentSlideIndex = useRef<number>(0)
   const { deckRef } = useContext(RevealContext)
   const { openedSidenav } = useContext(AppStateContext)
-  const [openedColorPicker, setOpenedColorPicker] = useState(false)
-  const currentSlideIndex = useRef<number>(0)
 
   const { setValue, control, watch, reset } = useForm({
     defaultValues: {
       image: null as null | File,
-      slideBg: 'white',
     },
   })
 
   const image = watch('image')
-  const color = watch('slideBg')
 
   // Applies the initial slide attributes such as background color
   useEffect(() => {
     if (deckRef.current) {
       deckRef.current?.sync()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deckRef.current])
+  }, [deckRef])
 
-  useEffect(() => {
-    if (image) {
+  const addNodeToSlide = useCallback(
+    ({
+      position,
+      size,
+      content,
+      type,
+    }: {
+      type: SlideElement['type']
+      content: string
+      position?: SlideElement['position']
+      size?: SlideElement['size']
+    }) => {
       setElements([
         ...elements,
         {
           'slide-id': `slide-${currentSlideIndex}`,
-          id: `image-node-${elements.length}`,
-          type: 'image-node',
-          content: URL.createObjectURL(image),
-          spacing: {
-            x: 500,
-            y: 250,
-          },
-          size: {
+          id: `${type}-${elements.length}`,
+          type,
+          content,
+          position: position ?? placeCentered(),
+          size: size ?? {
             width: 300,
             height: 300,
           },
         },
       ])
-      reset()
-    }
-  }, [image, setElements, elements, currentSlideIndex, reset])
+    },
+    [currentSlideIndex, elements, setElements],
+  )
 
   useEffect(() => {
-    if (deckRef.current && color) {
-      setElements(prev =>
-        prev.map(el => {
-          if (el['slide-id'] === `slide-${currentSlideIndex.current}`) {
-            return {
-              ...el,
-              bg: color,
-            }
-          }
-          return el
-        }),
-      )
+    if (image) {
+      addNodeToSlide({
+        type: 'image-node',
+        content: URL.createObjectURL(image),
+      })
+      reset()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [color])
+  }, [image, setElements, elements, currentSlideIndex, reset, addNodeToSlide])
 
   return (
     <div
@@ -103,24 +100,14 @@ export const Sidenav = () => {
         size='auto'
         className='gap-3 text-lg'
         onClick={() => {
-          setElements([
-            ...elements,
-            {
-              'slide-id': `slide-${currentSlideIndex}`,
-              id: `text-node-${elements.length}`,
-              type: 'text-node',
-              content: 'New Text',
-              bg: 'red',
-              spacing: {
-                x: 500,
-                y: 250,
-              },
-              size: {
-                width: 300,
-                height: 100,
-              },
+          addNodeToSlide({
+            type: 'text-node',
+            content: 'New Text',
+            size: {
+              width: 300,
+              height: 100,
             },
-          ])
+          })
         }}
       >
         <TypeIcon className='mb-[2px] !size-6' />
@@ -162,23 +149,14 @@ export const Sidenav = () => {
         size='auto'
         className='gap-3 text-lg'
         onClick={() => {
-          setElements([
-            ...elements,
-            {
-              'slide-id': `slide-${currentSlideIndex}`,
-              id: `flip-words-node-${elements.length}`,
-              type: 'flip-words-node',
-              content: '',
-              spacing: {
-                x: 500,
-                y: 250,
-              },
-              size: {
-                width: 300,
-                height: 100,
-              },
+          addNodeToSlide({
+            type: 'flip-words-node',
+            content: '',
+            size: {
+              width: 300,
+              height: 100,
             },
-          ])
+          })
         }}
       >
         <ScrollTextIcon className='mb-[2px] !size-6' />
@@ -190,57 +168,19 @@ export const Sidenav = () => {
         size='auto'
         className='gap-3 text-lg'
         onClick={() => {
-          setElements([
-            ...elements,
-            {
-              'slide-id': `slide-${currentSlideIndex}`,
-              id: `text-highlight-node-${elements.length}`,
-              type: 'text-highlight-node',
-              content: 'Sample text',
-              spacing: {
-                x: 500,
-                y: 250,
-              },
-              size: {
-                width: 300,
-                height: 100,
-              },
+          addNodeToSlide({
+            type: 'text-highlight-node',
+            content: 'Sample Text',
+            size: {
+              width: 300,
+              height: 100,
             },
-          ])
+          })
         }}
       >
         <HighlighterIcon className='mb-[2px] !size-6' />
         Add highlighted text
       </Button>
-
-      <Button
-        variant='none'
-        size='auto'
-        className='gap-3 break-all text-left text-lg/[1em]'
-        onClick={() => {
-          setOpenedColorPicker(!openedColorPicker)
-        }}
-      >
-        <Palette className='mb-[2px] !size-6' />
-        Slide background color
-      </Button>
-      <Controller
-        control={control}
-        name='slideBg'
-        render={({ field: { value, onChange, onBlur } }) => {
-          return (
-            <HexColorPicker
-              className={cn(
-                '!h-0 overflow-hidden px-3 transition-all',
-                openedColorPicker && '!h-44',
-              )}
-              color={value}
-              onBlur={onBlur}
-              onChange={onChange}
-            />
-          )
-        }}
-      />
 
       <Accordion type='single' collapsible className='w-full'>
         <AccordionItem value='tools' className='border-0'>
@@ -254,25 +194,7 @@ export const Sidenav = () => {
               variant='none'
               size='auto'
               className='text-md gap-3 py-2'
-              onClick={() => {
-                setElements([
-                  ...elements,
-                  {
-                    'slide-id': `slide-${currentSlideIndex}`,
-                    id: `text-highlight-node-${elements.length}`,
-                    type: 'text-highlight-node',
-                    content: 'Sample text',
-                    spacing: {
-                      x: 500,
-                      y: 250,
-                    },
-                    size: {
-                      width: 300,
-                      height: 100,
-                    },
-                  },
-                ])
-              }}
+              onClick={() => {}}
             >
               <Code className='mb-[2px] !size-6' />
               Add code snippet
@@ -281,30 +203,7 @@ export const Sidenav = () => {
         </AccordionItem>
       </Accordion>
 
-      <Button
-        onClick={() => {
-          setElements(prev => [
-            ...prev,
-            {
-              'slide-id': `slide-${(currentSlideIndex.current || 0) + 1}`,
-              id: `text-node-${elements.length + 1}`,
-              bg: 'red',
-              type: 'text-node',
-              content: 'New Text',
-              spacing: {
-                x: window.innerWidth / 2 - 150,
-                y: window.innerHeight / 2 - 50,
-              },
-              size: {
-                width: 300,
-                height: 100,
-              },
-            },
-          ])
-        }}
-      >
-        Create a first slide +
-      </Button>
+      <AddNewSlide currentSlideIndex={currentSlideIndex.current} />
     </div>
   )
 }

@@ -2,16 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Mistral } from '@mistralai/mistralai'
 
 import { KEYS } from '@/shared/constants/env'
+import { parseResponse } from './lib/utils'
 
 const client = new Mistral({ apiKey: KEYS.MISTRAL_KEY })
 
-type ChatParams = {
+type RemakeBodyParams = {
   prompt: string
   text: string
 }
 
-export const POST = async (params: NextRequest) => {
-  const res = (await params.json()) as unknown as ChatParams
+interface ExtendedNextApiRequest extends NextRequest {
+  json(): Promise<RemakeBodyParams>
+}
+
+export const POST = async (params: ExtendedNextApiRequest) => {
+  const res = await params.json()
 
   const chatResponse = await client.agents.complete({
     agentId: `${KEYS.MISTRAL_AGENT}`,
@@ -26,7 +31,5 @@ export const POST = async (params: NextRequest) => {
     ],
   })
 
-  return NextResponse.json(
-    chatResponse?.choices ? chatResponse?.choices[0]?.message.content : '',
-  )
+  return NextResponse.json(parseResponse(chatResponse))
 }
