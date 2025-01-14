@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, ReactNode, useRef, useState } from 'react'
+import { memo, ReactNode, useEffect, useRef, useState } from 'react'
 import { useOnClickOutside } from 'usehooks-ts'
 
 import { cn } from '@/shared/lib/cn-merge'
@@ -17,8 +17,10 @@ type Props =
         y: number
       }
       onDelete: () => void
+      onDragLeave?: (newPosition: { x: number; y: number }) => void
     }
   | {
+      id?: string
       type: 'wyswyg'
       wyswygSlot: ReactNode
       initialPosition?: {
@@ -26,6 +28,7 @@ type Props =
         y: number
       }
       onDelete: () => void
+      onDragLeave?: (newPosition: { x: number; y: number }) => void
     }
 
 const DraggableResizable = memo(
@@ -52,17 +55,21 @@ const DraggableResizable = memo(
       setGrabbed(false)
     })
 
+    useEffect(() => {
+      if (!grabbed) {
+        if (rest.onDragLeave) {
+          rest.onDragLeave(position)
+        }
+      }
+    }, [grabbed])
+
     return (
       <div
+        id={(rest.type === 'wyswyg' && rest.id) || undefined}
         ref={draggableRef}
         className='absolute inline-block'
         aria-label='draggable-resizable'
         onDoubleClick={() => setGrabbed(true)}
-        onKeyUp={e => {
-          if (e.key === 'Delete') {
-            onDelete()
-          }
-        }}
         style={{
           position: 'absolute',
           top: 0,
@@ -75,7 +82,9 @@ const DraggableResizable = memo(
         <Controls
           grabbed={grabbed}
           handleMouseDown={dragOnMouseDown}
-          onDelete={onDelete}
+          onDelete={() => {
+            onDelete()
+          }}
         />
         <div
           className={cn(

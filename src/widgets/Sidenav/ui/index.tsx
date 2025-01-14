@@ -1,15 +1,17 @@
 'use client'
 
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import {
   Code,
   HighlighterIcon,
   ImagePlusIcon,
+  PanelLeft,
   ScrollTextIcon,
   TypeIcon,
   Wrench,
 } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
+import { useOnClickOutside } from 'usehooks-ts'
 import { v4 as uuidv4 } from 'uuid'
 
 import { AddNewSlide } from '@/features/AddNewSlide'
@@ -26,7 +28,6 @@ import { AppStateContext } from '@/shared/context/app-state-context'
 import { RevealContext } from '@/shared/context/reveal-context'
 import { SlideElementsContext } from '@/shared/context/slide-elements-context'
 import { cn } from '@/shared/lib/cn-merge'
-import { placeCentered } from '../lib'
 
 type DeckState = {
   indexh: number
@@ -41,6 +42,8 @@ export const Sidenav = () => {
     deckRef.current?.getState().indexh || 0,
   )
 
+  const sidenavBar = useRef<HTMLDivElement>({} as HTMLDivElement)
+
   const { setValue, control, watch, reset } = useForm({
     defaultValues: {
       image: null as null | File,
@@ -48,6 +51,10 @@ export const Sidenav = () => {
   })
 
   const image = watch('image')
+
+  useOnClickOutside(sidenavBar, () => {
+    setOpenedSidenav(false)
+  })
 
   // Applies the initial slide attributes such as background color
   useEffect(() => {
@@ -85,7 +92,7 @@ export const Sidenav = () => {
           id: `${type}-${uuidv4()}`,
           type,
           content,
-          position: position ?? placeCentered(),
+          position: position ?? { x: 500 - 250, y: 300 },
           size: size ?? {
             width: 300,
             height: 300,
@@ -110,11 +117,19 @@ export const Sidenav = () => {
 
   return (
     <div
+      ref={sidenavBar}
       className={cn(
-        'absolute bottom-0 right-0 top-0 flex w-[250px] flex-col items-start gap-2 !bg-slate-100 p-4 opacity-0 transition xl:px-8',
-        openedSidenav && 'opacity-1',
+        'opacity-1 absolute bottom-0 right-0 top-0 z-50 flex translate-x-full flex-col items-start gap-2 !bg-slate-100 p-4 transition xl:px-8',
+        openedSidenav && 'opacity-1 translate-x-0',
       )}
     >
+      <Button
+        className='absolute right-0 top-0 z-30'
+        variant='none'
+        onClick={() => setOpenedSidenav(!openedSidenav)}
+      >
+        <PanelLeft size={24} color='black' />
+      </Button>
       <Button
         variant='none'
         size='auto'
