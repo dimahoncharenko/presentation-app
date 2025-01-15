@@ -291,7 +291,16 @@ export const Sidenav = () => {
                     variant='none'
                     size='auto'
                     className='text-md m-0 gap-3 py-0 text-[#a59ea0]'
-                    onClick={() => {}}
+                    onClick={() => {
+                      addNodeToSlide({
+                        type: 'code-snippet-node',
+                        content: '',
+                        size: {
+                          width: 300,
+                          height: 100,
+                        },
+                      })
+                    }}
                   >
                     <Code className='mb-[2px] mt-0 !size-6' />
                     <span

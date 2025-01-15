@@ -7,7 +7,11 @@ import { DraggableResizable } from '@/widgets/DraggableResizable'
 import { Sidenav } from '@/widgets/Sidenav'
 import { AddNewSlide } from '@/features/AddNewSlide'
 import { Slide } from '@/entities/Slide/ui'
-import { EditableFlipWords, EditableText } from '@/entities/SlideElement'
+import {
+  EditableCodeSnippet,
+  EditableFlipWords,
+  EditableText,
+} from '@/entities/SlideElement'
 import { groupBySlideId } from '@/entities/SlideElement/lib'
 import { TextHighlight } from '@/shared/ui/bricks/featured/TextHighlight'
 import { RevealContext } from '@/shared/context/reveal-context'
@@ -125,6 +129,32 @@ export const PresentationWrapper = () => {
                               <p className='text-black'>
                                 <TextHighlight>{el.content}</TextHighlight>
                               </p>
+                            </DraggableResizable>
+                          ) : el.type === 'code-snippet-node' ? (
+                            <DraggableResizable
+                              onDelete={() => handleDelete(el.id)}
+                              type='common'
+                              initialPosition={el.position}
+                            >
+                              <EditableCodeSnippet
+                                initialValue={el.content}
+                                handleSubmit={value => {
+                                  if (value.trim()) {
+                                    setElements(prev =>
+                                      prev.map(e => {
+                                        if (e.id === el.id) {
+                                          return {
+                                            ...e,
+                                            content: value,
+                                          }
+                                        }
+
+                                        return e
+                                      }),
+                                    )
+                                  }
+                                }}
+                              ></EditableCodeSnippet>
                             </DraggableResizable>
                           ) : (
                             <DraggableResizable

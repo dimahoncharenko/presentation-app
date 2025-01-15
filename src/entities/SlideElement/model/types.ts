@@ -25,6 +25,10 @@ export type SlideFlipWords = {
   type: 'flip-words-node'
 } & SharedProperties
 
+export type SlideCodeSnippet = {
+  type: 'code-snippet-node'
+} & SharedProperties
+
 export type SlideTextHighlight = {
   type: 'text-highlight-node'
 } & SharedProperties
@@ -34,3 +38,4 @@ export type SlideElement =
   | SlideImage
   | SlideFlipWords
   | SlideTextHighlight
+  | SlideCodeSnippet
