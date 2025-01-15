@@ -15,6 +15,8 @@ import 'reveal.js/dist/theme/black.css'
 import 'reveal.js-plugins/chalkboard/plugin'
 import 'reveal.js-plugins/customcontrols/plugin'
 
+import Highlight from 'reveal.js/plugin/highlight/highlight.esm.js'
+
 type RevealContext = {
   deckRef: React.RefObject<Reveal.Api | null>
   setDeckRef: (el: React.RefObject<HTMLDivElement> | null) => void
@@ -36,7 +38,7 @@ export const RevealProvider = ({ children, deckElRef }: Props) => {
     width: '100%',
     height: '100%',
     transition: 'concave',
-    plugins: [window.RevealChalkboard, window.RevealCustomControls],
+    plugins: [window.RevealChalkboard, window.RevealCustomControls, Highlight],
   })
 
   useEffect(() => {
