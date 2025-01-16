@@ -294,7 +294,7 @@ export const Sidenav = () => {
                     onClick={() => {
                       addNodeToSlide({
                         type: 'code-snippet-node',
-                        content: '',
+                        content: 'console.log("Sample code")',
                         size: {
                           width: 300,
                           height: 100,

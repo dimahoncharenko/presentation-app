@@ -8,8 +8,13 @@ import { useDraggable } from '../lib/useDraggable'
 import { useResizable } from '../lib/useResizable'
 import { Controls } from './Controls'
 
+type ChildrenProps = {
+  grabbed: boolean
+}
+
 type Props =
   | {
+      id: string
       type: 'common'
       children: ReactNode
       initialPosition?: {
@@ -17,12 +22,14 @@ type Props =
         y: number
       }
       onDelete: () => void
+      heightResizable?: boolean
       onDragLeave?: (newPosition: { x: number; y: number }) => void
     }
   | {
-      id?: string
-      type: 'wyswyg'
-      wyswygSlot: ReactNode
+      id: string
+      type: 'advanced'
+      heightResizable?: boolean
+      children: (params: ChildrenProps) => ReactNode
       initialPosition?: {
         x: number
         y: number
@@ -32,7 +39,7 @@ type Props =
     }
 
 const DraggableResizable = memo(
-  ({ initialPosition, onDelete, ...rest }: Props) => {
+  ({ initialPosition, onDelete, heightResizable = true, ...rest }: Props) => {
     const [grabbed, setGrabbed] = useState(false)
     const contentRef = useRef<HTMLDivElement>(null)
     const {
@@ -47,6 +54,7 @@ const DraggableResizable = memo(
       position,
       setPosition: adjustPosition,
       contentRef,
+      heightResizable,
     })
 
     useOnClickOutside(draggableRef || ([] as HTMLElement[]), () => {
@@ -65,7 +73,7 @@ const DraggableResizable = memo(
 
     return (
       <div
-        id={(rest.type === 'wyswyg' && rest.id) || undefined}
+        id={rest.id}
         ref={draggableRef}
         className='absolute inline-block'
         aria-label='draggable-resizable'
@@ -125,7 +133,9 @@ const DraggableResizable = memo(
               ref={contentRef}
               aria-label='draggable-resizable-resizer-content'
             >
-              {rest.type === 'common' ? rest.children : rest.wyswygSlot}
+              {rest.type === 'advanced'
+                ? rest.children({ grabbed })
+                : rest.children}
             </div>
           </div>
         </div>
