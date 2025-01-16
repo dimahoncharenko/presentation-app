@@ -5,6 +5,7 @@ type Props = {
   contentRef: React.RefObject<HTMLDivElement | null>
   position: { x: number; y: number }
   setPosition: (value: { x: number; y: number }) => void
+  heightResizable?: boolean
 }
 
 export const useResizable = ({
@@ -12,6 +13,7 @@ export const useResizable = ({
   setPosition,
   position,
   contentRef,
+  heightResizable = true,
 }: Props) => {
   const [size, setSize] = useState({ width: 0, height: 0 })
   const [initialized, setInitialized] = useState(false)
@@ -39,10 +41,13 @@ export const useResizable = ({
           // Calculate new width, height and position
           if (direction === 'se') {
             newWidth = rect.width - (prevX - event.clientX)
-            newHeight = rect.height - (prevY - event.clientY)
+            // In cases when I don't need to resize height
+            if (heightResizable)
+              newHeight = rect.height - (prevY - event.clientY)
           } else if (direction === 'sw') {
             newWidth = rect.width - (event.clientX - prevX)
-            newHeight = rect.height + (event.clientY - prevY)
+            if (heightResizable)
+              newHeight = rect.height + (event.clientY - prevY)
 
             setPosition({
               y: position.y,
@@ -50,14 +55,17 @@ export const useResizable = ({
             })
           } else if (direction === 'ne') {
             newWidth = rect.width - (prevX - event.clientX)
-            newHeight = rect.height + (prevY - event.clientY)
+            if (heightResizable)
+              newHeight = rect.height + (prevY - event.clientY)
             setPosition({
               x: position.x,
               y: position.y - (position.y - event.clientY),
             })
           } else if (direction === 'nw') {
             newWidth = rect.width + (prevX - event.clientX)
-            newHeight = rect.height + (prevY - event.clientY)
+
+            if (heightResizable)
+              newHeight = rect.height + (prevY - event.clientY)
             setPosition({
               x: position.x - (position.x - event.clientX),
               y: position.y - (position.y - event.clientY),
@@ -115,7 +123,7 @@ export const useResizable = ({
 
         newSize = {
           width: Math.max(rect.width, 200),
-          height: Math.max(rect.height, 50),
+          height: Math.max(rect.height, 40),
         }
       }
 

@@ -2,8 +2,6 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 
 import './globals.css'
-// Imports reveal.js black theme
-import 'reveal.js/dist/theme/black.css'
 
 import Script from 'next/script'
 import { SpeedInsights } from '@vercel/speed-insights/next'

@@ -24,11 +24,12 @@ export const EditableText = ({
           <DraggableResizable
             id={element.id}
             onDelete={onDelete}
-            type='wyswyg'
+            type='common'
             onDragLeave={onChangedPosition}
-            wyswygSlot={<WYSWYG content={element.content} editor={editor} />}
             initialPosition={element.position}
-          />
+          >
+            <WYSWYG content={element.content} editor={editor} />
+          </DraggableResizable>
         )
       }}
     </EditorWrapper>
