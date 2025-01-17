@@ -11,7 +11,7 @@ import {
 import Reveal from 'reveal.js'
 
 import 'reveal.js/dist/reveal.css'
-import 'reveal.js/dist/theme/black.css'
+import 'reveal.js/dist/theme/simple.css'
 import 'reveal.js-plugins/chalkboard/plugin'
 import 'reveal.js-plugins/customcontrols/plugin'
 
