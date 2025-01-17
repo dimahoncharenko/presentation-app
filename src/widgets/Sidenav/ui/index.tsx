@@ -10,6 +10,7 @@ import {
   Palette,
   PanelLeft,
   ScrollTextIcon,
+  Trash2,
   TypeIcon,
   Wrench,
 } from 'lucide-react'
@@ -17,6 +18,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 
 import { AddNewSlide } from '@/features/AddNewSlide'
+import { useSlidesStore } from '@/entities/Slide/lib/slide-store-provider'
 import { SlideElement } from '@/entities/SlideElement'
 import {
   Accordion,
@@ -29,7 +31,6 @@ import { Input } from '@/shared/ui/bricks/common/input'
 import { Sidebar, SidebarBody } from '@/shared/ui/bricks/featured/sidebar'
 import { AppStateContext } from '@/shared/context/app-state-context'
 import { RevealContext } from '@/shared/context/reveal-context'
-import { SlideElementsContext } from '@/shared/context/slide-elements-context'
 import { cn } from '@/shared/lib/cn-merge'
 
 type DeckState = {
@@ -38,7 +39,6 @@ type DeckState = {
 }
 
 export const Sidenav = () => {
-  const { elements, setElements } = useContext(SlideElementsContext)
   const { deckRef } = useContext(RevealContext)
   const { openedSidenav, setSelectedColor, setOpenedSidenav } =
     useContext(AppStateContext)
@@ -48,6 +48,7 @@ export const Sidenav = () => {
   )
 
   const [showedSidenav, setShowedSidenav] = useState(false)
+  const slidesState = useSlidesStore(state => state)
 
   const { setValue, control, watch, reset } = useForm({
     defaultValues: {
@@ -86,24 +87,20 @@ export const Sidenav = () => {
       position?: SlideElement['position']
       size?: SlideElement['size']
     }) => {
-      setElements([
-        ...elements,
-        {
-          'slide-id': `slide-${currentSlide}`,
-          id: `${type}-${uuidv4()}`,
-          type,
-          content,
-          position: position ?? { x: 500 - 250, y: 300 },
-          size: size ?? {
-            width: 300,
-            height: 300,
-          },
+      slidesState.addNodeToSlide(`slide-${currentSlide}`, {
+        id: `${type}-${uuidv4()}`,
+        type,
+        content,
+        position: position ?? { x: 500 - 250, y: 300 },
+        size: size ?? {
+          width: 300,
+          height: 300,
         },
-      ])
+      })
 
       setOpenedSidenav(false)
     },
-    [currentSlide, elements, setElements],
+    [currentSlide, slidesState.slides.length],
   )
 
   useEffect(() => {
@@ -114,7 +111,7 @@ export const Sidenav = () => {
       })
       reset()
     }
-  }, [image, setElements, elements, currentSlide, reset, addNodeToSlide])
+  }, [image, slidesState.slides.length, currentSlide, reset, addNodeToSlide])
 
   return (
     <div className='custom-controls absolute z-30 w-full'>
@@ -274,9 +271,12 @@ export const Sidenav = () => {
             <Accordion type='single' collapsible className='h-full w-full'>
               <AccordionItem value='tools' className='border-0'>
                 <AccordionTrigger className='m-0 py-0 hover:no-underline'>
-                  <p className='!m-0 flex items-center gap-3 text-lg text-[#a59ea0]'>
+                  <div className='!m-0 flex items-center gap-3 text-lg text-[#a59ea0]'>
                     <Wrench className='mb-[2px] !size-6' />
                     <span
+                      style={{
+                        fontFamily: 'Lato, sans-serif',
+                      }}
                       className={cn(
                         'opacity-0 transition-opacity',
                         openedSidenav && 'opacity-1',
@@ -284,7 +284,7 @@ export const Sidenav = () => {
                     >
                       Other tools
                     </span>
-                  </p>
+                  </div>
                 </AccordionTrigger>
                 <AccordionContent hidden={!openedSidenav} className='m-0 pl-4'>
                   <Button
@@ -331,6 +331,25 @@ export const Sidenav = () => {
                 Create next slide
               </span>
             </AddNewSlide>
+
+            <Button
+              onClick={() => {
+                slidesState.removeSlide(`slide-${currentSlide}`)
+                deckRef.current?.sync()
+              }}
+              variant='none'
+              className='items-center justify-start gap-3 p-0 text-lg text-[#a59ea0]'
+            >
+              <Trash2 className='mb-[2px] mt-0 !size-6' />
+              <span
+                className={cn(
+                  'opacity-0 transition-opacity',
+                  openedSidenav && 'opacity-1',
+                )}
+              >
+                Remove the slide
+              </span>
+            </Button>
 
             <Button
               variant='none'
