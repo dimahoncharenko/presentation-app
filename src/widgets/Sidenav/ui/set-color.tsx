@@ -71,14 +71,20 @@ export const SetColor = ({ handleClick, hideText, closeSidenav }: Props) => {
 
   const handleSave = () => {
     if (customPalette) {
+      const newColor = {
+        color: debouncedColor,
+        label: `Custom color ${customPalette.length + 1}`,
+      }
+
+      const MAX_COLORS = 44
+
+      if (customPalette.length > MAX_COLORS) {
+        customPalette.pop()
+      }
+
       localStorage.setItem(
         STORAGE_KEYS.CUSTOM_PALETTE,
-        JSON.stringify(
-          customPalette.concat({
-            color: debouncedColor,
-            label: `Custom color ${customPalette.length + 1}`,
-          }),
-        ),
+        JSON.stringify(customPalette.concat(newColor)),
       )
     } else {
       localStorage.setItem(
@@ -180,17 +186,17 @@ export const SetColor = ({ handleClick, hideText, closeSidenav }: Props) => {
             </div>
             <div
               className={cn(
-                'backface-hidden rotate-x-180 absolute w-full rounded-lg bg-gray-200 p-1',
+                'backface-hidden rotate-x-180 absolute w-full rounded-lg bg-[#f0f8ff] p-1',
                 classes.cardBack,
               )}
             >
-              <div className='flex h-full w-full flex-wrap gap-1'>
+              <div className='flex h-auto w-full flex-wrap gap-1 self-start px-[11px] py-[11px]'>
                 {customPalette &&
                   customPalette.map((color, index) => (
                     <span
                       onClick={() => handleClick(color.color)}
                       key={index}
-                      className='size-5 cursor-pointer rounded-sm'
+                      className='size-[30.3px] cursor-pointer rounded-sm'
                       style={{ backgroundColor: color.color }}
                     ></span>
                   ))}

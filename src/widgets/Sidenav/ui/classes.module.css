@@ -25,11 +25,11 @@
 
 .cardFront {
   background-color: white;
+
   z-index: 2; /* Ensure the front side is on top when not flipped */
 }
 
 .cardBack {
-  background-color: lightgray;
   transform: rotateX(180deg); /* Ensure the back side is correctly oriented */
   z-index: 1; /* Ensure the back side is behind the front side when not flipped */
 }
