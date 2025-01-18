@@ -7,7 +7,6 @@ import {
   Code,
   HighlighterIcon,
   ImagePlusIcon,
-  Palette,
   PanelLeft,
   ScrollTextIcon,
   Trash2,
@@ -32,6 +31,7 @@ import { Sidebar, SidebarBody } from '@/shared/ui/bricks/featured/sidebar'
 import { AppStateContext } from '@/shared/context/app-state-context'
 import { RevealContext } from '@/shared/context/reveal-context'
 import { cn } from '@/shared/lib/cn-merge'
+import { SetColor } from './set-color'
 
 type DeckState = {
   indexh: number
@@ -132,26 +132,20 @@ export const Sidenav = () => {
           )}
         >
           <div className='flex flex-1 flex-col gap-3'>
-            <Button
-              variant='none'
-              className='items-center justify-start gap-3 p-0 text-lg text-[#a59ea0]'
-              onClick={() => {
+            <SetColor
+              closeSidenav={() => {
+                setShowedSidenav(false)
+                setOpenedSidenav(false)
+              }}
+              handleClick={color => {
                 setSelectedColor({
                   indexh: deckRef.current!.getState().indexh,
-                  color: 'red',
+                  color,
                 })
               }}
-            >
-              <Palette className='!size-6' />
-              <span
-                className={cn(
-                  'opacity-0 transition-opacity',
-                  openedSidenav && 'opacity-1',
-                )}
-              >
-                Set Color
-              </span>
-            </Button>
+              hideText={!openedSidenav}
+            />
+
             <Button
               variant='none'
               size='auto'
