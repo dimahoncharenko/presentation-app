@@ -1,0 +1,3 @@
+export const STORAGE_KEYS = {
+  CUSTOM_PALETTE: 'CUSTOM_PALETTE',
+}
