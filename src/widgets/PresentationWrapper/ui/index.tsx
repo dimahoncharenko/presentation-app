@@ -11,12 +11,14 @@ import { Slide } from '@/entities/Slide/ui'
 import { EditableFlipWords, EditableText } from '@/entities/SlideElement'
 import { TextHighlight } from '@/shared/ui/bricks/featured/TextHighlight'
 import { RevealContext } from '@/shared/context/reveal-context'
+import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 
 export const PresentationWrapper = () => {
   const { setDeckRef, deckRef } = useContext(RevealContext)
   const deckDivRef = useRef<HTMLDivElement>({} as HTMLDivElement) // reference to deck container div
   const slidesState = useSlidesStore(state => state)
+  const { selectedNodes } = useContext(SelectedContext)
 
   useEffect(() => {
     if (!deckRef.current && deckDivRef.current) {
@@ -34,6 +36,31 @@ export const PresentationWrapper = () => {
 
   const handleDelete = (slideId: string, id: string) => {
     slidesState.removeNodeFromSlide(slideId, id)
+  }
+
+  const handleDragAll = ({
+    deltaX,
+    deltaY,
+  }: {
+    deltaX: number
+    deltaY: number
+  }) => {
+    if (selectedNodes.length > 0) {
+      slidesState.slides.forEach(slide => {
+        if (slide.slideId === `slide-${deckRef.current?.getState().indexh}`) {
+          slide.elements.forEach(el => {
+            if (selectedNodes.includes(el.id)) {
+              const newNodePosition = {
+                x: el.position.x + deltaX,
+                y: el.position.y + deltaY,
+              }
+
+              slidesState.adjustPosition(slide.slideId, el.id, newNodePosition)
+            }
+          })
+        }
+      })
+    }
   }
 
   return (
@@ -80,6 +107,7 @@ export const PresentationWrapper = () => {
                           ) : el.type === 'text-node' ? (
                             <EditableText
                               element={el}
+                              handleDragAll={handleDragAll}
                               onDelete={() =>
                                 handleDelete(slide.slideId, el.id)
                               }

@@ -1,8 +1,9 @@
 'use client'
 
-import { memo, ReactNode, useEffect, useRef, useState } from 'react'
+import { memo, ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import { useOnClickOutside } from 'usehooks-ts'
 
+import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 import { useDraggable } from '../lib/useDraggable'
 import { useResizable } from '../lib/useResizable'
@@ -24,6 +25,7 @@ type Props =
       onDelete: () => void
       heightResizable?: boolean
       onDragLeave?: (newPosition: { x: number; y: number }) => void
+      handleDragAll?: (params: { deltaX: number; deltaY: number }) => void
     }
   | {
       id: string
@@ -36,19 +38,20 @@ type Props =
       }
       onDelete: () => void
       onDragLeave?: (newPosition: { x: number; y: number }) => void
+      handleDragAll?: (params: { deltaX: number; deltaY: number }) => void
     }
 
 const DraggableResizable = memo(
   ({ initialPosition, onDelete, heightResizable = true, ...rest }: Props) => {
     const [grabbed, setGrabbed] = useState(false)
     const contentRef = useRef<HTMLDivElement>(null)
-    const {
-      draggableRef,
-      dragOnMouseDown,
-      position,
-      adjustPosition,
-      forceDragging,
-    } = useDraggable({ initialPosition })
+    const { selectedNodes, handleSelectNode } = useContext(SelectedContext)
+
+    const { draggableRef, dragOnMouseDown, position, adjustPosition } =
+      useDraggable({
+        initialPosition,
+      })
+
     const { resizeOnMouseDown, size } = useResizable({
       draggableRef,
       position,
@@ -57,15 +60,50 @@ const DraggableResizable = memo(
       heightResizable,
     })
 
+    const isSelected = selectedNodes.find(
+      nodeId => nodeId === rest.id || nodeId === rest.id + '_node',
+    )
+
+    // TODO: If was clicked outside of selected nodes, then clear selection
+    // useEffect(() => {
+    //   const handleDbl = (event: MouseEvent) => {
+    //     const node = event.target as HTMLElement
+
+    //     if (!node.id) {
+    //       setSelectedNodes(() => [])
+    //       !selectedNodes.length && setGrabbed(false)
+    //     }
+    //   }
+
+    //   window.addEventListener('dblclick', handleDbl)
+
+    //   return () => {
+    //     window.removeEventListener('dblclick', handleDbl)
+    //   }
+    // }, [])
+
+    useEffect(() => {
+      if (selectedNodes.length > 0 && isSelected) {
+        setGrabbed(true)
+      } else if (selectedNodes.length > 0 && !isSelected) {
+        setGrabbed(false)
+      }
+    }, [selectedNodes.length])
+
     useOnClickOutside(draggableRef || ([] as HTMLElement[]), () => {
       // Disable dragging/resizing and editing the element when clicked outside
-      forceDragging(false)
       setGrabbed(false)
     })
 
     useEffect(() => {
       if (!grabbed) {
         if (rest.onDragLeave) {
+          const deltaX = position.x - (initialPosition?.x ?? 0)
+          const deltaY = position.y - (initialPosition?.y ?? 0)
+
+          console.log(deltaX, deltaY)
+
+          rest.handleDragAll?.({ deltaX: deltaX, deltaY: deltaY })
           rest.onDragLeave(position)
         }
       }
@@ -77,7 +115,10 @@ const DraggableResizable = memo(
         ref={draggableRef}
         className='absolute inline-block'
         aria-label='draggable-resizable'
-        onDoubleClick={() => setGrabbed(true)}
+        onDoubleClick={e => {
+          if (e.ctrlKey) handleSelectNode(rest.id)
+          setGrabbed(true)
+        }}
         style={{
           position: 'absolute',
           top: 0,
@@ -89,7 +130,9 @@ const DraggableResizable = memo(
       >
         <Controls
           grabbed={grabbed}
-          handleMouseDown={dragOnMouseDown}
+          handleMouseDown={e => {
+            dragOnMouseDown(e)
+          }}
           onDelete={() => {
             onDelete()
           }}

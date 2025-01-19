@@ -29,11 +29,11 @@ export const SlidesStoreProvider = ({ children }: SlidesStoreProviderProps) => {
 }
 
 export const useSlidesStore = <T,>(selector: (store: SlidesStore) => T): T => {
-  const counterStoreContext = useContext(SlidesContext)
+  const slidesStoreContext = useContext(SlidesContext)
 
-  if (!counterStoreContext) {
+  if (!slidesStoreContext) {
     throw new Error(`useSlidesStore must be used within SlidesStoreProvider`)
   }
 
-  return useStore(counterStoreContext, selector)
+  return useStore(slidesStoreContext, selector)
 }

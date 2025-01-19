@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import {
   IconAlignCenter,
   IconAlignJustified,
@@ -33,19 +33,26 @@ import { FancyRewriter } from './FancyRewriter'
 type Props = {
   content: string
   editor: Editor | null
+  id: string
 }
 
 const handleSelect = (e: Event) => {
   e.preventDefault()
 }
 
-const WYSWYG = memo(({ editor }: Props) => {
+const WYSWYG = memo(({ editor, id }: Props) => {
   const [paletteOpened, setPaletteOpened] = useState(true)
+
+  useEffect(() => {
+    if (editor) {
+      editor.commands.updateAttributes('paragraph', { id })
+    }
+  }, [id, editor])
 
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <EditorContent className={classes.editor} editor={editor} />
+        <EditorContent id={id} className={classes.editor} editor={editor} />
       </ContextMenuTrigger>
       <ContextMenuContent className='w-64'>
         <ContextMenuSub open={paletteOpened} onOpenChange={setPaletteOpened}>
