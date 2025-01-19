@@ -26,7 +26,9 @@ export const Controls = ({
     >
       <span className='block size-4'></span>
       <div
-        onMouseDown={handleMouseDown}
+        onMouseDown={e => {
+          handleMouseDown(e)
+        }}
         className='cursor-move'
         aria-label='draggable-resizable-handler'
       >

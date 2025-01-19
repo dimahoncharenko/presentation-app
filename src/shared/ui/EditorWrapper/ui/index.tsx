@@ -1,5 +1,6 @@
 import Color from '@tiptap/extension-color'
 import FontFamily from '@tiptap/extension-font-family'
+import Paragraph from '@tiptap/extension-paragraph'
 import TextAlign from '@tiptap/extension-text-align'
 import TextStyle from '@tiptap/extension-text-style'
 import UnderlineExtension from '@tiptap/extension-underline'
@@ -7,6 +8,21 @@ import { Editor, useEditor, UseEditorOptions } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 import { FontSize } from '@/widgets/WYSWYG/lib/FontSizeExtension'
+
+const CustomParagraph = Paragraph.extend({
+  addAttributes() {
+    return {
+      id: {
+        default: null,
+        renderHTML: attributes => {
+          return {
+            id: `${attributes.id}`,
+          }
+        },
+      },
+    }
+  },
+})
 
 const extensions = [
   StarterKit,
@@ -18,6 +34,7 @@ const extensions = [
     types: ['heading', 'paragraph'],
   }),
   TextStyle.configure({ mergeNestedSpanStyles: true }),
+  CustomParagraph,
 ]
 
 type Props = {

@@ -10,45 +10,26 @@ type Props = {
 
 export const useDraggable = ({ disabled, initialPosition }: Props) => {
   const draggableRef = useRef<HTMLDivElement>({} as HTMLDivElement)
-  const [isDragging, setIsDragging] = useState(false)
   const [position, setPosition] = useState(initialPosition ?? { x: 0, y: 0 })
 
   const adjustPosition = (value: { x: number; y: number }) => {
     setPosition(value)
   }
 
-  const forceDragging = (value: boolean) => {
-    setIsDragging(value)
-  }
-
   const dragOnMouseDown = (
     e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
   ) => {
     // Draggable element (aria-label='draggable-resizable-handler')
-    const currentEl = e.target as HTMLElement
+    const currentEl = e.currentTarget as HTMLElement
 
     // Controls wrapper (aria-label='draggable-resizable-controls')
-    const parentEl = currentEl.parentNode?.parentNode as HTMLElement
+    const parentEl = currentEl.parentNode as HTMLElement
 
     if (parentEl) {
-      let rect: DOMRect
-      let handlerSize: number
-
-      // If it's not the draggable controls, then it's a handler,
-      // we need the container of the handler to take its width and calculate the position
-      if (parentEl.ariaLabel !== 'draggable-resizable-controls') {
-        const controls = parentEl.parentNode as HTMLElement
-
-        handlerSize = parentEl.getBoundingClientRect().width
-
-        rect = controls.getBoundingClientRect()
-      } else {
-        handlerSize = (
-          parentEl.children[0] as HTMLElement
-        ).getBoundingClientRect().width
-
-        rect = parentEl.getBoundingClientRect()
-      }
+      const rect = parentEl.getBoundingClientRect()
+      const handlerSize = (
+        parentEl.children[0] as HTMLElement
+      ).getBoundingClientRect().width
 
       // Sets the position of the draggable element: mouse position - top left corner + doubled handler size
       // Doubled handler size is used for centering the draggable element
@@ -62,17 +43,15 @@ export const useDraggable = ({ disabled, initialPosition }: Props) => {
           // Calculates new position and updates
           const newX = event.clientX - offsetX
           const newY = event.clientY - offsetY
+
           setPosition({ x: newX, y: newY })
         }
       }
 
       const handleMouseUp = () => {
-        setIsDragging(false)
         document.removeEventListener('mousemove', handleMouseMove)
         document.removeEventListener('mouseup', handleMouseUp)
       }
-
-      setIsDragging(true)
 
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleMouseUp)
@@ -82,9 +61,7 @@ export const useDraggable = ({ disabled, initialPosition }: Props) => {
   return {
     draggableRef,
     dragOnMouseDown,
-    isDragging,
     position,
     adjustPosition,
-    forceDragging,
   }
 }

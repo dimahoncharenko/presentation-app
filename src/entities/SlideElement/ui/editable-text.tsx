@@ -9,6 +9,7 @@ type Props = {
   onChange: (value: string) => void
   onDelete: () => void
   onChangedPosition?: (newPosition: { x: number; y: number }) => void
+  handleDragAll?: (params: { deltaX: number; deltaY: number }) => void
 }
 
 export const EditableText = ({
@@ -16,6 +17,7 @@ export const EditableText = ({
   onDelete,
   onChange,
   onChangedPosition,
+  handleDragAll,
 }: Props) => {
   return (
     <EditorWrapper onChange={onChange} content={element.content}>
@@ -27,8 +29,13 @@ export const EditableText = ({
             type='common'
             onDragLeave={onChangedPosition}
             initialPosition={element.position}
+            handleDragAll={handleDragAll}
           >
-            <WYSWYG content={element.content} editor={editor} />
+            <WYSWYG
+              id={element.id + '_node'}
+              content={element.content}
+              editor={editor}
+            />
           </DraggableResizable>
         )
       }}
