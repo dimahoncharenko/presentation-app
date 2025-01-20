@@ -1,8 +1,10 @@
-import { MouseEvent, useRef, useState } from 'react'
+import { MouseEvent, useContext, useRef } from 'react'
+
+import { SelectedContext } from '@/shared/context/selected-nodes'
 
 type Props = {
   disabled?: boolean
-  initialPosition?: {
+  initialPosition: {
     x: number
     y: number
   }
@@ -10,11 +12,7 @@ type Props = {
 
 export const useDraggable = ({ disabled, initialPosition }: Props) => {
   const draggableRef = useRef<HTMLDivElement>({} as HTMLDivElement)
-  const [position, setPosition] = useState(initialPosition ?? { x: 0, y: 0 })
-
-  const adjustPosition = (value: { x: number; y: number }) => {
-    setPosition(value)
-  }
+  const { selectedNodes, changePosition } = useContext(SelectedContext)
 
   const dragOnMouseDown = (
     e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
@@ -40,11 +38,21 @@ export const useDraggable = ({ disabled, initialPosition }: Props) => {
         const event = evt as unknown as MouseEvent
 
         if (draggableRef.current && !disabled) {
-          // Calculates new position and updates
-          const newX = event.clientX - offsetX
-          const newY = event.clientY - offsetY
+          // Change position of all selected elements
+          const delta = {
+            x: event.clientX - offsetX - initialPosition.x,
+            y: event.clientY - offsetY - initialPosition.y,
+          }
 
-          setPosition({ x: newX, y: newY })
+          selectedNodes.forEach(node => {
+            changePosition({
+              id: node.id,
+              position: {
+                x: node.position.x + delta.x,
+                y: node.position.y + delta.y,
+              },
+            })
+          })
         }
       }
 
@@ -61,7 +69,5 @@ export const useDraggable = ({ disabled, initialPosition }: Props) => {
   return {
     draggableRef,
     dragOnMouseDown,
-    position,
-    adjustPosition,
   }
 }
