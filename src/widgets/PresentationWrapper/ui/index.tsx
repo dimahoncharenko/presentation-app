@@ -3,7 +3,7 @@
 import React, { useContext, useEffect, useRef } from 'react'
 import Image from 'next/image'
 
-import { DraggableResizable } from '@/widgets/DraggableResizable'
+import { DraggableResizable } from '@/widgets/DraggableResizable/ui'
 import { Sidenav } from '@/widgets/Sidenav'
 import { AddNewSlide } from '@/features/AddNewSlide'
 import { useSlidesStore } from '@/entities/Slide/lib/slide-store-provider'
@@ -11,14 +11,12 @@ import { Slide } from '@/entities/Slide/ui'
 import { EditableFlipWords, EditableText } from '@/entities/SlideElement'
 import { TextHighlight } from '@/shared/ui/bricks/featured/TextHighlight'
 import { RevealContext } from '@/shared/context/reveal-context'
-import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 
 export const PresentationWrapper = () => {
   const { setDeckRef, deckRef } = useContext(RevealContext)
   const deckDivRef = useRef<HTMLDivElement>({} as HTMLDivElement) // reference to deck container div
   const slidesState = useSlidesStore(state => state)
-  const { selectedNodes } = useContext(SelectedContext)
 
   useEffect(() => {
     if (!deckRef.current && deckDivRef.current) {
@@ -38,29 +36,12 @@ export const PresentationWrapper = () => {
     slidesState.removeNodeFromSlide(slideId, id)
   }
 
-  const handleDragAll = ({
-    deltaX,
-    deltaY,
-  }: {
-    deltaX: number
-    deltaY: number
-  }) => {
-    if (selectedNodes.length > 0) {
-      slidesState.slides.forEach(slide => {
-        if (slide.slideId === `slide-${deckRef.current?.getState().indexh}`) {
-          slide.elements.forEach(el => {
-            if (selectedNodes.includes(el.id)) {
-              const newNodePosition = {
-                x: el.position.x + deltaX,
-                y: el.position.y + deltaY,
-              }
-
-              slidesState.adjustPosition(slide.slideId, el.id, newNodePosition)
-            }
-          })
-        }
-      })
-    }
+  const handleDragLeave = (
+    slideId: string,
+    nodeId: string,
+    newPosition: { x: number; y: number },
+  ) => {
+    slidesState.adjustPosition(slideId, nodeId, newPosition)
   }
 
   return (
@@ -94,6 +75,13 @@ export const PresentationWrapper = () => {
                               onDelete={() =>
                                 handleDelete(slide.slideId, el.id)
                               }
+                              onDragLeave={newPosition => {
+                                handleDragLeave(
+                                  slide.slideId,
+                                  el.id,
+                                  newPosition,
+                                )
+                              }}
                               type='common'
                               initialPosition={el.position}
                             >
@@ -107,12 +95,11 @@ export const PresentationWrapper = () => {
                           ) : el.type === 'text-node' ? (
                             <EditableText
                               element={el}
-                              handleDragAll={handleDragAll}
                               onDelete={() =>
                                 handleDelete(slide.slideId, el.id)
                               }
                               onChangedPosition={newPosition => {
-                                slidesState.adjustPosition(
+                                handleDragLeave(
                                   slide.slideId,
                                   el.id,
                                   newPosition,
@@ -134,6 +121,13 @@ export const PresentationWrapper = () => {
                               onDelete={() =>
                                 handleDelete(slide.slideId, el.id)
                               }
+                              onDragLeave={newPosition => {
+                                handleDragLeave(
+                                  slide.slideId,
+                                  el.id,
+                                  newPosition,
+                                )
+                              }}
                               type='common'
                               initialPosition={el.position}
                             >
@@ -147,6 +141,13 @@ export const PresentationWrapper = () => {
                               onDelete={() =>
                                 handleDelete(slide.slideId, el.id)
                               }
+                              onDragLeave={newPosition => {
+                                handleDragLeave(
+                                  slide.slideId,
+                                  el.id,
+                                  newPosition,
+                                )
+                              }}
                               type='common'
                               initialPosition={el.position}
                             >

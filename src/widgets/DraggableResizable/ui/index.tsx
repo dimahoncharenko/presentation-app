@@ -18,7 +18,7 @@ type Props =
       id: string
       type: 'common'
       children: ReactNode
-      initialPosition?: {
+      initialPosition: {
         x: number
         y: number
       }
@@ -32,7 +32,7 @@ type Props =
       type: 'advanced'
       heightResizable?: boolean
       children: (params: ChildrenProps) => ReactNode
-      initialPosition?: {
+      initialPosition: {
         x: number
         y: number
       }
@@ -45,42 +45,66 @@ const DraggableResizable = memo(
   ({ initialPosition, onDelete, heightResizable = true, ...rest }: Props) => {
     const [grabbed, setGrabbed] = useState(false)
     const contentRef = useRef<HTMLDivElement>(null)
-    const { selectedNodes, handleSelectNode } = useContext(SelectedContext)
+    const {
+      selectedNodes,
+      handleSelectNode,
+      changePosition,
+      setSelectedNodes,
+    } = useContext(SelectedContext)
 
-    const { draggableRef, dragOnMouseDown, position, adjustPosition } =
-      useDraggable({
-        initialPosition,
-      })
+    const { draggableRef, dragOnMouseDown } = useDraggable({
+      initialPosition: {
+        x: initialPosition.x,
+        y: initialPosition.y,
+      },
+    })
 
     const { resizeOnMouseDown, size } = useResizable({
       draggableRef,
-      position,
-      setPosition: adjustPosition,
+      position: initialPosition,
+      setPosition: newPos => {
+        selectedNodes.forEach(node => {
+          const delta = {
+            x: newPos.x - node.position.x,
+            y: newPos.y - node.position.y,
+          }
+
+          console.log('setPosition: ', delta)
+
+          changePosition({
+            id: node.id,
+            position: {
+              x: node.position.x + delta.x,
+              y: node.position.y + delta.y,
+            },
+          })
+        })
+      },
       contentRef,
       heightResizable,
     })
 
     const isSelected = selectedNodes.find(
-      nodeId => nodeId === rest.id || nodeId === rest.id + '_node',
+      node => node.id === rest.id || node.id === rest.id + '_node',
     )
 
-    // TODO: If was clicked outside of selected nodes, then clear selection
-    // useEffect(() => {
-    //   const handleDbl = (event: MouseEvent) => {
-    //     const node = event.target as HTMLElement
+    // If was clicked outside of selected nodes, then clear selection
+    useEffect(() => {
+      const handleDbl = (event: MouseEvent) => {
+        const node = event.target as HTMLElement
 
-    //     if (!node.id) {
-    //       setSelectedNodes(() => [])
-    //       !selectedNodes.length && setGrabbed(false)
-    //     }
-    //   }
+        if (!node.id) {
+          setSelectedNodes(() => [])
+          if (!selectedNodes.length) setGrabbed(false)
+        }
+      }
 
-    //   window.addEventListener('dblclick', handleDbl)
+      window.addEventListener('dblclick', handleDbl)
 
-    //   return () => {
-    //     window.removeEventListener('dblclick', handleDbl)
-    //   }
-    // }, [])
+      return () => {
+        window.removeEventListener('dblclick', handleDbl)
+      }
+    }, [])
 
     useEffect(() => {
       if (selectedNodes.length > 0 && isSelected) {
@@ -96,18 +120,15 @@ const DraggableResizable = memo(
     })
 
     useEffect(() => {
-      if (!grabbed) {
+      if (isSelected && !grabbed) {
         if (rest.onDragLeave) {
-          const deltaX = position.x - (initialPosition?.x ?? 0)
-          const deltaY = position.y - (initialPosition?.y ?? 0)
-
-          console.log(deltaX, deltaY)
-
-          rest.handleDragAll?.({ deltaX: deltaX, deltaY: deltaY })
-          rest.onDragLeave(position)
+          rest.onDragLeave(isSelected.position)
         }
       }
-    }, [grabbed])
+    }, [grabbed, isSelected])
+
+    const newX = isSelected?.position.x
+    const newY = isSelected?.position.y
 
     return (
       <div
@@ -116,14 +137,21 @@ const DraggableResizable = memo(
         className='absolute inline-block'
         aria-label='draggable-resizable'
         onDoubleClick={e => {
-          if (e.ctrlKey) handleSelectNode(rest.id)
+          if (e.ctrlKey || selectedNodes.length < 1)
+            handleSelectNode({
+              id: rest.id,
+              position: {
+                x: initialPosition.x,
+                y: initialPosition.y,
+              },
+            })
           setGrabbed(true)
         }}
         style={{
           position: 'absolute',
           top: 0,
           left: 0,
-          transform: `translate(${position.x}px, ${position.y}px)`,
+          transform: `translate(${newX ?? initialPosition.x}px, ${newY ?? initialPosition.y}px)`,
           width: `${size.width}px`,
           height: `${size.height}px`,
         }}

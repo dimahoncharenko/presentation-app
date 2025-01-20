@@ -6,10 +6,19 @@ import {
   useState,
 } from 'react'
 
+export interface SelectedNode {
+  id: string
+  position: {
+    x: number
+    y: number
+  }
+}
+
 type SelectedNodesContext = {
-  selectedNodes: string[]
-  setSelectedNodes: Dispatch<SetStateAction<string[]>>
-  handleSelectNode: (id: string) => void
+  selectedNodes: SelectedNode[]
+  setSelectedNodes: Dispatch<SetStateAction<SelectedNode[]>>
+  handleSelectNode: (node: SelectedNode) => void
+  changePosition: (node: SelectedNode) => void
 }
 
 export const SelectedContext = createContext({} as SelectedNodesContext)
@@ -21,17 +30,32 @@ type SelectedNodesProviderProps = {
 export const SelectedNodesProvider = ({
   children,
 }: SelectedNodesProviderProps) => {
-  const [selectedNodes, setSelectedNodes] = useState<string[]>([])
+  const [selectedNodes, setSelectedNodes] = useState<SelectedNode[]>([])
 
-  const handleSelectNode = (id: string) => {
+  const handleSelectNode = (node: SelectedNode) => {
     setSelectedNodes(prev =>
-      prev.includes(id) ? prev.filter(nodeId => nodeId !== id) : [...prev, id],
+      prev.find(el => el.id === node.id)
+        ? prev.filter(el => el.id !== node.id)
+        : [...prev, node],
+    )
+  }
+
+  const changePosition = (node: SelectedNode) => {
+    setSelectedNodes(prev =>
+      prev.map(el =>
+        el.id === node.id ? { ...el, position: node.position } : el,
+      ),
     )
   }
 
   return (
     <SelectedContext.Provider
-      value={{ selectedNodes, setSelectedNodes, handleSelectNode }}
+      value={{
+        selectedNodes,
+        changePosition,
+        setSelectedNodes,
+        handleSelectNode,
+      }}
     >
       {children}
     </SelectedContext.Provider>
