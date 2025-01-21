@@ -30,6 +30,13 @@ export const EditableText = ({
             onDragLeave={onChangedPosition}
             initialPosition={element.position}
             handleDragAll={handleDragAll}
+            initialNodeParams={{
+              position: element.position,
+              size: {
+                height: element.size?.height ?? 0,
+                width: element.size?.width ?? 0,
+              },
+            }}
           >
             <WYSWYG
               id={element.id + '_node'}

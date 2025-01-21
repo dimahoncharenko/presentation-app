@@ -3,10 +3,12 @@
 import { memo, ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import { useOnClickOutside } from 'usehooks-ts'
 
+import { SlideElement } from '@/entities/SlideElement'
 import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 import { useDraggable } from '../lib/useDraggable'
 import { useResizable } from '../lib/useResizable'
+import { useResizableMultiple } from '../lib/useResizableMultiple'
 import { Controls } from './Controls'
 
 type ChildrenProps = {
@@ -22,6 +24,10 @@ type Props =
         x: number
         y: number
       }
+      initialNodeParams?: {
+        position: SlideElement['position']
+        size: SlideElement['size']
+      }
       onDelete: () => void
       heightResizable?: boolean
       onDragLeave?: (newPosition: { x: number; y: number }) => void
@@ -36,13 +42,23 @@ type Props =
         x: number
         y: number
       }
+      initialNodeParams?: {
+        position: SlideElement['position']
+        size: SlideElement['size']
+      }
       onDelete: () => void
       onDragLeave?: (newPosition: { x: number; y: number }) => void
       handleDragAll?: (params: { deltaX: number; deltaY: number }) => void
     }
 
 const DraggableResizable = memo(
-  ({ initialPosition, onDelete, heightResizable = true, ...rest }: Props) => {
+  ({
+    initialPosition,
+    onDelete,
+    initialNodeParams,
+    heightResizable = true,
+    ...rest
+  }: Props) => {
     const [grabbed, setGrabbed] = useState(false)
     const contentRef = useRef<HTMLDivElement>(null)
     const {
@@ -52,37 +68,27 @@ const DraggableResizable = memo(
       setSelectedNodes,
     } = useContext(SelectedContext)
 
+    const [blockedDragging, setBlockedDragging] = useState(false)
+
     const { draggableRef, dragOnMouseDown } = useDraggable({
-      initialPosition: {
-        x: initialPosition.x,
-        y: initialPosition.y,
-      },
+      disabled: blockedDragging,
     })
 
-    const { resizeOnMouseDown, size } = useResizable({
+    const { resizeOnMouseDown, isResizing } = useResizableMultiple({
       draggableRef,
-      position: initialPosition,
-      setPosition: newPos => {
-        selectedNodes.forEach(node => {
-          const delta = {
-            x: newPos.x - node.position.x,
-            y: newPos.y - node.position.y,
-          }
-
-          console.log('setPosition: ', delta)
-
-          changePosition({
-            id: node.id,
-            position: {
-              x: node.position.x + delta.x,
-              y: node.position.y + delta.y,
-            },
-          })
-        })
-      },
       contentRef,
       heightResizable,
     })
+
+    useEffect(() => {
+      console.log('RESIZING: ', isResizing)
+
+      if (isResizing) {
+        setBlockedDragging(true)
+      } else {
+        setBlockedDragging(false)
+      }
+    }, [isResizing])
 
     const isSelected = selectedNodes.find(
       node => node.id === rest.id || node.id === rest.id + '_node',
@@ -130,6 +136,9 @@ const DraggableResizable = memo(
     const newX = isSelected?.position.x
     const newY = isSelected?.position.y
 
+    const newWidth = isSelected?.size?.width
+    const newHeight = isSelected?.size?.height
+
     return (
       <div
         id={rest.id}
@@ -144,6 +153,10 @@ const DraggableResizable = memo(
                 x: initialPosition.x,
                 y: initialPosition.y,
               },
+              size: {
+                width: initialNodeParams?.size?.width ?? 0,
+                height: initialNodeParams?.size?.height ?? 0,
+              },
             })
           setGrabbed(true)
         }}
@@ -152,8 +165,8 @@ const DraggableResizable = memo(
           top: 0,
           left: 0,
           transform: `translate(${newX ?? initialPosition.x}px, ${newY ?? initialPosition.y}px)`,
-          width: `${size.width}px`,
-          height: `${size.height}px`,
+          width: `${newWidth ?? initialNodeParams?.size?.width ?? 200}px`,
+          height: `${newHeight ?? initialNodeParams?.size?.width ?? 40}px`,
         }}
       >
         <Controls
