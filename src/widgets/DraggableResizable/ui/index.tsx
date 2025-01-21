@@ -61,38 +61,24 @@ const DraggableResizable = memo(
   }: Props) => {
     const [grabbed, setGrabbed] = useState(false)
     const contentRef = useRef<HTMLDivElement>(null)
-    const {
-      selectedNodes,
-      handleSelectNode,
-      changePosition,
-      setSelectedNodes,
-    } = useContext(SelectedContext)
+    const { selectedNodes, handleSelectNode, setSelectedNodes } =
+      useContext(SelectedContext)
 
-    const [blockedDragging, setBlockedDragging] = useState(false)
+    const { draggableRef, dragOnMouseDown } = useDraggable()
 
-    const { draggableRef, dragOnMouseDown } = useDraggable({
-      disabled: blockedDragging,
-    })
-
-    const { resizeOnMouseDown, isResizing } = useResizableMultiple({
+    const { resizeOnMouseDown } = useResizableMultiple({
       draggableRef,
-      contentRef,
       heightResizable,
     })
-
-    useEffect(() => {
-      console.log('RESIZING: ', isResizing)
-
-      if (isResizing) {
-        setBlockedDragging(true)
-      } else {
-        setBlockedDragging(false)
-      }
-    }, [isResizing])
-
     const isSelected = selectedNodes.find(
       node => node.id === rest.id || node.id === rest.id + '_node',
     )
+
+    useEffect(() => {
+      if (!isSelected) {
+        setGrabbed(false)
+      }
+    }, [isSelected])
 
     // If was clicked outside of selected nodes, then clear selection
     useEffect(() => {
@@ -101,7 +87,12 @@ const DraggableResizable = memo(
 
         if (!node.id) {
           setSelectedNodes(() => [])
-          if (!selectedNodes.length) setGrabbed(false)
+
+          if (isSelected) {
+            if (rest.onDragLeave) {
+              rest.onDragLeave(isSelected.position)
+            }
+          }
         }
       }
 
@@ -110,28 +101,7 @@ const DraggableResizable = memo(
       return () => {
         window.removeEventListener('dblclick', handleDbl)
       }
-    }, [])
-
-    useEffect(() => {
-      if (selectedNodes.length > 0 && isSelected) {
-        setGrabbed(true)
-      } else if (selectedNodes.length > 0 && !isSelected) {
-        setGrabbed(false)
-      }
-    }, [selectedNodes.length])
-
-    useOnClickOutside(draggableRef || ([] as HTMLElement[]), () => {
-      // Disable dragging/resizing and editing the element when clicked outside
-      setGrabbed(false)
-    })
-
-    useEffect(() => {
-      if (isSelected && !grabbed) {
-        if (rest.onDragLeave) {
-          rest.onDragLeave(isSelected.position)
-        }
-      }
-    }, [grabbed, isSelected])
+    }, [isSelected?.position.x, isSelected?.position.y])
 
     const newX = isSelected?.position.x
     const newY = isSelected?.position.y
@@ -146,18 +116,18 @@ const DraggableResizable = memo(
         className='absolute inline-block'
         aria-label='draggable-resizable'
         onDoubleClick={e => {
-          if (e.ctrlKey || selectedNodes.length < 1)
-            handleSelectNode({
-              id: rest.id,
-              position: {
-                x: initialPosition.x,
-                y: initialPosition.y,
-              },
-              size: {
-                width: initialNodeParams?.size?.width ?? 0,
-                height: initialNodeParams?.size?.height ?? 0,
-              },
-            })
+          handleSelectNode({
+            id: rest.id,
+            position: {
+              x: initialPosition.x,
+              y: initialPosition.y,
+            },
+            size: {
+              width: initialNodeParams?.size?.width ?? 0,
+              height: initialNodeParams?.size?.height ?? 0,
+            },
+          })
+
           setGrabbed(true)
         }}
         style={{
@@ -214,6 +184,7 @@ const DraggableResizable = memo(
 
             {/* Resizer content */}
             <div
+              id='draggable-resizable-content-container'
               ref={contentRef}
               aria-label='draggable-resizable-resizer-content'
             >

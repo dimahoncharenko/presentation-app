@@ -45,7 +45,7 @@ export const SelectedNodesProvider = ({
     )
   }
 
-  const changePosition = (node: SelectedNode) => {
+  const changePosition = (node: Omit<SelectedNode, 'size'>) => {
     setSelectedNodes(prev =>
       prev.map(el =>
         el.id === node.id ? { ...el, position: node.position } : el,
@@ -53,7 +53,7 @@ export const SelectedNodesProvider = ({
     )
   }
 
-  const changeSize = (node: SelectedNode) => {
+  const changeSize = (node: Omit<SelectedNode, 'position'>) => {
     setSelectedNodes(prev =>
       prev.map(el => (el.id === node.id ? { ...el, size: node.size } : el)),
     )

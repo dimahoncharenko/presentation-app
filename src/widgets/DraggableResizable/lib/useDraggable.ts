@@ -63,5 +63,6 @@ export const useDraggable = (props: Props) => {
   return {
     draggableRef,
     dragOnMouseDown,
+    adjustPositionForSelected,
   }
 }
