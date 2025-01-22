@@ -25,6 +25,11 @@ export type SlidesActions = {
     nodeId: SlideElement['id'],
     newPosition: SlideElement['position'],
   ) => void
+  adjustSize: (
+    slideId: SlidesState['slides'][number]['slideId'],
+    nodeId: SlideElement['id'],
+    newSize: SlideElement['size'],
+  ) => void
   changeContent: (
     slideId: SlidesState['slides'][number]['slideId'],
     nodeId: SlideElement['id'],
@@ -212,6 +217,27 @@ export const createSlidesStore = (
                 elements: slide.elements.map(el => {
                   if (el.id === nodeId) {
                     el = { ...el, position: newPosition }
+                  }
+                  return el
+                }),
+              }
+
+              return slide
+            }
+
+            return slide
+          }),
+        })),
+      adjustSize: (slideId, nodeId, newSize) =>
+        set(state => ({
+          ...state,
+          slides: state.slides.map(slide => {
+            if (slide.slideId === slideId) {
+              slide = {
+                ...slide,
+                elements: slide.elements.map(el => {
+                  if (el.id === nodeId) {
+                    el = { ...el, size: newSize }
                   }
                   return el
                 }),

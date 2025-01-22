@@ -1,4 +1,4 @@
-import { MouseEvent, useContext, useRef } from 'react'
+import { MouseEvent, useContext, useEffect, useRef } from 'react'
 
 import { SelectedContext } from '@/shared/context/selected-nodes'
 import {
@@ -9,29 +9,14 @@ import {
 
 type Props = Partial<{
   disabled: boolean
+  initialPosition: {
+    x: number
+    y: number
+  }
 }> | void
 
 export const useDraggable = (props: Props) => {
   const draggableRef = useRef<HTMLDivElement>({} as HTMLDivElement)
-  const { selectedNodes, changePosition } = useContext(SelectedContext)
-
-  const adjustPositionForSelected = ({
-    dx,
-    dy,
-  }: {
-    dx: number
-    dy: number
-  }) => {
-    selectedNodes.forEach(node => {
-      changePosition({
-        id: node.id,
-        position: {
-          x: node.position.x + dx,
-          y: node.position.y + dy,
-        },
-      })
-    })
-  }
 
   const dragOnMouseDown = (
     e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
@@ -45,8 +30,7 @@ export const useDraggable = (props: Props) => {
         const event = evt as unknown as MouseEvent
 
         if (draggableRef.current && !props?.disabled) {
-          const delta = getPositionDelta(e, event)
-          adjustPositionForSelected(delta)
+          draggableRef.current.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`
         }
       }
 
@@ -63,6 +47,5 @@ export const useDraggable = (props: Props) => {
   return {
     draggableRef,
     dragOnMouseDown,
-    adjustPositionForSelected,
   }
 }

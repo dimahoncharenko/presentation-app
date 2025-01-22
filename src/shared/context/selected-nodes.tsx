@@ -22,8 +22,8 @@ type SelectedNodesContext = {
   selectedNodes: SelectedNode[]
   setSelectedNodes: Dispatch<SetStateAction<SelectedNode[]>>
   handleSelectNode: (node: SelectedNode) => void
-  changePosition: (node: SelectedNode) => void
-  changeSize: (node: SelectedNode) => void
+  changePosition: (node: Omit<SelectedNode, 'size'>) => void
+  changeSize: (node: Omit<SelectedNode, 'position'>) => void
 }
 
 export const SelectedContext = createContext({} as SelectedNodesContext)

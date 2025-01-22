@@ -1,7 +1,6 @@
 'use client'
 
 import { memo, ReactNode, useContext, useEffect, useRef, useState } from 'react'
-import { useOnClickOutside } from 'usehooks-ts'
 
 import { SlideElement } from '@/entities/SlideElement'
 import { SelectedContext } from '@/shared/context/selected-nodes'
@@ -64,15 +63,18 @@ const DraggableResizable = memo(
     const { selectedNodes, handleSelectNode, setSelectedNodes } =
       useContext(SelectedContext)
 
-    const { draggableRef, dragOnMouseDown } = useDraggable()
+    const { draggableRef, dragOnMouseDown } = useDraggable({
+      initialPosition,
+    })
+
+    const isSelected = selectedNodes.find(
+      node => node.id === rest.id || node.id === rest.id + '_node',
+    )
 
     const { resizeOnMouseDown } = useResizableMultiple({
       draggableRef,
       heightResizable,
     })
-    const isSelected = selectedNodes.find(
-      node => node.id === rest.id || node.id === rest.id + '_node',
-    )
 
     useEffect(() => {
       if (!isSelected) {
@@ -80,18 +82,27 @@ const DraggableResizable = memo(
       }
     }, [isSelected])
 
+    const newX = isSelected?.position.x
+    const newY = isSelected?.position.y
+
     // If was clicked outside of selected nodes, then clear selection
     useEffect(() => {
       const handleDbl = (event: MouseEvent) => {
-        const node = event.target as HTMLElement
+        if (newX && newY) {
+          const node = event.target as HTMLElement
 
-        if (!node.id) {
-          setSelectedNodes(() => [])
+          const delta = {
+            dx: event.clientX - newX,
+            dy: event.clientY - newY,
+          }
 
-          if (isSelected) {
-            if (rest.onDragLeave) {
-              rest.onDragLeave(isSelected.position)
-            }
+          if (rest.onDragLeave && !node.id) {
+            rest.onDragLeave({
+              x: delta.dx,
+              y: delta.dy,
+            })
+
+            setSelectedNodes(() => [])
           }
         }
       }
@@ -103,17 +114,11 @@ const DraggableResizable = memo(
       }
     }, [isSelected?.position.x, isSelected?.position.y])
 
-    const newX = isSelected?.position.x
-    const newY = isSelected?.position.y
-
-    const newWidth = isSelected?.size?.width
-    const newHeight = isSelected?.size?.height
-
     return (
       <div
         id={rest.id}
         ref={draggableRef}
-        className='absolute inline-block'
+        className='absolute left-0 top-0 inline-block'
         aria-label='draggable-resizable'
         onDoubleClick={e => {
           handleSelectNode({
@@ -129,14 +134,6 @@ const DraggableResizable = memo(
           })
 
           setGrabbed(true)
-        }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          transform: `translate(${newX ?? initialPosition.x}px, ${newY ?? initialPosition.y}px)`,
-          width: `${newWidth ?? initialNodeParams?.size?.width ?? 200}px`,
-          height: `${newHeight ?? initialNodeParams?.size?.width ?? 40}px`,
         }}
       >
         <Controls

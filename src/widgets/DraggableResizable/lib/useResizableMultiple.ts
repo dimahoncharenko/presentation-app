@@ -1,11 +1,18 @@
-import { MouseEvent, useContext, useEffect, useState } from 'react'
+import {
+  MouseEvent,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 
 import { SelectedContext } from '@/shared/context/selected-nodes'
-import { getRectData } from './use-draggable-utils'
 
 type Props = {
   draggableRef: React.RefObject<HTMLElement>
   heightResizable?: boolean
+  id?: string
 }
 
 export const useResizableMultiple = ({
@@ -16,173 +23,17 @@ export const useResizableMultiple = ({
   const { changePosition, changeSize, selectedNodes } =
     useContext(SelectedContext)
 
-  const [naturalSize, setNaturalSize] = useState({
-    width: 0,
+  const initialSize = useRef<{ width: number; height: number }>({
     height: 0,
+    width: 0,
   })
 
-  const resizeOnMouseDown = (
-    e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
-    direction: string,
-  ) => {
-    const currentEl = e.target as HTMLElement
-    const parentEl = currentEl.parentNode as HTMLElement
+  const size = useRef<{ width: number; height: number }>({
+    height: 0,
+    width: 0,
+  })
 
-    if (parentEl) {
-      let prevX = e.clientX
-      let prevY = e.clientY
-
-      const handleMouseMove: EventListener = evt => {
-        const event = evt as unknown as MouseEvent
-
-        if (draggableRef.current) {
-          const rect = draggableRef.current.getBoundingClientRect()
-          const handler = draggableRef.current.querySelector(
-            '#draggable-resizable-controls',
-          )
-          const handlerRect = getRectData(handler)
-
-          const HANDLER_HEIGHT = handlerRect.height
-
-          let newWidth = 0
-          let newHeight = 0
-
-          // Calculate new width, height and position
-          if (direction === 'se') {
-            newWidth = rect.width - (prevX - event.clientX)
-            // In cases when I don't need to resize height
-            if (heightResizable)
-              newHeight = rect.height - (prevY - event.clientY)
-
-            selectedNodes.forEach(node => {
-              changePosition({
-                id: node.id,
-                position: {
-                  x: node.position.x,
-                  y: node.position.y,
-                },
-              })
-
-              changeSize({
-                id: node.id,
-                position: node.position,
-                size: {
-                  width: newWidth,
-                  height:
-                    event.clientY > node.position.y + naturalSize.height
-                      ? newHeight
-                      : naturalSize.height,
-                },
-              })
-            })
-          } else if (direction === 'sw') {
-            newWidth = rect.width - (event.clientX - prevX)
-            if (heightResizable)
-              newHeight = rect.height + (event.clientY - prevY)
-
-            selectedNodes.forEach(node => {
-              changePosition({
-                id: node.id,
-                position: {
-                  x: node.position.x + (event.clientX - e.clientX),
-                  y: node.position.y,
-                },
-              })
-
-              changeSize({
-                id: node.id,
-                position: node.position,
-                size: {
-                  width: newWidth,
-                  height:
-                    event.clientY > node.position.y + naturalSize.height
-                      ? newHeight
-                      : naturalSize.height,
-                },
-              })
-            })
-          } else if (direction === 'ne') {
-            newWidth = rect.width - (prevX - event.clientX)
-
-            if (heightResizable)
-              newHeight = rect.height + (prevY - event.clientY)
-
-            selectedNodes.forEach(node => {
-              changePosition({
-                id: node.id,
-                position: {
-                  x: node.position.x,
-                  y:
-                    newHeight > naturalSize.height
-                      ? node.position.y +
-                        (event.clientY - e.clientY) +
-                        HANDLER_HEIGHT
-                      : node.position.y + HANDLER_HEIGHT,
-                },
-              })
-
-              changeSize({
-                id: node.id,
-                position: node.position,
-                size: {
-                  width: newWidth,
-                  height:
-                    event.clientY < node.position.y + naturalSize.height
-                      ? newHeight
-                      : naturalSize.height,
-                },
-              })
-            })
-          } else if (direction === 'nw') {
-            newWidth = rect.width + (prevX - event.clientX)
-
-            if (heightResizable)
-              newHeight = rect.height + (prevY - event.clientY)
-
-            selectedNodes.forEach(node => {
-              changePosition({
-                id: node.id,
-                position: {
-                  x: node.position.x + (event.clientX - e.clientX),
-                  y:
-                    newHeight > naturalSize.height
-                      ? node.position.y +
-                        (event.clientY - e.clientY) +
-                        HANDLER_HEIGHT
-                      : node.position.y + HANDLER_HEIGHT,
-                },
-              })
-
-              changeSize({
-                id: node.id,
-                position: node.position,
-                size: {
-                  width: newWidth,
-                  height:
-                    event.clientY < node.position.y
-                      ? newHeight
-                      : naturalSize.height,
-                },
-              })
-            })
-          }
-
-          prevX = event.clientX
-          prevY = event.clientY
-        }
-      }
-
-      const handleMouseUp = () => {
-        setIsResizing(false)
-        document.removeEventListener('mousemove', handleMouseMove)
-        document.removeEventListener('mouseup', handleMouseUp)
-      }
-
-      setIsResizing(true)
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
-    }
-  }
+  const position = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
   // It's used to calculate the natural size of the element; only while mounting
   useEffect(() => {
@@ -200,27 +51,165 @@ export const useResizableMultiple = ({
 
           if (!img.naturalHeight || !img?.naturalWidth) {
             img.onload = () => {
-              setNaturalSize({
-                width: img.naturalWidth,
-                // Preserve aspect ratio and make sure the image is maximum $maxWidth
-                height: (img.naturalHeight * maxWidth) / img.naturalWidth,
-              })
+              initialSize.current.width = img.naturalWidth
+              initialSize.current.height =
+                (img.naturalHeight * maxWidth) / img.naturalWidth
             }
             return
           }
         } else {
           const rect = contentChild.getBoundingClientRect()
-          setNaturalSize({
-            width: rect.width,
-            height: rect.height,
-          })
+          initialSize.current.width = rect.width
+          initialSize.current.height = rect.height
         }
       }
     }
   }, [draggableRef])
 
+  useLayoutEffect(() => {
+    if (draggableRef.current) {
+      const positionX = position.current.x
+      const positionY = position.current.y
+      const nodeWidth = size.current.width
+      const nodeHeight = size.current.height
+
+      draggableRef.current.style.transform = `translate(${positionX || 500}px, ${positionY || 300}px)`
+      draggableRef.current.style.width = `${nodeWidth || initialSize.current.width || 200}px`
+      draggableRef.current.style.height = `${nodeHeight || initialSize.current.height || 50}px`
+    }
+  }, [
+    draggableRef,
+    size.current.height,
+    size.current.width,
+    position.current.x,
+    position.current.y,
+  ])
+
+  const resizeOnMouseDown = (
+    e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
+    direction: string,
+  ) => {
+    const currentEl = e.target as HTMLElement
+    const parentEl = currentEl.parentNode as HTMLElement
+
+    if (parentEl) {
+      let prevX = e.clientX
+      let prevY = e.clientY
+
+      let prevWidth = parentEl.offsetWidth
+      let prevHeight = parentEl.offsetHeight
+
+      const handleMouseMove: EventListener = evt => {
+        const event = evt as unknown as MouseEvent
+
+        if (draggableRef.current) {
+          const rect = draggableRef.current.getBoundingClientRect()
+          size.current.width = rect.width - (event.clientX - prevX)
+
+          if (direction === 'se') {
+            if (heightResizable) {
+              size.current.height = rect.height - (prevY - event.clientY)
+            }
+
+            position.current = {
+              x: e.clientX - prevWidth,
+              y: e.clientY - prevHeight,
+            }
+
+            size.current = {
+              width: rect.width + (event.clientX - prevX),
+              height: size.current.height,
+            }
+          } else if (direction === 'sw') {
+            if (heightResizable) {
+              size.current.height = rect.height - (prevY - event.clientY)
+            }
+
+            position.current = {
+              y: e.clientY - prevHeight,
+              x: prevX - (prevX - event.clientX),
+            }
+
+            size.current = {
+              width: rect.width - (event.clientX - prevX),
+              height: size.current.height,
+            }
+          } else if (direction === 'ne') {
+            if (heightResizable) {
+              size.current.height = rect.height - (event.clientY - prevY)
+            }
+
+            position.current = {
+              x: e.clientX - prevWidth,
+              y: event.clientY + (prevY - event.clientY),
+            }
+
+            size.current = {
+              width: rect.width + (event.clientX - prevX),
+              height: size.current.height,
+            }
+          } else if (direction === 'nw') {
+            if (heightResizable)
+              size.current.height = rect.height + (prevY - event.clientY)
+
+            position.current = {
+              x: prevX - (prevX - event.clientX),
+              y: prevY - (prevY - event.clientY),
+            }
+
+            size.current = {
+              width: rect.width - (event.clientX - prevX),
+              height: size.current.height,
+            }
+          }
+
+          draggableRef.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`
+          draggableRef.current.style.width = `${size.current.width}px`
+          draggableRef.current.style.height = `${size.current.height}px`
+
+          prevX = event.clientX
+          prevY = event.clientY
+        }
+      }
+
+      const handleMouseUp = () => {
+        setIsResizing(false)
+        selectedNodes.forEach(node => {
+          changePosition({
+            id: node.id,
+            position: position.current,
+          })
+
+          changeSize({
+            id: node.id,
+            size: size.current,
+          })
+        })
+
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+      }
+
+      setIsResizing(true)
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+    }
+  }
+
+  const nodePosition = {
+    x: position.current.x,
+    y: position.current.y,
+  }
+
+  const nodeSize = {
+    width: size.current.width,
+    height: size.current.height,
+  }
+
   return {
     resizeOnMouseDown,
     isResizing,
+    nodePosition,
+    nodeSize,
   }
 }
