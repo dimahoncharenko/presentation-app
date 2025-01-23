@@ -1,58 +1,36 @@
-import { MouseEvent, useContext, useRef } from 'react'
+import { MouseEvent, useContext, useEffect, useRef } from 'react'
 
 import { SelectedContext } from '@/shared/context/selected-nodes'
+import {
+  getDraggableHandler,
+  getParentNode,
+  getPositionDelta,
+} from './use-draggable-utils'
 
-type Props = {
-  disabled?: boolean
+type Props = Partial<{
+  disabled: boolean
   initialPosition: {
     x: number
     y: number
   }
-}
+}> | void
 
-export const useDraggable = ({ disabled, initialPosition }: Props) => {
+export const useDraggable = (props: Props) => {
   const draggableRef = useRef<HTMLDivElement>({} as HTMLDivElement)
-  const { selectedNodes, changePosition } = useContext(SelectedContext)
 
   const dragOnMouseDown = (
     e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
   ) => {
-    // Draggable element (aria-label='draggable-resizable-handler')
-    const currentEl = e.currentTarget as HTMLElement
-
-    // Controls wrapper (aria-label='draggable-resizable-controls')
-    const parentEl = currentEl.parentNode as HTMLElement
+    // Initialize the dragging only after the container has been initialized
+    const handler = getDraggableHandler(e)
+    const parentEl = getParentNode(handler)
 
     if (parentEl) {
-      const rect = parentEl.getBoundingClientRect()
-      const handlerSize = (
-        parentEl.children[0] as HTMLElement
-      ).getBoundingClientRect().width
-
-      // Sets the position of the draggable element: mouse position - top left corner + doubled handler size
-      // Doubled handler size is used for centering the draggable element
-      const offsetX = e.clientX - rect.left + handlerSize * 2
-      const offsetY = e.clientY - rect.top
-
       const handleMouseMove: EventListener = evt => {
         const event = evt as unknown as MouseEvent
 
-        if (draggableRef.current && !disabled) {
-          // Change position of all selected elements
-          const delta = {
-            x: event.clientX - offsetX - initialPosition.x,
-            y: event.clientY - offsetY - initialPosition.y,
-          }
-
-          selectedNodes.forEach(node => {
-            changePosition({
-              id: node.id,
-              position: {
-                x: node.position.x + delta.x,
-                y: node.position.y + delta.y,
-              },
-            })
-          })
+        if (draggableRef.current && !props?.disabled) {
+          draggableRef.current.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`
         }
       }
 

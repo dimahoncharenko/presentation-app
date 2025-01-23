@@ -11,12 +11,14 @@ import { Slide } from '@/entities/Slide/ui'
 import { EditableFlipWords, EditableText } from '@/entities/SlideElement'
 import { TextHighlight } from '@/shared/ui/bricks/featured/TextHighlight'
 import { RevealContext } from '@/shared/context/reveal-context'
+import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 
 export const PresentationWrapper = () => {
   const { setDeckRef, deckRef } = useContext(RevealContext)
   const deckDivRef = useRef<HTMLDivElement>({} as HTMLDivElement) // reference to deck container div
   const slidesState = useSlidesStore(state => state)
+  const { selectedNodes } = useContext(SelectedContext)
 
   useEffect(() => {
     if (!deckRef.current && deckDivRef.current) {
@@ -40,8 +42,10 @@ export const PresentationWrapper = () => {
     slideId: string,
     nodeId: string,
     newPosition: { x: number; y: number },
+    newSize?: { width: number; height: number },
   ) => {
     slidesState.adjustPosition(slideId, nodeId, newPosition)
+    slidesState.adjustSize(slideId, nodeId, newSize)
   }
 
   return (
@@ -98,12 +102,26 @@ export const PresentationWrapper = () => {
                               onDelete={() =>
                                 handleDelete(slide.slideId, el.id)
                               }
-                              onChangedPosition={newPosition => {
-                                handleDragLeave(
-                                  slide.slideId,
-                                  el.id,
-                                  newPosition,
-                                )
+                              onChangedPosition={() => {
+                                selectedNodes.forEach(node => {
+                                  console.log(
+                                    'Is about to resize node: ',
+                                    node.size,
+                                  )
+
+                                  handleDragLeave(
+                                    slide.slideId,
+                                    node.id,
+                                    {
+                                      x: node.position.x,
+                                      y: node.position.y,
+                                    },
+                                    {
+                                      width: node.size!.width,
+                                      height: node.size!.height,
+                                    },
+                                  )
+                                })
                               }}
                               onChange={value => {
                                 if (!value) return

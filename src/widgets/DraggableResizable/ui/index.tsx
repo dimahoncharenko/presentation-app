@@ -1,12 +1,13 @@
 'use client'
 
 import { memo, ReactNode, useContext, useEffect, useRef, useState } from 'react'
-import { useOnClickOutside } from 'usehooks-ts'
 
+import { SlideElement } from '@/entities/SlideElement'
 import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 import { useDraggable } from '../lib/useDraggable'
 import { useResizable } from '../lib/useResizable'
+import { useResizableMultiple } from '../lib/useResizableMultiple'
 import { Controls } from './Controls'
 
 type ChildrenProps = {
@@ -22,6 +23,10 @@ type Props =
         x: number
         y: number
       }
+      initialNodeParams?: {
+        position: SlideElement['position']
+        size: SlideElement['size']
+      }
       onDelete: () => void
       heightResizable?: boolean
       onDragLeave?: (newPosition: { x: number; y: number }) => void
@@ -36,66 +41,69 @@ type Props =
         x: number
         y: number
       }
+      initialNodeParams?: {
+        position: SlideElement['position']
+        size: SlideElement['size']
+      }
       onDelete: () => void
       onDragLeave?: (newPosition: { x: number; y: number }) => void
       handleDragAll?: (params: { deltaX: number; deltaY: number }) => void
     }
 
 const DraggableResizable = memo(
-  ({ initialPosition, onDelete, heightResizable = true, ...rest }: Props) => {
+  ({
+    initialPosition,
+    onDelete,
+    initialNodeParams,
+    heightResizable = true,
+    ...rest
+  }: Props) => {
     const [grabbed, setGrabbed] = useState(false)
     const contentRef = useRef<HTMLDivElement>(null)
-    const {
-      selectedNodes,
-      handleSelectNode,
-      changePosition,
-      setSelectedNodes,
-    } = useContext(SelectedContext)
+    const { selectedNodes, handleSelectNode, setSelectedNodes } =
+      useContext(SelectedContext)
 
     const { draggableRef, dragOnMouseDown } = useDraggable({
-      initialPosition: {
-        x: initialPosition.x,
-        y: initialPosition.y,
-      },
-    })
-
-    const { resizeOnMouseDown, size } = useResizable({
-      draggableRef,
-      position: initialPosition,
-      setPosition: newPos => {
-        selectedNodes.forEach(node => {
-          const delta = {
-            x: newPos.x - node.position.x,
-            y: newPos.y - node.position.y,
-          }
-
-          console.log('setPosition: ', delta)
-
-          changePosition({
-            id: node.id,
-            position: {
-              x: node.position.x + delta.x,
-              y: node.position.y + delta.y,
-            },
-          })
-        })
-      },
-      contentRef,
-      heightResizable,
+      initialPosition,
     })
 
     const isSelected = selectedNodes.find(
       node => node.id === rest.id || node.id === rest.id + '_node',
     )
 
+    const { resizeOnMouseDown } = useResizableMultiple({
+      draggableRef,
+      heightResizable,
+    })
+
+    useEffect(() => {
+      if (!isSelected) {
+        setGrabbed(false)
+      }
+    }, [isSelected])
+
+    const newX = isSelected?.position.x
+    const newY = isSelected?.position.y
+
     // If was clicked outside of selected nodes, then clear selection
     useEffect(() => {
       const handleDbl = (event: MouseEvent) => {
-        const node = event.target as HTMLElement
+        if (newX && newY) {
+          const node = event.target as HTMLElement
 
-        if (!node.id) {
-          setSelectedNodes(() => [])
-          if (!selectedNodes.length) setGrabbed(false)
+          const delta = {
+            dx: event.clientX - newX,
+            dy: event.clientY - newY,
+          }
+
+          if (rest.onDragLeave && !node.id) {
+            rest.onDragLeave({
+              x: delta.dx,
+              y: delta.dy,
+            })
+
+            setSelectedNodes(() => [])
+          }
         }
       }
 
@@ -104,56 +112,28 @@ const DraggableResizable = memo(
       return () => {
         window.removeEventListener('dblclick', handleDbl)
       }
-    }, [])
-
-    useEffect(() => {
-      if (selectedNodes.length > 0 && isSelected) {
-        setGrabbed(true)
-      } else if (selectedNodes.length > 0 && !isSelected) {
-        setGrabbed(false)
-      }
-    }, [selectedNodes.length])
-
-    useOnClickOutside(draggableRef || ([] as HTMLElement[]), () => {
-      // Disable dragging/resizing and editing the element when clicked outside
-      setGrabbed(false)
-    })
-
-    useEffect(() => {
-      if (isSelected && !grabbed) {
-        if (rest.onDragLeave) {
-          rest.onDragLeave(isSelected.position)
-        }
-      }
-    }, [grabbed, isSelected])
-
-    const newX = isSelected?.position.x
-    const newY = isSelected?.position.y
+    }, [isSelected?.position.x, isSelected?.position.y])
 
     return (
       <div
         id={rest.id}
         ref={draggableRef}
-        className='absolute inline-block'
+        className='absolute left-0 top-0 inline-block'
         aria-label='draggable-resizable'
         onDoubleClick={e => {
-          if (e.ctrlKey || selectedNodes.length < 1)
-            handleSelectNode({
-              id: rest.id,
-              position: {
-                x: initialPosition.x,
-                y: initialPosition.y,
-              },
-            })
+          handleSelectNode({
+            id: rest.id,
+            position: {
+              x: initialPosition.x,
+              y: initialPosition.y,
+            },
+            size: {
+              width: initialNodeParams?.size?.width ?? 0,
+              height: initialNodeParams?.size?.height ?? 0,
+            },
+          })
+
           setGrabbed(true)
-        }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          transform: `translate(${newX ?? initialPosition.x}px, ${newY ?? initialPosition.y}px)`,
-          width: `${size.width}px`,
-          height: `${size.height}px`,
         }}
       >
         <Controls
@@ -201,6 +181,7 @@ const DraggableResizable = memo(
 
             {/* Resizer content */}
             <div
+              id='draggable-resizable-content-container'
               ref={contentRef}
               aria-label='draggable-resizable-resizer-content'
             >

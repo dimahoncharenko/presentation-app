@@ -22,7 +22,7 @@ export const Controls = ({
         className,
         grabbed && 'flex items-center justify-between',
       )}
-      aria-label='draggable-resizable-controls'
+      id='draggable-resizable-controls'
     >
       <span className='block size-4'></span>
       <div

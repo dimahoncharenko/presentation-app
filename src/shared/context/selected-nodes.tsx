@@ -12,13 +12,18 @@ export interface SelectedNode {
     x: number
     y: number
   }
+  size?: {
+    width: number
+    height: number
+  }
 }
 
 type SelectedNodesContext = {
   selectedNodes: SelectedNode[]
   setSelectedNodes: Dispatch<SetStateAction<SelectedNode[]>>
   handleSelectNode: (node: SelectedNode) => void
-  changePosition: (node: SelectedNode) => void
+  changePosition: (node: Omit<SelectedNode, 'size'>) => void
+  changeSize: (node: Omit<SelectedNode, 'position'>) => void
 }
 
 export const SelectedContext = createContext({} as SelectedNodesContext)
@@ -40,11 +45,17 @@ export const SelectedNodesProvider = ({
     )
   }
 
-  const changePosition = (node: SelectedNode) => {
+  const changePosition = (node: Omit<SelectedNode, 'size'>) => {
     setSelectedNodes(prev =>
       prev.map(el =>
         el.id === node.id ? { ...el, position: node.position } : el,
       ),
+    )
+  }
+
+  const changeSize = (node: Omit<SelectedNode, 'position'>) => {
+    setSelectedNodes(prev =>
+      prev.map(el => (el.id === node.id ? { ...el, size: node.size } : el)),
     )
   }
 
@@ -55,6 +66,7 @@ export const SelectedNodesProvider = ({
         changePosition,
         setSelectedNodes,
         handleSelectNode,
+        changeSize,
       }}
     >
       {children}
