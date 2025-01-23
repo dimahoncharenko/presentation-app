@@ -48,6 +48,21 @@ export const PresentationWrapper = () => {
     slidesState.adjustSize(slideId, nodeId, newSize)
   }
 
+  useEffect(() => {
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Delete' && deckRef.current) {
+        selectedNodes.forEach(node => {
+          slidesState.removeNodeFromSlide(
+            `slide-${deckRef.current!.getState().indexh}`,
+            node.id,
+          )
+        })
+      }
+    }
+
+    window.addEventListener('keyup', handleKeyUp)
+  }, [selectedNodes.length, deckRef])
+
   return (
     <>
       <div

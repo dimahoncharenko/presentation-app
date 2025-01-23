@@ -6,7 +6,6 @@ import { SlideElement } from '@/entities/SlideElement'
 import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 import { useDraggable } from '../lib/useDraggable'
-import { useResizable } from '../lib/useResizable'
 import { useResizableMultiple } from '../lib/useResizableMultiple'
 import { Controls } from './Controls'
 
@@ -120,7 +119,7 @@ const DraggableResizable = memo(
         ref={draggableRef}
         className='absolute left-0 top-0 inline-block'
         aria-label='draggable-resizable'
-        onDoubleClick={e => {
+        onDoubleClick={() => {
           handleSelectNode({
             id: rest.id,
             position: {
