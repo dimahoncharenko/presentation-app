@@ -1,11 +1,6 @@
-import { MouseEvent, useContext, useEffect, useRef } from 'react'
+import { MouseEvent, useRef } from 'react'
 
-import { SelectedContext } from '@/shared/context/selected-nodes'
-import {
-  getDraggableHandler,
-  getParentNode,
-  getPositionDelta,
-} from './use-draggable-utils'
+import { getDraggableHandler, getParentNode } from './use-draggable-utils'
 
 type Props = Partial<{
   disabled: boolean

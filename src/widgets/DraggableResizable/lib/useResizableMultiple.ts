@@ -96,8 +96,8 @@ export const useResizableMultiple = ({
       let prevX = e.clientX
       let prevY = e.clientY
 
-      let prevWidth = parentEl.offsetWidth
-      let prevHeight = parentEl.offsetHeight
+      const prevWidth = parentEl.offsetWidth
+      const prevHeight = parentEl.offsetHeight
 
       const handleMouseMove: EventListener = evt => {
         const event = evt as unknown as MouseEvent
