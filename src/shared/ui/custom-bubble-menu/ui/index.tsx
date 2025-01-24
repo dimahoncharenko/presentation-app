@@ -14,7 +14,7 @@ export const CustomBubbleMenu = ({ editor, hide, attributes }: Props) => {
   return (
     <BubbleMenu
       editor={editor}
-      className={cn('max-w-[215px]', hide && 'hidden')}
+      className={cn('min-w-[215px]', hide && 'hidden')}
     >
       <BubbleMenuContent
         editor={editor}

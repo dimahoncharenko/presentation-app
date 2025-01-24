@@ -1,20 +1,17 @@
 'use client'
 
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect } from 'react'
 import { useCurrentAttributes } from '@/shared/hooks/useCurrentAttributes'
 import { CustomBubbleMenu } from '@/shared/ui/custom-bubble-menu'
 import { BubbleMenuContent } from '@/shared/ui/custom-bubble-menu/ui/Content'
 import { Editor, EditorContent } from '@tiptap/react'
-import { List, ListOrdered, Palette } from 'lucide-react'
+import { List, ListOrdered } from 'lucide-react'
 
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuSeparator,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from '@/shared/ui/bricks/common/context-menu'
 import {
@@ -23,7 +20,6 @@ import {
 } from '@/shared/ui/bricks/common/toggle-group'
 import { cn } from '@/shared/lib/cn-merge'
 import classes from './classes.module.css'
-import { ColorPicker } from './ColorPicker'
 import { FancyRewriter } from './FancyRewriter'
 
 type Props = {
@@ -38,7 +34,6 @@ const handleSelect = (e: Event) => {
 }
 
 const WYSWYG = memo(({ editor, id, hideBubbleMenu }: Props) => {
-  const [paletteOpened, setPaletteOpened] = useState(true)
   const attributes = useCurrentAttributes(editor)
 
   useEffect(() => {
@@ -59,7 +54,7 @@ const WYSWYG = memo(({ editor, id, hideBubbleMenu }: Props) => {
           />
         )}
       </ContextMenuTrigger>
-      <ContextMenuContent className='w-[215px]'>
+      <ContextMenuContent className='min-w-[215px]'>
         {editor && (
           <BubbleMenuContent
             classNames={{
@@ -71,25 +66,10 @@ const WYSWYG = memo(({ editor, id, hideBubbleMenu }: Props) => {
           />
         )}
 
-        <ContextMenuSub open={paletteOpened} onOpenChange={setPaletteOpened}>
-          <ContextMenuSubTrigger className='flex items-center gap-2 pl-5'>
-            <Palette className='size-4' /> Set Color
-          </ContextMenuSubTrigger>
-          <ContextMenuSubContent onPointerDownOutside={console.log}>
-            <ContextMenuItem
-              className='relative flex-col'
-              onSelect={handleSelect}
-            >
-              {editor && <ColorPicker editor={editor} />}
-            </ContextMenuItem>
-          </ContextMenuSubContent>
-        </ContextMenuSub>
-
-        <ContextMenuSeparator />
-
         <ContextMenuItem onSelect={handleSelect} inset>
           <ToggleGroup type='single'>
             <ToggleGroupItem
+              title='Add bulleted list'
               value='bullet'
               onMouseDownCapture={() => {
                 editor
@@ -105,6 +85,7 @@ const WYSWYG = memo(({ editor, id, hideBubbleMenu }: Props) => {
               <List className='size-4' />
             </ToggleGroupItem>
             <ToggleGroupItem
+              title='Add ordered list'
               value='ordered'
               onMouseDownCapture={() => {
                 editor
