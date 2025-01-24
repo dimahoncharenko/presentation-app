@@ -8,7 +8,15 @@ import {
   IconAlignRight,
 } from '@tabler/icons-react'
 import { Editor, EditorContent } from '@tiptap/react'
-import { Bold, Italic, Underline } from 'lucide-react'
+import {
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  Palette,
+  Type,
+  Underline,
+} from 'lucide-react'
 
 import {
   ContextMenu,
@@ -43,6 +51,8 @@ const handleSelect = (e: Event) => {
 const WYSWYG = memo(({ editor, id }: Props) => {
   const [paletteOpened, setPaletteOpened] = useState(true)
 
+  console.log(editor?.getAttributes('paragraph'))
+
   useEffect(() => {
     if (editor) {
       editor.commands.updateAttributes('paragraph', { id })
@@ -56,7 +66,9 @@ const WYSWYG = memo(({ editor, id }: Props) => {
       </ContextMenuTrigger>
       <ContextMenuContent className='w-64'>
         <ContextMenuSub open={paletteOpened} onOpenChange={setPaletteOpened}>
-          <ContextMenuSubTrigger inset>Set Color</ContextMenuSubTrigger>
+          <ContextMenuSubTrigger className='flex items-center gap-2 pl-5'>
+            <Palette className='size-4' /> Set Color
+          </ContextMenuSubTrigger>
           <ContextMenuSubContent onPointerDownOutside={console.log}>
             <ContextMenuItem
               className='relative flex-col'
@@ -67,49 +79,10 @@ const WYSWYG = memo(({ editor, id }: Props) => {
           </ContextMenuSubContent>
         </ContextMenuSub>
 
-        <ContextMenuItem inset onSelect={handleSelect}>
-          <ToggleGroup type='multiple'>
-            <ToggleGroupItem
-              value='bold'
-              aria-label='Toggle bold'
-              onMouseDownCapture={() =>
-                editor?.chain().focus().toggleBold().run()
-              }
-              className={cn(
-                editor?.isActive('bold') && 'bg-black bg-opacity-5',
-              )}
-            >
-              <Bold className='h-4 w-4' />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value='italic'
-              aria-label='Toggle italic'
-              onMouseDownCapture={() => {
-                editor?.chain().focus().toggleItalic().run()
-              }}
-              className={cn(
-                editor?.isActive('italic') && 'bg-black bg-opacity-5',
-              )}
-            >
-              <Italic className='h-4 w-4' />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value='underline'
-              aria-label='Toggle underline'
-              onMouseDownCapture={() => {
-                editor?.chain().focus().toggleUnderline().run()
-              }}
-              className={cn(
-                editor?.isActive('underline') && 'bg-black bg-opacity-5',
-              )}
-            >
-              <Underline className='h-4 w-4' />
-            </ToggleGroupItem>
-          </ToggleGroup>
-        </ContextMenuItem>
-
         <ContextMenuSub>
-          <ContextMenuSubTrigger inset>Set Font</ContextMenuSubTrigger>
+          <ContextMenuSubTrigger className='flex items-center gap-2 pl-5'>
+            <Type className='size-4' /> Set Font
+          </ContextMenuSubTrigger>
           <ContextMenuSubContent className='w-48'>
             <ContextMenuItem
               onSelect={handleSelect}
@@ -161,6 +134,48 @@ const WYSWYG = memo(({ editor, id }: Props) => {
             </ContextMenuItem>
           </ContextMenuSubContent>
         </ContextMenuSub>
+
+        <ContextMenuItem inset onSelect={handleSelect}>
+          <ToggleGroup type='multiple'>
+            <ToggleGroupItem
+              value='bold'
+              aria-label='Toggle bold'
+              onMouseDownCapture={() =>
+                editor?.chain().focus().toggleBold().run()
+              }
+              className={cn(
+                editor?.isActive('bold') && 'bg-black bg-opacity-5',
+              )}
+            >
+              <Bold className='h-4 w-4' />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value='italic'
+              aria-label='Toggle italic'
+              onMouseDownCapture={() => {
+                editor?.chain().focus().toggleItalic().run()
+              }}
+              className={cn(
+                editor?.isActive('italic') && 'bg-black bg-opacity-5',
+              )}
+            >
+              <Italic className='h-4 w-4' />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value='underline'
+              aria-label='Toggle underline'
+              onMouseDownCapture={() => {
+                editor?.chain().focus().toggleUnderline().run()
+              }}
+              className={cn(
+                editor?.isActive('underline') && 'bg-black bg-opacity-5',
+              )}
+            >
+              <Underline className='h-4 w-4' />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </ContextMenuItem>
+
         <ContextMenuSeparator />
         <ContextMenuCheckboxItem onSelect={handleSelect}>
           <ToggleGroup
@@ -206,6 +221,43 @@ const WYSWYG = memo(({ editor, id }: Props) => {
             </ToggleGroupItem>
           </ToggleGroup>
         </ContextMenuCheckboxItem>
+
+        <ContextMenuItem onSelect={handleSelect} inset>
+          <ToggleGroup type='single'>
+            <ToggleGroupItem
+              value='bullet'
+              onMouseDownCapture={() => {
+                editor
+                  ?.chain()
+                  .focus()
+                  .toggleList('bulletList', 'listItem')
+                  .run()
+              }}
+              className={cn(
+                editor?.isActive('bulletList') && 'bg-black bg-opacity-5',
+              )}
+            >
+              <List className='size-4' />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value='ordered'
+              onMouseDownCapture={() => {
+                editor
+                  ?.chain()
+                  .focus()
+                  .toggleList('orderedList', 'listItem')
+                  .run()
+              }}
+              className={cn(
+                editor?.isActive('orderedList') && 'bg-black bg-opacity-5',
+              )}
+            >
+              <ListOrdered className='size-4' />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </ContextMenuItem>
+
+        <ContextMenuSeparator />
 
         <ContextMenuItem onSelect={handleSelect}>
           {editor && <FancyRewriter editor={editor} />}
