@@ -22,6 +22,9 @@ type SelectedNodesContext = {
   selectedNodes: SelectedNode[]
   setSelectedNodes: Dispatch<SetStateAction<SelectedNode[]>>
   handleSelectNode: (node: SelectedNode) => void
+  removeSelectedNode: (node: SelectedNode) => void
+  toggleSelectNode: (node: SelectedNode) => void
+  isSelectedNode: (node: SelectedNode) => boolean
   changePosition: (node: Omit<SelectedNode, 'size'>) => void
   changeSize: (node: Omit<SelectedNode, 'position'>) => void
 }
@@ -37,12 +40,24 @@ export const SelectedNodesProvider = ({
 }: SelectedNodesProviderProps) => {
   const [selectedNodes, setSelectedNodes] = useState<SelectedNode[]>([])
 
+  const isSelectedNode = (node: SelectedNode) => {
+    return !!selectedNodes.find(el => el.id === node.id)
+  }
+
+  const toggleSelectNode = (node: SelectedNode) => {
+    if (isSelectedNode(node)) {
+      handleSelectNode(node)
+    } else {
+      removeSelectedNode(node)
+    }
+  }
+
+  const removeSelectedNode = (node: SelectedNode) => {
+    setSelectedNodes(prev => prev.filter(el => el.id !== node.id))
+  }
+
   const handleSelectNode = (node: SelectedNode) => {
-    setSelectedNodes(prev =>
-      prev.find(el => el.id === node.id)
-        ? prev.filter(el => el.id !== node.id)
-        : [...prev, node],
-    )
+    setSelectedNodes(prev => [...prev, node])
   }
 
   const changePosition = (node: Omit<SelectedNode, 'size'>) => {
@@ -65,6 +80,9 @@ export const SelectedNodesProvider = ({
         selectedNodes,
         changePosition,
         setSelectedNodes,
+        toggleSelectNode,
+        isSelectedNode,
+        removeSelectedNode,
         handleSelectNode,
         changeSize,
       }}
