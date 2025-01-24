@@ -12,7 +12,6 @@ import { SelectedContext } from '@/shared/context/selected-nodes'
 type Props = {
   draggableRef: React.RefObject<HTMLElement>
   heightResizable?: boolean
-  id?: string
 }
 
 export const useResizableMultiple = ({

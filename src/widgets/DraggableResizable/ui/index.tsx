@@ -11,6 +11,7 @@ import { Controls } from './Controls'
 
 type ChildrenProps = {
   grabbed: boolean
+  isResizing: boolean
 }
 
 type Props =
@@ -69,7 +70,7 @@ const DraggableResizable = memo(
       node => node.id === rest.id || node.id === rest.id + '_node',
     )
 
-    const { resizeOnMouseDown } = useResizableMultiple({
+    const { resizeOnMouseDown, isResizing } = useResizableMultiple({
       draggableRef,
       heightResizable,
     })
@@ -177,7 +178,7 @@ const DraggableResizable = memo(
               aria-label='draggable-resizable-resizer-content'
             >
               {rest.type === 'advanced'
-                ? rest.children({ grabbed: !!isSelected })
+                ? rest.children({ grabbed: !!isSelected, isResizing })
                 : rest.children}
             </div>
           </div>
