@@ -26,7 +26,7 @@ export const EditableText = ({
           <DraggableResizable
             id={element.id}
             onDelete={onDelete}
-            type='common'
+            type='advanced'
             onDragLeave={onChangedPosition}
             initialPosition={element.position}
             handleDragAll={handleDragAll}
@@ -38,11 +38,14 @@ export const EditableText = ({
               },
             }}
           >
-            <WYSWYG
-              id={element.id + '_node'}
-              content={element.content}
-              editor={editor}
-            />
+            {({ grabbed }) => (
+              <WYSWYG
+                id={element.id + '_node'}
+                content={element.content}
+                editor={editor}
+                grabbed={grabbed}
+              />
+            )}
           </DraggableResizable>
         )
       }}

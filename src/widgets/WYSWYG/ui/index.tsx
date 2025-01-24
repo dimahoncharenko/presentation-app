@@ -36,22 +36,22 @@ import {
 import { cn } from '@/shared/lib/cn-merge'
 import classes from './classes.module.css'
 import { ColorPicker } from './ColorPicker'
+import { CustomBubbleMenu } from './custom-bubble-menu'
 import { FancyRewriter } from './FancyRewriter'
 
 type Props = {
   content: string
   editor: Editor | null
   id: string
+  grabbed: boolean
 }
 
 const handleSelect = (e: Event) => {
   e.preventDefault()
 }
 
-const WYSWYG = memo(({ editor, id }: Props) => {
+const WYSWYG = memo(({ editor, id, grabbed }: Props) => {
   const [paletteOpened, setPaletteOpened] = useState(true)
-
-  console.log(editor?.getAttributes('paragraph'))
 
   useEffect(() => {
     if (editor) {
@@ -63,6 +63,7 @@ const WYSWYG = memo(({ editor, id }: Props) => {
     <ContextMenu>
       <ContextMenuTrigger>
         <EditorContent id={id} className={classes.editor} editor={editor} />
+        {editor && <CustomBubbleMenu grabbed={grabbed} editor={editor} />}
       </ContextMenuTrigger>
       <ContextMenuContent className='w-64'>
         <ContextMenuSub open={paletteOpened} onOpenChange={setPaletteOpened}>
@@ -134,6 +135,8 @@ const WYSWYG = memo(({ editor, id }: Props) => {
             </ContextMenuItem>
           </ContextMenuSubContent>
         </ContextMenuSub>
+
+        <ContextMenuItem inset></ContextMenuItem>
 
         <ContextMenuItem inset onSelect={handleSelect}>
           <ToggleGroup type='multiple'>
