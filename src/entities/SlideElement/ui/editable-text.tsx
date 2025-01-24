@@ -38,12 +38,12 @@ export const EditableText = ({
               },
             }}
           >
-            {({ grabbed }) => (
+            {({ grabbed, isResizing }) => (
               <WYSWYG
                 id={element.id + '_node'}
                 content={element.content}
                 editor={editor}
-                grabbed={grabbed}
+                hideBubbleMenu={isResizing || !grabbed}
               />
             )}
           </DraggableResizable>
