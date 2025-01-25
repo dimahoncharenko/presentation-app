@@ -1,5 +1,6 @@
 import Color from '@tiptap/extension-color'
 import FontFamily from '@tiptap/extension-font-family'
+import Highlight from '@tiptap/extension-highlight'
 import Paragraph from '@tiptap/extension-paragraph'
 import TextAlign from '@tiptap/extension-text-align'
 import TextStyle from '@tiptap/extension-text-style'
@@ -30,6 +31,9 @@ const extensions = [
   FontFamily,
   UnderlineExtension,
   FontSize,
+  Highlight.configure({
+    multicolor: true,
+  }),
   TextAlign.configure({
     types: ['heading', 'paragraph'],
   }),
