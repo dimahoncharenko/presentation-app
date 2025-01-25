@@ -33,6 +33,7 @@ import {
 } from '../../bricks/common/select'
 import { ToggleGroup, ToggleGroupItem } from '../../bricks/common/toggle-group'
 import { sizes } from '../lib/data'
+import { HighlightText } from './HighlightText'
 
 type Props = {
   editor: Editor
@@ -279,6 +280,8 @@ export const BubbleMenuContent = ({
           {editor && <ColorPicker editor={editor} />}
         </PopoverContent>
       </Popover>
+
+      <HighlightText editor={editor} />
     </div>
   )
 }
