@@ -75,28 +75,17 @@ const DraggableResizable = memo(
       heightResizable,
     })
 
-    const newX = isSelected?.position.x
-    const newY = isSelected?.position.y
-
     // If was clicked outside of selected nodes, then clear selection
     useEffect(() => {
       const handleDbl = (event: MouseEvent) => {
-        if (newX && newY) {
-          const node = event.target as HTMLElement
+        const node = event.target as HTMLElement
+        if (rest.onDragLeave && !node.id) {
+          rest.onDragLeave({
+            x: event.clientX,
+            y: event.clientY,
+          })
 
-          const delta = {
-            dx: event.clientX - newX,
-            dy: event.clientY - newY,
-          }
-
-          if (rest.onDragLeave && !node.id) {
-            rest.onDragLeave({
-              x: delta.dx,
-              y: delta.dy,
-            })
-
-            setSelectedNodes(() => [])
-          }
+          setSelectedNodes(() => [])
         }
       }
 
@@ -105,7 +94,7 @@ const DraggableResizable = memo(
       return () => {
         window.removeEventListener('dblclick', handleDbl)
       }
-    }, [isSelected?.position.x, isSelected?.position.y])
+    }, [])
 
     return (
       <div

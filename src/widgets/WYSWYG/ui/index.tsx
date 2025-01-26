@@ -5,7 +5,6 @@ import { useCurrentAttributes } from '@/shared/hooks/useCurrentAttributes'
 import { CustomBubbleMenu } from '@/shared/ui/custom-bubble-menu'
 import { BubbleMenuContent } from '@/shared/ui/custom-bubble-menu/ui/Content'
 import { Editor, EditorContent } from '@tiptap/react'
-import { List, ListOrdered } from 'lucide-react'
 
 import {
   ContextMenu,
@@ -14,13 +13,11 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@/shared/ui/bricks/common/context-menu'
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from '@/shared/ui/bricks/common/toggle-group'
-import { cn } from '@/shared/lib/cn-merge'
+import { editorIsAvailable } from '../lib/utils'
+import { BulletListOptions } from './bullet-list-option'
 import classes from './classes.module.css'
 import { FancyRewriter } from './FancyRewriter'
+import { OrderedListOptions } from './ordered-list-option'
 
 type Props = {
   content: string
@@ -46,7 +43,8 @@ const WYSWYG = memo(({ editor, id, hideBubbleMenu }: Props) => {
     <ContextMenu>
       <ContextMenuTrigger>
         <EditorContent id={id} className={classes.editor} editor={editor} />
-        {editor && (
+
+        {editorIsAvailable(editor) && (
           <CustomBubbleMenu
             attributes={attributes}
             hide={hideBubbleMenu}
@@ -55,10 +53,10 @@ const WYSWYG = memo(({ editor, id, hideBubbleMenu }: Props) => {
         )}
       </ContextMenuTrigger>
       <ContextMenuContent className='min-w-[215px]'>
-        {editor && (
+        {editorIsAvailable(editor) && (
           <BubbleMenuContent
             classNames={{
-              container: 'absolute left-0 -top-14',
+              container: 'absolute left-0 -top-20',
               trigger: 'p-1 pr-0',
             }}
             editor={editor}
@@ -66,47 +64,17 @@ const WYSWYG = memo(({ editor, id, hideBubbleMenu }: Props) => {
           />
         )}
 
-        <ContextMenuItem onSelect={handleSelect} inset>
-          <ToggleGroup type='single'>
-            <ToggleGroupItem
-              title='Add bulleted list'
-              value='bullet'
-              onMouseDownCapture={() => {
-                editor
-                  ?.chain()
-                  .focus()
-                  .toggleList('bulletList', 'listItem')
-                  .run()
-              }}
-              className={cn(
-                editor?.isActive('bulletList') && 'bg-black bg-opacity-5',
-              )}
-            >
-              <List className='size-4' />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              title='Add ordered list'
-              value='ordered'
-              onMouseDownCapture={() => {
-                editor
-                  ?.chain()
-                  .focus()
-                  .toggleList('orderedList', 'listItem')
-                  .run()
-              }}
-              className={cn(
-                editor?.isActive('orderedList') && 'bg-black bg-opacity-5',
-              )}
-            >
-              <ListOrdered className='size-4' />
-            </ToggleGroupItem>
-          </ToggleGroup>
+        <ContextMenuItem onSelect={handleSelect}>
+          {editorIsAvailable(editor) && <BulletListOptions editor={editor} />}
         </ContextMenuItem>
 
+        <ContextMenuItem onSelect={handleSelect}>
+          {editorIsAvailable(editor) && <OrderedListOptions editor={editor} />}
+        </ContextMenuItem>
         <ContextMenuSeparator />
 
         <ContextMenuItem onSelect={handleSelect}>
-          {editor && <FancyRewriter editor={editor} />}
+          {editorIsAvailable(editor) && <FancyRewriter editor={editor} />}
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>

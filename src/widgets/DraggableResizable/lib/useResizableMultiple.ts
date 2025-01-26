@@ -44,6 +44,8 @@ export const useResizableMultiple = ({
       if (content) {
         const contentChild = content.firstChild as HTMLElement
 
+        console.log('Content: ', content)
+
         if (contentChild.tagName === 'IMG') {
           const img = contentChild as HTMLImageElement
           const maxWidth = 300

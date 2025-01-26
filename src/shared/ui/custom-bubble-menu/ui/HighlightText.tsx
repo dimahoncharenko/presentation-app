@@ -18,7 +18,8 @@ export const HighlightText = ({ editor }: Props) => {
   const [opened, setOpened] = useState(false)
 
   useEffect(() => {
-    editor.chain().focus().toggleHighlight({ color }).run()
+    if (!color) return
+    editor.chain().toggleHighlight({ color }).run()
   }, [editor, color])
 
   const handleChange = (newColor: string) => {

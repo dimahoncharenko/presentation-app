@@ -121,8 +121,6 @@ export const BubbleMenuContent = ({
           size='auto'
           onClick={() => {
             if (currentFontSizeIndex > -1) {
-              console.log(Number(sizes[sizes.length - 1]))
-
               editor
                 ?.chain()
                 .focus()
