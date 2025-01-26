@@ -1,6 +1,8 @@
+import BulletList from '@tiptap/extension-bullet-list'
 import Color from '@tiptap/extension-color'
 import FontFamily from '@tiptap/extension-font-family'
 import Highlight from '@tiptap/extension-highlight'
+import OrderedList from '@tiptap/extension-ordered-list'
 import Paragraph from '@tiptap/extension-paragraph'
 import TextAlign from '@tiptap/extension-text-align'
 import TextStyle from '@tiptap/extension-text-style'
@@ -9,6 +11,40 @@ import { Editor, useEditor, UseEditorOptions } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 import { FontSize } from '@/widgets/WYSWYG/lib/FontSizeExtension'
+
+const CustomBulletList = BulletList.extend({
+  addAttributes() {
+    return {
+      style: {
+        default: null,
+        parseHTML: element => element.getAttribute('style'),
+        renderHTML: attributes => {
+          if (!attributes.style) {
+            return {}
+          }
+          return { style: attributes.style }
+        },
+      },
+    }
+  },
+})
+
+const CustomOrderedList = OrderedList.extend({
+  addAttributes() {
+    return {
+      style: {
+        default: null,
+        parseHTML: element => element.getAttribute('style'),
+        renderHTML: attributes => {
+          if (!attributes.style) {
+            return {}
+          }
+          return { style: attributes.style }
+        },
+      },
+    }
+  },
+})
 
 const CustomParagraph = Paragraph.extend({
   addAttributes() {
@@ -26,10 +62,16 @@ const CustomParagraph = Paragraph.extend({
 })
 
 const extensions = [
-  StarterKit,
+  StarterKit.configure({
+    bulletList: false,
+    paragraph: false,
+    orderedList: false,
+  }),
   Color,
   FontFamily,
   UnderlineExtension,
+  CustomBulletList,
+  CustomOrderedList,
   FontSize,
   Highlight.configure({
     multicolor: true,

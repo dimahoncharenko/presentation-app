@@ -25,7 +25,7 @@ export const useDraggable = (props: Props) => {
         const event = evt as unknown as MouseEvent
 
         if (draggableRef.current && !props?.disabled) {
-          draggableRef.current.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`
+          draggableRef.current.style.transform = `translate(${event.clientX - parentEl.clientWidth / 2 - handler.clientWidth * 2}px, ${event.clientY}px)`
         }
       }
 

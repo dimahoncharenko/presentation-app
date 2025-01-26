@@ -35,3 +35,5 @@ export const getRectData = (node: HTMLElement | Element | null) => {
       } as DOMRect)
     : node.getBoundingClientRect()
 }
+
+export const calculateNewCoordinates = () => {}
