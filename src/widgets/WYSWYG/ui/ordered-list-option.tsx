@@ -41,7 +41,7 @@ export const OrderedListOptions = ({ editor }: Props) => {
           </Button>
         </HoverCardTrigger>
         <HoverCardContent className='absolute -right-[148px] -top-7 z-10 w-32 rounded-md border border-gray-200 bg-white p-2 shadow-sm'>
-          <div className='grid grid-cols-2 grid-rows-4 gap-x-8 px-3'>
+          <div className='grid grid-cols-2 grid-rows-4 gap-8 px-3'>
             <Button
               disabled={!editor?.isActive('orderedList')}
               variant='none'

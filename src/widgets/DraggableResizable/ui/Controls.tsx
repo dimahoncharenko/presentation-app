@@ -18,7 +18,7 @@ export const Controls = ({
   return (
     <div
       className={cn(
-        'absolute -top-4 hidden w-full rounded-t-lg bg-white px-1',
+        'absolute -top-4 z-30 hidden w-full rounded-t-lg bg-white px-1',
         className,
         grabbed && 'flex items-center justify-between',
       )}

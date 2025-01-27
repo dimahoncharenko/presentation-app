@@ -217,7 +217,7 @@ export const Sidenav = () => {
               onClick={() => {
                 addNodeToSlide({
                   type: 'flip-words-node',
-                  content: '',
+                  content: 'Type Here',
                   size: {
                     width: 300,
                     height: 100,
