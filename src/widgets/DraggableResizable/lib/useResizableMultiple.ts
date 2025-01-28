@@ -8,6 +8,7 @@ import {
 } from 'react'
 
 import { SelectedContext } from '@/shared/context/selected-nodes'
+import { getChild, loadNaturalImageSize } from './use-draggable-utils'
 
 type Props = {
   draggableRef: React.RefObject<HTMLElement>
@@ -22,10 +23,7 @@ export const useResizableMultiple = ({
   const { changePosition, changeSize, selectedNodes } =
     useContext(SelectedContext)
 
-  const initialSize = useRef<{ width: number; height: number }>({
-    height: 0,
-    width: 0,
-  })
+  const [initialized, setInitialized] = useState(false)
 
   const size = useRef<{ width: number; height: number }>({
     height: 0,
@@ -35,46 +33,51 @@ export const useResizableMultiple = ({
   const position = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
   // It's used to calculate the natural size of the element; only while mounting
-  useEffect(() => {
-    if (draggableRef.current) {
-      const content = draggableRef.current.querySelector(
-        '#draggable-resizable-content-container',
-      )
+  useLayoutEffect(() => {
+    ;(async () => {
+      if (draggableRef.current) {
+        const content = getChild(
+          draggableRef.current,
+          '#draggable-resizable-content-container',
+        )
 
-      if (content) {
-        const contentChild = content.firstChild as HTMLElement
+        if (content) {
+          const contentChild = content.firstChild as HTMLElement
 
-        if (contentChild.tagName === 'IMG') {
-          const img = contentChild as HTMLImageElement
-          const maxWidth = 300
+          if (contentChild.tagName === 'IMG') {
+            const img = contentChild as HTMLImageElement
+            const maxWidth = 300
 
-          if (!img.naturalHeight || !img?.naturalWidth) {
-            img.onload = () => {
-              initialSize.current.width = img.naturalWidth
-              initialSize.current.height =
-                (img.naturalHeight * maxWidth) / img.naturalWidth
-            }
+            const { height, width } = await loadNaturalImageSize(img)
+
+            size.current.height = (height * maxWidth) / width
+            size.current.width = (width * maxWidth) / width
+
+            setInitialized(true)
+
             return
+          } else {
+            const { width, height } = contentChild.getBoundingClientRect()
+            size.current.height = height
+            size.current.width = width
+
+            setInitialized(true)
           }
-        } else {
-          const rect = contentChild.getBoundingClientRect()
-          initialSize.current.width = rect.width
-          initialSize.current.height = rect.height
         }
       }
-    }
+    })()
   }, [draggableRef])
 
-  useLayoutEffect(() => {
-    if (draggableRef.current) {
+  useEffect(() => {
+    if (draggableRef.current && initialized) {
       const positionX = position.current.x
       const positionY = position.current.y
       const nodeWidth = size.current.width
       const nodeHeight = size.current.height
 
       draggableRef.current.style.transform = `translate(${positionX || 500}px, ${positionY || 300}px)`
-      draggableRef.current.style.width = `${nodeWidth || initialSize.current.width || 200}px`
-      draggableRef.current.style.height = `${nodeHeight || initialSize.current.height || 50}px`
+      draggableRef.current.style.width = `${nodeWidth}px`
+      draggableRef.current.style.height = `${nodeHeight}px`
     }
   }, [
     draggableRef,
@@ -82,6 +85,7 @@ export const useResizableMultiple = ({
     size.current.width,
     position.current.x,
     position.current.y,
+    initialized,
   ])
 
   const resizeOnMouseDown = (

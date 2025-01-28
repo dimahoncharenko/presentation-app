@@ -1,7 +1,5 @@
 import { MouseEvent, useRef } from 'react'
 
-import { getDraggableHandler, getParentNode } from './use-draggable-utils'
-
 type Props = Partial<{
   disabled: boolean
   initialPosition: {
@@ -16,26 +14,22 @@ export const useDraggable = (props: Props) => {
   const dragOnMouseDown = (
     e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
   ) => {
-    // Initialize the dragging only after the container has been initialized
-    const handler = getDraggableHandler(e)
-    const parentEl = getParentNode(handler)
-
-    if (parentEl) {
+    if (e.currentTarget) {
       const handleMouseMove: EventListener = evt => {
         const event = evt as unknown as MouseEvent
 
         if (draggableRef.current && !props?.disabled) {
-          draggableRef.current.style.transform = `translate(${event.clientX - parentEl.clientWidth / 2 - handler.clientWidth * 2}px, ${event.clientY}px)`
+          draggableRef.current.style.transform = `translate(calc(${event.clientX}px - 50%), ${event.clientY}px)`
         }
       }
 
-      const handleMouseUp = () => {
+      const removeHandlers = () => {
         document.removeEventListener('mousemove', handleMouseMove)
-        document.removeEventListener('mouseup', handleMouseUp)
+        document.removeEventListener('mouseup', removeHandlers)
       }
 
       document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('mouseup', removeHandlers)
     }
   }
 

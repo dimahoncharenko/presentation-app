@@ -56,6 +56,7 @@ const DraggableResizable = memo(
     onDelete,
     initialNodeParams,
     heightResizable = true,
+    id,
     ...rest
   }: Props) => {
     const contentRef = useRef<HTMLDivElement>(null)
@@ -66,8 +67,8 @@ const DraggableResizable = memo(
       initialPosition,
     })
 
-    const isSelected = selectedNodes.find(
-      node => node.id === rest.id || node.id === rest.id + '_node',
+    const isNodeSelected = selectedNodes.find(
+      node => node.id === id || node.id === `${id}_node`,
     )
 
     const { resizeOnMouseDown, isResizing } = useResizableMultiple({
@@ -98,14 +99,14 @@ const DraggableResizable = memo(
 
     return (
       <div
-        id={rest.id}
+        id={id}
         ref={draggableRef}
         className='absolute left-0 top-0 inline-block'
         aria-label='draggable-resizable'
         onDoubleClick={() => {
-          if (!isSelected)
+          if (!isNodeSelected)
             handleSelectNode({
-              id: rest.id,
+              id,
               position: {
                 x: initialPosition.x,
                 y: initialPosition.y,
@@ -118,24 +119,20 @@ const DraggableResizable = memo(
         }}
       >
         <Controls
-          grabbed={!!isSelected}
-          handleMouseDown={e => {
-            dragOnMouseDown(e)
-          }}
-          onDelete={() => {
-            onDelete()
-          }}
+          grabbed={!!isNodeSelected}
+          handleMouseDown={dragOnMouseDown}
+          onDelete={onDelete}
         />
         <div
           className={cn(
             'relative h-full w-full',
-            !isSelected && 'pointer-events-none',
+            !isNodeSelected && 'pointer-events-none',
           )}
         >
           <div
             className={cn(
               'absolute h-full min-h-max w-full break-all',
-              isSelected && 'border-2 border-dashed border-opacity-85',
+              isNodeSelected && 'border-2 border-dashed border-opacity-85',
             )}
           >
             {/* Resize handlers (corners) */}
@@ -167,7 +164,7 @@ const DraggableResizable = memo(
               aria-label='draggable-resizable-resizer-content'
             >
               {rest.type === 'advanced'
-                ? rest.children({ grabbed: !!isSelected, isResizing })
+                ? rest.children({ grabbed: !!isNodeSelected, isResizing })
                 : rest.children}
             </div>
           </div>

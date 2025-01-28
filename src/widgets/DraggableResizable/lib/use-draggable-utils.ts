@@ -36,4 +36,21 @@ export const getRectData = (node: HTMLElement | Element | null) => {
     : node.getBoundingClientRect()
 }
 
-export const calculateNewCoordinates = () => {}
+export const getChild = (node: HTMLElement, selector: string) => {
+  const child = node.querySelector(selector)
+  if (!child) throw new Error('No child')
+
+  return child
+}
+
+export const loadNaturalImageSize = (
+  img: HTMLImageElement,
+): Promise<{ width: number; height: number }> =>
+  new Promise(resolve => {
+    img.onload = () => {
+      resolve({
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+      })
+    }
+  })
