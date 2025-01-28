@@ -8,8 +8,7 @@ type Props = {
   element: SlideText
   onChange: (value: string) => void
   onDelete: () => void
-  onChangedPosition?: (newPosition: { x: number; y: number }) => void
-  handleDragAll?: (params: { deltaX: number; deltaY: number }) => void
+  onChangedPosition: (newPosition: { x: number; y: number }) => void
 }
 
 export const EditableText = ({
@@ -17,7 +16,6 @@ export const EditableText = ({
   onDelete,
   onChange,
   onChangedPosition,
-  handleDragAll,
 }: Props) => {
   return (
     <EditorWrapper onChange={onChange} content={element.content}>
@@ -29,7 +27,6 @@ export const EditableText = ({
             type='advanced'
             onDragLeave={onChangedPosition}
             initialPosition={element.position}
-            handleDragAll={handleDragAll}
             initialNodeParams={{
               position: element.position,
               size: {
@@ -40,7 +37,7 @@ export const EditableText = ({
           >
             {({ grabbed, isResizing }) => (
               <WYSWYG
-                id={element.id + '_node'}
+                id={`${element.id}_node`}
                 content={element.content}
                 editor={editor}
                 hideBubbleMenu={isResizing || !grabbed}
