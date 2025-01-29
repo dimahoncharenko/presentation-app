@@ -1,23 +1,102 @@
-import { MouseEvent, useEffect, useState } from 'react'
+import {
+  MouseEvent,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
+
+import { SelectedContext } from '@/shared/context/selected-nodes'
+import {
+  changeElementSize,
+  getChild,
+  loadNaturalImageSize,
+} from './use-draggable-utils'
 
 type Props = {
   draggableRef: React.RefObject<HTMLElement>
-  contentRef: React.RefObject<HTMLDivElement | null>
-  position: { x: number; y: number }
-  setPosition: (value: { x: number; y: number }) => void
   heightResizable?: boolean
 }
 
-export const useResizable = ({
+export const useResizableMultiple = ({
   draggableRef,
-  setPosition,
-  position,
-  contentRef,
   heightResizable = true,
 }: Props) => {
-  const [size, setSize] = useState({ width: 0, height: 0 })
-  const [initialized, setInitialized] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
+  const { changePosition, changeSize, selectedNodes } =
+    useContext(SelectedContext)
+
+  const [initialized, setInitialized] = useState(false)
+
+  const size = useRef<{ width: number; height: number }>({
+    height: 0,
+    width: 0,
+  })
+
+  const position = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+
+  // It's used to calculate the natural size of the element; only while mounting
+  useLayoutEffect(() => {
+    ;(async () => {
+      if (draggableRef.current) {
+        const content = getChild(
+          draggableRef.current,
+          '#draggable-resizable-content-container',
+        )
+
+        if (content) {
+          const contentChild = content.firstChild as HTMLElement
+
+          if (contentChild.tagName === 'IMG') {
+            const img = contentChild as HTMLImageElement
+            const maxWidth = 300
+
+            const { height, width } = await loadNaturalImageSize(img)
+
+            const newSize = {
+              width: (width * maxWidth) / width,
+              height: (height * maxWidth) / width,
+            }
+            changeElementSize(size, newSize)
+
+            setInitialized(true)
+            return
+          } else {
+            const { width, height } = contentChild.getBoundingClientRect()
+
+            const newSize = {
+              width: Math.max(width, 170),
+              height: Math.max(height, 50),
+            }
+            changeElementSize(size, newSize)
+
+            setInitialized(true)
+          }
+        }
+      }
+    })()
+  }, [draggableRef])
+
+  useEffect(() => {
+    if (draggableRef.current && initialized) {
+      const positionX = position.current.x
+      const positionY = position.current.y
+      const nodeWidth = size.current.width
+      const nodeHeight = size.current.height
+
+      draggableRef.current.style.transform = `translate(${positionX || 500}px, ${positionY || 300}px)`
+      draggableRef.current.style.width = `${nodeWidth}px`
+      draggableRef.current.style.height = `${nodeHeight}px`
+    }
+  }, [
+    draggableRef,
+    size.current.height,
+    size.current.width,
+    position.current.x,
+    position.current.y,
+    initialized,
+  ])
 
   const resizeOnMouseDown = (
     e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
@@ -30,49 +109,77 @@ export const useResizable = ({
       let prevX = e.clientX
       let prevY = e.clientY
 
+      const prevWidth = parentEl.offsetWidth
+      const prevHeight = parentEl.offsetHeight
+
       const handleMouseMove: EventListener = evt => {
         const event = evt as unknown as MouseEvent
 
         if (draggableRef.current) {
           const rect = draggableRef.current.getBoundingClientRect()
-          let newWidth = size.width
-          let newHeight = size.height
+          size.current.width = rect.width - (event.clientX - prevX)
 
-          // Calculate new width, height and position
           if (direction === 'se') {
-            newWidth = rect.width - (prevX - event.clientX)
-            // In cases when I don't need to resize height
-            if (heightResizable)
-              newHeight = rect.height - (prevY - event.clientY)
+            if (heightResizable) {
+              size.current.height = rect.height - (prevY - event.clientY)
+            }
+
+            position.current = {
+              x: e.clientX - prevWidth,
+              y: e.clientY - prevHeight,
+            }
+
+            size.current = {
+              width: rect.width + (event.clientX - prevX),
+              height: size.current.height,
+            }
           } else if (direction === 'sw') {
-            newWidth = rect.width - (event.clientX - prevX)
-            if (heightResizable)
-              newHeight = rect.height + (event.clientY - prevY)
+            if (heightResizable) {
+              size.current.height = rect.height - (prevY - event.clientY)
+            }
 
-            setPosition({
-              y: position.y,
-              x: position.x - (position.x - event.clientX),
-            })
+            position.current = {
+              y: e.clientY - prevHeight,
+              x: prevX - (prevX - event.clientX),
+            }
+
+            size.current = {
+              width: rect.width - (event.clientX - prevX),
+              height: size.current.height,
+            }
           } else if (direction === 'ne') {
-            newWidth = rect.width - (prevX - event.clientX)
-            if (heightResizable)
-              newHeight = rect.height + (prevY - event.clientY)
-            setPosition({
-              x: position.x,
-              y: position.y - (position.y - event.clientY),
-            })
-          } else if (direction === 'nw') {
-            newWidth = rect.width + (prevX - event.clientX)
+            if (heightResizable) {
+              size.current.height = rect.height - (event.clientY - prevY)
+            }
 
+            position.current = {
+              x: e.clientX - prevWidth,
+              y: event.clientY + (prevY - event.clientY),
+            }
+
+            size.current = {
+              width: rect.width + (event.clientX - prevX),
+              height: size.current.height,
+            }
+          } else if (direction === 'nw') {
             if (heightResizable)
-              newHeight = rect.height + (prevY - event.clientY)
-            setPosition({
-              x: position.x - (position.x - event.clientX),
-              y: position.y - (position.y - event.clientY),
-            })
+              size.current.height = rect.height + (prevY - event.clientY)
+
+            position.current = {
+              x: prevX - (prevX - event.clientX),
+              y: prevY - (prevY - event.clientY),
+            }
+
+            size.current = {
+              width: rect.width - (event.clientX - prevX),
+              height: size.current.height,
+            }
           }
 
-          setSize({ width: newWidth, height: newHeight })
+          draggableRef.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`
+          draggableRef.current.style.width = `${size.current.width}px`
+          draggableRef.current.style.height = `${size.current.height}px`
+
           prevX = event.clientX
           prevY = event.clientY
         }
@@ -80,6 +187,18 @@ export const useResizable = ({
 
       const handleMouseUp = () => {
         setIsResizing(false)
+        selectedNodes.forEach(node => {
+          changePosition({
+            id: node.id,
+            position: position.current,
+          })
+
+          changeSize({
+            id: node.id,
+            size: size.current,
+          })
+        })
+
         document.removeEventListener('mousemove', handleMouseMove)
         document.removeEventListener('mouseup', handleMouseUp)
       }
@@ -90,66 +209,20 @@ export const useResizable = ({
     }
   }
 
-  // It's used to calculate the natural size of the draggable element; only while mounting
-  useEffect(() => {
-    if (contentRef.current && draggableRef.current && !initialized) {
-      const child = contentRef.current.children[0] as HTMLElement
-      let newSize: { width: number; height: number }
+  const nodePosition = {
+    x: position.current.x,
+    y: position.current.y,
+  }
 
-      if (child.tagName === 'IMG') {
-        const img = child as HTMLImageElement
-
-        // Handle image loading
-        if (!img.naturalHeight || !img.naturalWidth) {
-          img.onload = () => {
-            newSize = {
-              width: img.naturalWidth,
-              height: img.naturalHeight,
-            }
-            setSize(newSize)
-            draggableRef.current!.style.width = `${newSize.width}px`
-            draggableRef.current!.style.height = `${newSize.height}px`
-            setInitialized(true)
-          }
-          return
-        }
-
-        newSize = {
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-        }
-      } else {
-        const rect = child.getBoundingClientRect()
-
-        newSize = {
-          width: Math.max(rect.width, 200),
-          height: Math.max(rect.height, 40),
-        }
-      }
-
-      setSize({
-        width: newSize.width,
-        height: newSize.height,
-      })
-
-      setInitialized(true)
-
-      draggableRef.current.style.width = `${newSize.width}px`
-      draggableRef.current.style.height = `${newSize.height}px`
-    }
-  }, [contentRef, draggableRef, initialized, setInitialized, setSize])
-
-  // It's used to update the size of the draggable while resizing
-  useEffect(() => {
-    if (draggableRef.current) {
-      draggableRef.current.style.width = `${size.width}px`
-      draggableRef.current.style.height = `${size.height}px`
-    }
-  }, [size.height, size.width, draggableRef])
+  const nodeSize = {
+    width: size.current.width,
+    height: size.current.height,
+  }
 
   return {
     resizeOnMouseDown,
-    size,
     isResizing,
+    nodePosition,
+    nodeSize,
   }
 }

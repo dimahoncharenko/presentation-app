@@ -1,4 +1,4 @@
-import { MouseEvent } from 'react'
+import { MouseEvent, RefObject } from 'react'
 
 export const getDraggableHandler = (
   e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
@@ -54,3 +54,12 @@ export const loadNaturalImageSize = (
       })
     }
   })
+
+export const changeElementSize = (
+  ref: RefObject<{ width: number; height: number }>,
+  newSize: { width: number; height: number },
+) => {
+  ref.current = newSize
+
+  return ref
+}
