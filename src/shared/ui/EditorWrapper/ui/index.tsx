@@ -51,10 +51,39 @@ const CustomParagraph = Paragraph.extend({
     return {
       id: {
         default: null,
+        parseHTML: element => element.getAttribute('id') || null,
         renderHTML: attributes => {
-          return {
-            id: `${attributes.id}`,
+          if (!attributes.id) {
+            return {}
           }
+          return { id: attributes.id }
+        },
+      },
+    }
+  },
+})
+
+export const CustomTextStyle = TextStyle.extend({
+  addAttributes() {
+    return {
+      id: {
+        default: null,
+        parseHTML: element => element.getAttribute('id') || null,
+        renderHTML: attributes => {
+          if (!attributes.id) {
+            return {}
+          }
+          return { id: attributes.id }
+        },
+      },
+      class: {
+        default: '',
+        parseHTML: element => element.getAttribute('class') || '',
+        renderHTML: attributes => {
+          if (!attributes.class) {
+            return {}
+          }
+          return { class: attributes.class }
         },
       },
     }
@@ -79,7 +108,7 @@ const extensions = [
   TextAlign.configure({
     types: ['heading', 'paragraph'],
   }),
-  TextStyle.configure({ mergeNestedSpanStyles: true }),
+  CustomTextStyle.configure({ mergeNestedSpanStyles: true }),
   CustomParagraph,
 ]
 
