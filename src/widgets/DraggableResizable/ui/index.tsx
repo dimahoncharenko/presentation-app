@@ -6,7 +6,7 @@ import { SlideElement } from '@/entities/SlideElement'
 import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 import { useDraggable } from '../lib/useDraggable'
-import { useResizableMultiple } from '../lib/useResizableMultiple'
+import { useResizableMultiple } from '../lib/useResizable'
 import { Controls } from './Controls'
 
 type ChildrenProps = {
