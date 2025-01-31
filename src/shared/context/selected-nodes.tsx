@@ -8,7 +8,7 @@ import {
 
 export interface SelectedNode {
   id: string
-  position: {
+  position?: {
     x: number
     y: number
   }

@@ -20,7 +20,7 @@ import classes from './classes.module.css'
 import { FancyRewriter } from './FancyRewriter'
 import { OrderedListOptions } from './ordered-list-option'
 
-type Props = {
+export type WYSWYGProps = {
   content: string
   editor: Editor | null
   id: string
@@ -48,7 +48,14 @@ const handleSelect = (e: Event) => {
 }
 
 const WYSWYG = memo(
-  ({ editor, id, hideBubbleMenu, classNames, inputProps, features }: Props) => {
+  ({
+    editor,
+    id,
+    hideBubbleMenu,
+    classNames,
+    inputProps,
+    features,
+  }: WYSWYGProps) => {
     const attributes = useCurrentAttributes(editor)
 
     useEffect(() => {

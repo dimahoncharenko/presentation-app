@@ -8,8 +8,11 @@ import { Sidenav } from '@/widgets/Sidenav'
 import { AddNewSlide } from '@/features/AddNewSlide'
 import { useSlidesStore } from '@/entities/Slide/lib/slide-store-provider'
 import { Slide } from '@/entities/Slide/ui'
-import { EditableFlipWords, EditableText } from '@/entities/SlideElement'
-import { TextHighlight } from '@/shared/ui/bricks/featured/TextHighlight'
+import {
+  EditableFlippableText,
+  EditableHighlightText,
+  EditableText,
+} from '@/entities/SlideElement'
 import { RevealContext } from '@/shared/context/reveal-context'
 import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
@@ -102,7 +105,6 @@ export const PresentationWrapper = () => {
                                 )
                               }}
                               type='common'
-                              initialPosition={el.position}
                             >
                               <Image
                                 src={el.content}
@@ -117,25 +119,12 @@ export const PresentationWrapper = () => {
                               onDelete={() =>
                                 handleDelete(slide.slideId, el.id)
                               }
-                              onChangedPosition={() => {
+                              onChangedPosition={newPosition => {
                                 selectedNodes.forEach(node => {
-                                  console.log(
-                                    'Is about to resize node: ',
-                                    node.size,
-                                  )
-
-                                  handleDragLeave(
-                                    slide.slideId,
-                                    node.id,
-                                    {
-                                      x: node.position.x,
-                                      y: node.position.y,
-                                    },
-                                    {
-                                      width: node.size!.width,
-                                      height: node.size!.height,
-                                    },
-                                  )
+                                  handleDragLeave(slide.slideId, node.id, {
+                                    x: newPosition.x,
+                                    y: newPosition.y,
+                                  })
                                 })
                               }}
                               onChange={value => {
@@ -162,11 +151,11 @@ export const PresentationWrapper = () => {
                                 )
                               }}
                               type='common'
-                              initialPosition={el.position}
                             >
-                              <p className='text-black'>
-                                <TextHighlight>{el.content}</TextHighlight>
-                              </p>
+                              <EditableHighlightText
+                                initialValue={el.content}
+                                handleSubmit={() => {}}
+                              />
                             </DraggableResizable>
                           ) : (
                             <DraggableResizable
@@ -182,9 +171,8 @@ export const PresentationWrapper = () => {
                                 )
                               }}
                               type='common'
-                              initialPosition={el.position}
                             >
-                              <EditableFlipWords
+                              <EditableFlippableText
                                 initialValue={el.content}
                                 handleSubmit={words => {
                                   if (words.trim()) {

@@ -63,3 +63,21 @@ export const changeElementSize = (
 
   return ref
 }
+
+type AssignHeightParams = {
+  height: number
+  minHeight: number
+  maxHeight: number
+}
+
+export const assignHeightWithinRange = ({
+  height,
+  minHeight,
+  maxHeight,
+}: AssignHeightParams) => {
+  const isHeightZero = height === 0
+
+  return isHeightZero
+    ? Math.max(height, maxHeight)
+    : Math.min(height, minHeight)
+}

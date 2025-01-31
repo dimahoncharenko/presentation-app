@@ -65,9 +65,15 @@ export const HeroHighlight = ({
 export const TextHighlight = ({
   children,
   className,
+  dangerouslySetInnerHTML,
 }: {
-  children: React.ReactNode
+  children?: React.ReactNode
   className?: string
+  dangerouslySetInnerHTML?:
+    | {
+        __html: string | TrustedHTML
+      }
+    | undefined
 }) => {
   return (
     <motion.span
@@ -85,12 +91,12 @@ export const TextHighlight = ({
       style={{
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'left center',
-        display: 'inline',
       }}
       className={cn(
-        `relative inline-block rounded-lg bg-gradient-to-r from-indigo-300 to-purple-300 px-1 pb-1 dark:from-indigo-500 dark:to-purple-500`,
+        `relative inline-flex rounded-lg bg-gradient-to-r from-indigo-300 to-purple-300 px-3 dark:from-indigo-500 dark:to-purple-500`,
         className,
       )}
+      dangerouslySetInnerHTML={dangerouslySetInnerHTML}
     >
       {children}
     </motion.span>

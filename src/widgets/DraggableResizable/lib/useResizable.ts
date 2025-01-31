@@ -9,6 +9,7 @@ import {
 
 import { SelectedContext } from '@/shared/context/selected-nodes'
 import {
+  assignHeightWithinRange,
   changeElementSize,
   getChild,
   loadNaturalImageSize,
@@ -19,7 +20,7 @@ type Props = {
   heightResizable?: boolean
 }
 
-export const useResizableMultiple = ({
+export const useResizable = ({
   draggableRef,
   heightResizable = true,
 }: Props) => {
@@ -66,9 +67,14 @@ export const useResizableMultiple = ({
             const { width, height } = contentChild.getBoundingClientRect()
 
             const newSize = {
-              width: Math.max(width, 170),
-              height: Math.max(height, 50),
+              width: Math.max(width, 200),
+              height: assignHeightWithinRange({
+                height,
+                maxHeight: 50,
+                minHeight: 50,
+              }),
             }
+
             changeElementSize(size, newSize)
 
             setInitialized(true)

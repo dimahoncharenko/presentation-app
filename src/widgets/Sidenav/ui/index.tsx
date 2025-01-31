@@ -243,7 +243,7 @@ export const Sidenav = () => {
               onClick={() => {
                 addNodeToSlide({
                   type: 'text-highlight-node',
-                  content: 'Sample Text',
+                  content: 'New Text',
                   size: {
                     width: 300,
                     height: 100,
