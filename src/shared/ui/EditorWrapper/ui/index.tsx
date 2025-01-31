@@ -112,7 +112,7 @@ const extensions = [
   CustomParagraph,
 ]
 
-type Props = {
+export type EditorWrapperProps = {
   content: string
   onChange: (html: string) => void
   editorProps?: Partial<UseEditorOptions>
@@ -124,7 +124,7 @@ export const EditorWrapper = ({
   onChange,
   content,
   children,
-}: Props) => {
+}: EditorWrapperProps) => {
   const editor = useEditor({
     extensions,
     content,

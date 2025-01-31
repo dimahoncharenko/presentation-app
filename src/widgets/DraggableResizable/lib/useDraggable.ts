@@ -2,10 +2,6 @@ import { MouseEvent, useRef } from 'react'
 
 type Props = Partial<{
   disabled: boolean
-  initialPosition: {
-    x: number
-    y: number
-  }
 }> | void
 
 export const useDraggable = (props: Props) => {

@@ -26,14 +26,6 @@ export const EditableText = ({
             onDelete={onDelete}
             type='advanced'
             onDragLeave={onChangedPosition}
-            initialPosition={element.position}
-            initialNodeParams={{
-              position: element.position,
-              size: {
-                height: element.size?.height ?? 0,
-                width: element.size?.width ?? 0,
-              },
-            }}
           >
             {({ grabbed, isResizing }) => (
               <WYSWYG

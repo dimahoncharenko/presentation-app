@@ -1,12 +1,11 @@
 'use client'
 
-import { memo, ReactNode, useContext, useEffect, useRef } from 'react'
+import { memo, ReactNode, useContext, useEffect } from 'react'
 
-import { SlideElement } from '@/entities/SlideElement'
 import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 import { useDraggable } from '../lib/useDraggable'
-import { useResizableMultiple } from '../lib/useResizable'
+import { useResizable } from '../lib/useResizable'
 import { Controls } from './Controls'
 
 type ChildrenProps = {
@@ -19,59 +18,31 @@ type Props =
       id: string
       type: 'common'
       children: ReactNode
-      initialPosition: {
-        x: number
-        y: number
-      }
-      initialNodeParams?: {
-        position: SlideElement['position']
-        size: SlideElement['size']
-      }
       onDelete: () => void
       heightResizable?: boolean
       onDragLeave?: (newPosition: { x: number; y: number }) => void
-      handleDragAll?: (params: { deltaX: number; deltaY: number }) => void
     }
   | {
       id: string
       type: 'advanced'
       heightResizable?: boolean
       children: (params: ChildrenProps) => ReactNode
-      initialPosition: {
-        x: number
-        y: number
-      }
-      initialNodeParams?: {
-        position: SlideElement['position']
-        size: SlideElement['size']
-      }
       onDelete: () => void
       onDragLeave?: (newPosition: { x: number; y: number }) => void
-      handleDragAll?: (params: { deltaX: number; deltaY: number }) => void
     }
 
 const DraggableResizable = memo(
-  ({
-    initialPosition,
-    onDelete,
-    initialNodeParams,
-    heightResizable = true,
-    id,
-    ...rest
-  }: Props) => {
-    const contentRef = useRef<HTMLDivElement>(null)
+  ({ onDelete, heightResizable = true, id, ...rest }: Props) => {
     const { selectedNodes, handleSelectNode, setSelectedNodes } =
       useContext(SelectedContext)
 
-    const { draggableRef, dragOnMouseDown } = useDraggable({
-      initialPosition,
-    })
+    const { draggableRef, dragOnMouseDown } = useDraggable()
 
     const isNodeSelected = selectedNodes.find(
       node => node.id === id || node.id === `${id}_node`,
     )
 
-    const { resizeOnMouseDown, isResizing } = useResizableMultiple({
+    const { resizeOnMouseDown, isResizing } = useResizable({
       draggableRef,
       heightResizable,
     })
@@ -101,20 +72,12 @@ const DraggableResizable = memo(
       <div
         id={id}
         ref={draggableRef}
-        className='absolute left-0 top-0 inline-block'
+        className='absolute left-0 top-0'
         aria-label='draggable-resizable'
         onDoubleClick={() => {
           if (!isNodeSelected)
             handleSelectNode({
               id,
-              position: {
-                x: initialPosition.x,
-                y: initialPosition.y,
-              },
-              size: {
-                width: initialNodeParams?.size?.width ?? 0,
-                height: initialNodeParams?.size?.height ?? 0,
-              },
             })
         }}
       >
@@ -160,7 +123,6 @@ const DraggableResizable = memo(
             {/* Resizer content */}
             <div
               id='draggable-resizable-content-container'
-              ref={contentRef}
               aria-label='draggable-resizable-resizer-content'
             >
               {rest.type === 'advanced'
