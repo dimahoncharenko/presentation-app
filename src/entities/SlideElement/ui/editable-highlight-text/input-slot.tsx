@@ -26,6 +26,18 @@ export const InputSlot = ({
             editor={editor}
             content={content}
             id='highlight-text-editor'
+            features={{
+              align: false,
+              bold: true,
+              color: true,
+              font: true,
+              highlight: false,
+              indent: false,
+              justify: false,
+              italic: true,
+              size: true,
+              underline: true,
+            }}
           />
           <Button
             variant='none'
