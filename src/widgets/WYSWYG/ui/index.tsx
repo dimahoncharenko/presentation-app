@@ -41,6 +41,11 @@ export type WYSWYGProps = {
     italic: boolean
     underline: boolean
   }>
+  contextMenu?: Partial<{
+    bulletList: boolean
+    orderedList: boolean
+    magicPrompt: boolean
+  }>
 }
 
 const handleSelect = (e: Event) => {
@@ -55,6 +60,11 @@ const WYSWYG = memo(
     classNames,
     inputProps,
     features,
+    contextMenu = {
+      bulletList: true,
+      orderedList: true,
+      magicPrompt: true,
+    },
   }: WYSWYGProps) => {
     const attributes = useCurrentAttributes(editor)
 
@@ -96,20 +106,30 @@ const WYSWYG = memo(
             />
           )}
 
-          <ContextMenuItem onSelect={handleSelect}>
-            {editorIsAvailable(editor) && <BulletListOptions editor={editor} />}
-          </ContextMenuItem>
+          {contextMenu.bulletList && (
+            <ContextMenuItem onSelect={handleSelect}>
+              {editorIsAvailable(editor) && (
+                <BulletListOptions editor={editor} />
+              )}
+            </ContextMenuItem>
+          )}
 
-          <ContextMenuItem onSelect={handleSelect}>
-            {editorIsAvailable(editor) && (
-              <OrderedListOptions editor={editor} />
-            )}
-          </ContextMenuItem>
-          <ContextMenuSeparator />
+          {contextMenu.orderedList && (
+            <>
+              <ContextMenuItem onSelect={handleSelect}>
+                {editorIsAvailable(editor) && (
+                  <OrderedListOptions editor={editor} />
+                )}
+              </ContextMenuItem>
+              <ContextMenuSeparator />
+            </>
+          )}
 
-          <ContextMenuItem onSelect={handleSelect}>
-            {editorIsAvailable(editor) && <FancyRewriter editor={editor} />}
-          </ContextMenuItem>
+          {contextMenu.magicPrompt && (
+            <ContextMenuItem onSelect={handleSelect}>
+              {editorIsAvailable(editor) && <FancyRewriter editor={editor} />}
+            </ContextMenuItem>
+          )}
         </ContextMenuContent>
       </ContextMenu>
     )

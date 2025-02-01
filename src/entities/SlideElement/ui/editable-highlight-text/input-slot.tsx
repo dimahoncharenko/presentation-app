@@ -26,6 +26,11 @@ export const InputSlot = ({
             editor={editor}
             content={content}
             id='highlight-text-editor'
+            contextMenu={{
+              bulletList: false,
+              magicPrompt: true,
+              orderedList: false,
+            }}
             features={{
               align: false,
               bold: true,
