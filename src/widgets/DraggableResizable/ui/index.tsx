@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, ReactNode, useContext, useEffect } from 'react'
+import { useSelectable } from 'react-selectable-box'
 
 import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
@@ -37,6 +38,11 @@ const DraggableResizable = memo(
       useContext(SelectedContext)
 
     const { draggableRef, dragOnMouseDown } = useDraggable()
+
+    const { setNodeRef } = useSelectable({
+      value: { id },
+      rule: 'collision',
+    })
 
     const isNodeSelected = selectedNodes.find(
       node => node.id === id || node.id === `${id}_node`,
@@ -91,6 +97,7 @@ const DraggableResizable = memo(
             'relative min-h-max w-full',
             !isNodeSelected && 'pointer-events-none',
           )}
+          ref={setNodeRef}
         >
           <div
             className={cn(

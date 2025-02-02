@@ -2,6 +2,7 @@
 
 import React, { useContext, useEffect, useRef } from 'react'
 import Image from 'next/image'
+import Selectable from 'react-selectable-box'
 
 import { DraggableResizable } from '@/widgets/DraggableResizable/ui'
 import { Sidenav } from '@/widgets/Sidenav'
@@ -14,14 +15,15 @@ import {
   EditableText,
 } from '@/entities/SlideElement'
 import { RevealContext } from '@/shared/context/reveal-context'
-import { SelectedContext } from '@/shared/context/selected-nodes'
+import { SelectedContext, SelectedNode } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 
 export const PresentationWrapper = () => {
   const { setDeckRef, deckRef } = useContext(RevealContext)
   const deckDivRef = useRef<HTMLDivElement>({} as HTMLDivElement) // reference to deck container div
   const slidesState = useSlidesStore(state => state)
-  const { selectedNodes } = useContext(SelectedContext)
+  const { selectedNodes, setSelectedNodes, selectDisabled } =
+    useContext(SelectedContext)
 
   useEffect(() => {
     if (!deckRef.current && deckDivRef.current) {
@@ -69,144 +71,166 @@ export const PresentationWrapper = () => {
   return (
     <>
       <div
+        id='presentation-wrapper'
         className={cn('reveal mr-auto transition-all duration-200 ease-in-out')}
         ref={deckDivRef}
       >
-        {slidesState.slides.length > 0 && <Sidenav />}
+        <Selectable
+          disabled={selectDisabled}
+          mode='add'
+          value={selectedNodes}
+          dragContainer={() =>
+            document.getElementById('presentation-wrapper') as HTMLElement
+          }
+          onEnd={(
+            _,
+            {
+              added,
+              removed,
+            }: { added: SelectedNode[]; removed: SelectedNode[] },
+          ) => {
+            const result = selectedNodes.concat(added)
+            selectedNodes.filter(i => !removed.includes(i))
 
-        <div className='slides'>
-          {slidesState.slides.length > 0 ? (
-            <>
-              {slidesState.slides.map((slide, index) => (
-                <Slide
-                  index={index}
-                  key={slide.slideId}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                  bg={slide?.bgColor}
-                >
-                  <>
-                    {slide.elements.map(el => {
-                      return (
-                        <React.Fragment key={el.id}>
-                          {el.type === 'image-node' ? (
-                            <DraggableResizable
-                              id={el.id}
-                              onDelete={() =>
-                                handleDelete(slide.slideId, el.id)
-                              }
-                              onDragLeave={newPosition => {
-                                handleDragLeave(
-                                  slide.slideId,
-                                  el.id,
-                                  newPosition,
-                                )
-                              }}
-                              type='common'
-                            >
-                              <Image
-                                src={el.content}
-                                className='!m-0 !max-h-full !max-w-full select-none'
-                                fill
-                                alt={el.id}
-                              />
-                            </DraggableResizable>
-                          ) : el.type === 'text-node' ? (
-                            <EditableText
-                              element={el}
-                              onDelete={() =>
-                                handleDelete(slide.slideId, el.id)
-                              }
-                              onChangedPosition={newPosition => {
-                                selectedNodes.forEach(node => {
-                                  handleDragLeave(slide.slideId, node.id, {
-                                    x: newPosition.x,
-                                    y: newPosition.y,
+            setSelectedNodes(result)
+          }}
+        >
+          {slidesState.slides.length > 0 && <Sidenav />}
+
+          <div className='slides'>
+            {slidesState.slides.length > 0 ? (
+              <>
+                {slidesState.slides.map((slide, index) => (
+                  <Slide
+                    index={index}
+                    key={slide.slideId}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                    }}
+                    bg={slide?.bgColor}
+                  >
+                    <>
+                      {slide.elements.map(el => {
+                        return (
+                          <React.Fragment key={el.id}>
+                            {el.type === 'image-node' ? (
+                              <DraggableResizable
+                                id={el.id}
+                                onDelete={() =>
+                                  handleDelete(slide.slideId, el.id)
+                                }
+                                onDragLeave={newPosition => {
+                                  handleDragLeave(
+                                    slide.slideId,
+                                    el.id,
+                                    newPosition,
+                                  )
+                                }}
+                                type='common'
+                              >
+                                <Image
+                                  src={el.content}
+                                  className='!m-0 !max-h-full !max-w-full select-none'
+                                  fill
+                                  alt={el.id}
+                                />
+                              </DraggableResizable>
+                            ) : el.type === 'text-node' ? (
+                              <EditableText
+                                element={el}
+                                onDelete={() =>
+                                  handleDelete(slide.slideId, el.id)
+                                }
+                                onChangedPosition={newPosition => {
+                                  selectedNodes.forEach(node => {
+                                    handleDragLeave(slide.slideId, node.id, {
+                                      x: newPosition.x,
+                                      y: newPosition.y,
+                                    })
                                   })
-                                })
-                              }}
-                              onChange={value => {
-                                if (!value) return
+                                }}
+                                onChange={value => {
+                                  if (!value) return
 
-                                slidesState.changeContent(
-                                  slide.slideId,
-                                  el.id,
-                                  value,
-                                )
-                              }}
-                            />
-                          ) : el.type === 'text-highlight-node' ? (
-                            <DraggableResizable
-                              id={el.id}
-                              onDelete={() =>
-                                handleDelete(slide.slideId, el.id)
-                              }
-                              onDragLeave={newPosition => {
-                                handleDragLeave(
-                                  slide.slideId,
-                                  el.id,
-                                  newPosition,
-                                )
-                              }}
-                              type='common'
-                            >
-                              <EditableHighlightText
-                                initialValue={el.content}
-                                handleSubmit={() => {}}
-                              />
-                            </DraggableResizable>
-                          ) : (
-                            <DraggableResizable
-                              id={el.id}
-                              onDelete={() =>
-                                handleDelete(slide.slideId, el.id)
-                              }
-                              onDragLeave={newPosition => {
-                                handleDragLeave(
-                                  slide.slideId,
-                                  el.id,
-                                  newPosition,
-                                )
-                              }}
-                              type='common'
-                            >
-                              <EditableFlippableText
-                                initialValue={el.content}
-                                handleSubmit={words => {
-                                  if (words.trim()) {
-                                    slidesState.changeContent(
-                                      slide.slideId,
-                                      el.id,
-                                      words,
-                                    )
-                                  }
+                                  slidesState.changeContent(
+                                    slide.slideId,
+                                    el.id,
+                                    value,
+                                  )
                                 }}
                               />
-                            </DraggableResizable>
-                          )}
-                        </React.Fragment>
-                      )
-                    })}
-                  </>
-                </Slide>
-              ))}
-            </>
-          ) : (
-            <Slide
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-            >
-              <div className='flex h-full items-center justify-center'>
-                {/* 0 is the first slide, but for now there is no slides */}
-                <AddNewSlide currentSlideIndex={0} />
-              </div>
-            </Slide>
-          )}
-        </div>
+                            ) : el.type === 'text-highlight-node' ? (
+                              <DraggableResizable
+                                id={el.id}
+                                onDelete={() =>
+                                  handleDelete(slide.slideId, el.id)
+                                }
+                                onDragLeave={newPosition => {
+                                  handleDragLeave(
+                                    slide.slideId,
+                                    el.id,
+                                    newPosition,
+                                  )
+                                }}
+                                type='common'
+                              >
+                                <EditableHighlightText
+                                  initialValue={el.content}
+                                  handleSubmit={() => {}}
+                                />
+                              </DraggableResizable>
+                            ) : (
+                              <DraggableResizable
+                                id={el.id}
+                                onDelete={() =>
+                                  handleDelete(slide.slideId, el.id)
+                                }
+                                onDragLeave={newPosition => {
+                                  handleDragLeave(
+                                    slide.slideId,
+                                    el.id,
+                                    newPosition,
+                                  )
+                                }}
+                                type='common'
+                              >
+                                <EditableFlippableText
+                                  initialValue={el.content}
+                                  handleSubmit={words => {
+                                    if (words.trim()) {
+                                      slidesState.changeContent(
+                                        slide.slideId,
+                                        el.id,
+                                        words,
+                                      )
+                                    }
+                                  }}
+                                />
+                              </DraggableResizable>
+                            )}
+                          </React.Fragment>
+                        )
+                      })}
+                    </>
+                  </Slide>
+                ))}
+              </>
+            ) : (
+              <Slide
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+              >
+                <div className='flex h-full items-center justify-center'>
+                  {/* 0 is the first slide, but for now there is no slides */}
+                  <AddNewSlide currentSlideIndex={0} />
+                </div>
+              </Slide>
+            )}
+          </div>
+        </Selectable>
       </div>
     </>
   )

@@ -8,14 +8,6 @@ import {
 
 export interface SelectedNode {
   id: string
-  position?: {
-    x: number
-    y: number
-  }
-  size?: {
-    width: number
-    height: number
-  }
 }
 
 type SelectedNodesContext = {
@@ -25,8 +17,8 @@ type SelectedNodesContext = {
   removeSelectedNode: (node: SelectedNode) => void
   toggleSelectNode: (node: SelectedNode) => void
   isSelectedNode: (node: SelectedNode) => boolean
-  changePosition: (node: Omit<SelectedNode, 'size'>) => void
-  changeSize: (node: Omit<SelectedNode, 'position'>) => void
+  setSelectDisabled: Dispatch<SetStateAction<boolean>>
+  selectDisabled: boolean
 }
 
 export const SelectedContext = createContext({} as SelectedNodesContext)
@@ -38,6 +30,7 @@ type SelectedNodesProviderProps = {
 export const SelectedNodesProvider = ({
   children,
 }: SelectedNodesProviderProps) => {
+  const [selectDisabled, setSelectDisabled] = useState(false)
   const [selectedNodes, setSelectedNodes] = useState<SelectedNode[]>([])
 
   const isSelectedNode = (node: SelectedNode) => {
@@ -57,34 +50,21 @@ export const SelectedNodesProvider = ({
   }
 
   const handleSelectNode = (node: SelectedNode) => {
+    if (selectDisabled) return
     setSelectedNodes(prev => [...prev, node])
-  }
-
-  const changePosition = (node: Omit<SelectedNode, 'size'>) => {
-    setSelectedNodes(prev =>
-      prev.map(el =>
-        el.id === node.id ? { ...el, position: node.position } : el,
-      ),
-    )
-  }
-
-  const changeSize = (node: Omit<SelectedNode, 'position'>) => {
-    setSelectedNodes(prev =>
-      prev.map(el => (el.id === node.id ? { ...el, size: node.size } : el)),
-    )
   }
 
   return (
     <SelectedContext.Provider
       value={{
         selectedNodes,
-        changePosition,
+        selectDisabled,
+        setSelectDisabled,
         setSelectedNodes,
         toggleSelectNode,
         isSelectedNode,
         removeSelectedNode,
         handleSelectNode,
-        changeSize,
       }}
     >
       {children}

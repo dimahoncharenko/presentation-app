@@ -25,10 +25,8 @@ export const useResizable = ({
   heightResizable = true,
 }: Props) => {
   const [isResizing, setIsResizing] = useState(false)
-  const { changePosition, changeSize, selectedNodes } =
-    useContext(SelectedContext)
-
   const [initialized, setInitialized] = useState(false)
+  const { setSelectDisabled } = useContext(SelectedContext)
 
   const size = useRef<{ width: number; height: number }>({
     height: 0,
@@ -36,6 +34,10 @@ export const useResizable = ({
   })
 
   const position = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+
+  useEffect(() => {
+    setSelectDisabled(isResizing)
+  }, [isResizing])
 
   // It's used to calculate the natural size of the element; only while mounting
   useLayoutEffect(() => {
@@ -74,14 +76,6 @@ export const useResizable = ({
               }),
             }
 
-            console.log(
-              contentChild,
-              assignHeightWithinRange({
-                height,
-                minHeight: 50,
-              }),
-            )
-
             changeElementSize(size, newSize)
 
             setInitialized(true)
@@ -117,6 +111,8 @@ export const useResizable = ({
   ) => {
     const currentEl = e.target as HTMLElement
     const parentEl = currentEl.parentNode as HTMLElement
+
+    setIsResizing(true)
 
     if (parentEl) {
       let prevX = e.clientX
@@ -200,23 +196,11 @@ export const useResizable = ({
 
       const handleMouseUp = () => {
         setIsResizing(false)
-        selectedNodes.forEach(node => {
-          changePosition({
-            id: node.id,
-            position: position.current,
-          })
-
-          changeSize({
-            id: node.id,
-            size: size.current,
-          })
-        })
 
         document.removeEventListener('mousemove', handleMouseMove)
         document.removeEventListener('mouseup', handleMouseUp)
       }
 
-      setIsResizing(true)
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleMouseUp)
     }
