@@ -70,10 +70,17 @@ export const useResizable = ({
               width: Math.max(width, 200),
               height: assignHeightWithinRange({
                 height,
-                maxHeight: 50,
                 minHeight: 50,
               }),
             }
+
+            console.log(
+              contentChild,
+              assignHeightWithinRange({
+                height,
+                minHeight: 50,
+              }),
+            )
 
             changeElementSize(size, newSize)
 

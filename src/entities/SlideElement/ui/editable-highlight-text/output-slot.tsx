@@ -9,11 +9,9 @@ type OutputSlotProps = {
 }
 
 export const OutputSlot = ({ content, setEditable }: OutputSlotProps) => {
-  console.log(filterParagraphContent(content))
-
   return (
     <p
-      className='!m-0 text-black'
+      className='!m-0'
       onDoubleClick={e => {
         e.stopPropagation()
         setEditable(true)
