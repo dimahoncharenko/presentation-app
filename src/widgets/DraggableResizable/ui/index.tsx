@@ -78,7 +78,7 @@ const DraggableResizable = memo(
       <div
         id={id}
         ref={draggableRef}
-        className='absolute left-0 top-0 min-h-max'
+        className='absolute left-0 top-0'
         aria-label='draggable-resizable'
         onDoubleClick={() => {
           if (!isNodeSelected)
@@ -94,7 +94,7 @@ const DraggableResizable = memo(
         />
         <div
           className={cn(
-            'relative min-h-max w-full',
+            'relative h-full w-full',
             !isNodeSelected && 'pointer-events-none',
           )}
           ref={setNodeRef}

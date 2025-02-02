@@ -1,6 +1,6 @@
 'use client'
 
-import { InputHTMLAttributes, memo, useEffect } from 'react'
+import { InputHTMLAttributes, memo, useContext, useEffect, useRef } from 'react'
 import { useCurrentAttributes } from '@/shared/hooks/useCurrentAttributes'
 import { CustomBubbleMenu } from '@/shared/ui/custom-bubble-menu'
 import { BubbleMenuContent } from '@/shared/ui/custom-bubble-menu/ui/Content'
@@ -13,6 +13,7 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@/shared/ui/bricks/common/context-menu'
+import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 import { editorIsAvailable } from '../lib/utils'
 import { BulletListOptions } from './bullet-list-option'
@@ -67,6 +68,20 @@ const WYSWYG = memo(
     },
   }: WYSWYGProps) => {
     const attributes = useCurrentAttributes(editor)
+    const { setSelectDisabled } = useContext(SelectedContext)
+    const editorRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+      if (editorRef.current) {
+        editorRef.current.addEventListener('mouseenter', () => {
+          setSelectDisabled(true)
+        })
+
+        editorRef.current.addEventListener('mouseleave', () => {
+          setSelectDisabled(false)
+        })
+      }
+    }, [editorRef])
 
     useEffect(() => {
       if (editor) {
@@ -79,6 +94,7 @@ const WYSWYG = memo(
         <ContextMenuTrigger>
           <EditorContent
             {...inputProps}
+            ref={editorRef}
             id={id}
             className={cn(classes.editor, classNames?.container)}
             editor={editor}
