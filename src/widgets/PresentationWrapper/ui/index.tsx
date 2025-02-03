@@ -129,7 +129,11 @@ export const PresentationWrapper = () => {
                                 }}
                                 type='common'
                               >
-                                <EditableImage src={el.content} alt={el.id} />
+                                <EditableImage
+                                  id={el.id}
+                                  src={el.content}
+                                  alt={el.id}
+                                />
                               </DraggableResizable>
                             ) : el.type === 'text-node' ? (
                               <EditableText
