@@ -1,7 +1,11 @@
-import { ReactNode } from 'react'
+'use client'
+
+import { ReactNode, useContext, useEffect } from 'react'
 import Image from 'next/image'
 import { HoveredSubMenu } from '@/shared/ui/hovered-sub-menu'
+import { Controller, useForm } from 'react-hook-form'
 
+import { useSlidesStore } from '@/entities/Slide/lib/slide-store-provider'
 import { Button } from '@/shared/ui/bricks/common/Button'
 import {
   ContextMenu,
@@ -10,6 +14,8 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@/shared/ui/bricks/common/context-menu'
+import { Input } from '@/shared/ui/bricks/common/input'
+import { AppStateContext } from '@/shared/context/app-state-context'
 import { ImageAttributes } from '../../lib/useImageAttributes'
 import { parseFilterProperty, parseImageFrame } from '../../lib/utils'
 
@@ -17,23 +23,71 @@ type Props = {
   children: ReactNode
   changeFrame: (attr: ImageAttributes['frame']) => void
   changeFilter: (attr: ImageAttributes['filter']) => void
+  elementId: string
 }
 
 export const ImageContextMenu = ({
   children,
   changeFilter,
   changeFrame,
+  elementId,
 }: Props) => {
+  const { currentSlide } = useContext(AppStateContext)
+  const slidesState = useSlidesStore(state => state)
+
+  const { setValue, control, watch } = useForm({
+    defaultValues: {
+      image: null as null | File,
+    },
+  })
+
+  const image = watch('image')
+
+  useEffect(() => {
+    if (image) {
+      slidesState.replaceNode(`slide-${currentSlide}`, elementId, {
+        id: elementId,
+        content: URL.createObjectURL(image),
+        position: {
+          x: 0,
+          y: 0,
+        },
+        type: 'image-node',
+      })
+    }
+  }, [elementId, image, currentSlide])
+
   return (
     <ContextMenu>
-      <ContextMenuTrigger>{children}</ContextMenuTrigger>
-      <ContextMenuContent className='min-w-[215px]'>
-        <ContextMenuItem>
-          <Button variant='none'>Replace image</Button>
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem>
-          <Button variant='none'>Delete image</Button>
+      <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+      <ContextMenuContent className='relative min-w-[215px]'>
+        <ContextMenuItem inset onSelect={e => e.preventDefault()}>
+          <Controller
+            control={control}
+            name='image'
+            render={({ field: { name, onBlur, ref, disabled } }) => {
+              return (
+                <>
+                  <label htmlFor='image-replace' className='cursor-pointer'>
+                    <span>Replace image</span>
+                  </label>
+                  <Input
+                    name={name}
+                    onBlur={onBlur}
+                    ref={ref}
+                    disabled={disabled}
+                    onChange={evt =>
+                      evt.target.files &&
+                      setValue('image', evt.target.files?.[0])
+                    }
+                    type='file'
+                    className='hidden'
+                    id='image-replace'
+                  />
+                </>
+              )
+            }}
+          />
         </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem>

@@ -33,19 +33,10 @@ import { RevealContext } from '@/shared/context/reveal-context'
 import { cn } from '@/shared/lib/cn-merge'
 import { SetColor } from './set-color'
 
-type DeckState = {
-  indexh: number
-  indexv: number
-}
-
 export const Sidenav = () => {
   const { deckRef } = useContext(RevealContext)
-  const { openedSidenav, setSelectedColor, setOpenedSidenav } =
+  const { openedSidenav, setSelectedColor, setOpenedSidenav, currentSlide } =
     useContext(AppStateContext)
-
-  const [currentSlide, setCurrentSlide] = useState(
-    deckRef.current?.getState().indexh || 0,
-  )
 
   const [showedSidenav, setShowedSidenav] = useState(false)
   const slidesState = useSlidesStore(state => state)
@@ -57,23 +48,6 @@ export const Sidenav = () => {
   })
 
   const image = watch('image')
-
-  // Applies the initial slide attributes such as background color
-  useEffect(() => {
-    const handleSlideChanged = (event: Event) => {
-      const currentSlide = event as unknown as DeckState
-      setCurrentSlide(currentSlide.indexh)
-    }
-
-    if (deckRef.current) {
-      deckRef.current.sync()
-    }
-    deckRef.current?.on('slidechanged', handleSlideChanged)
-
-    return () => {
-      deckRef.current?.off('slidechanged', handleSlideChanged)
-    }
-  }, [deckRef.current])
 
   const addNodeToSlide = useCallback(
     ({

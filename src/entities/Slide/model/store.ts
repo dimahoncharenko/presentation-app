@@ -37,6 +37,11 @@ export type SlidesActions = {
   ) => void
   removeSlide: (slideId: SlidesState['slides'][number]['slideId']) => void
   addSlide: (slideIndex: number) => void
+  replaceNode: (
+    slideId: SlidesState['slides'][number]['slideId'],
+    nodeId: SlideElement['id'],
+    newNode: SlideElement,
+  ) => void
 }
 
 export type SlidesStore = SlidesState & SlidesActions
@@ -262,6 +267,23 @@ export const createSlidesStore = (
                   }
                   return el
                 }),
+              }
+
+              return slide
+            }
+
+            return slide
+          }),
+        })),
+      replaceNode: (slideId, nodeIdToReplace, newNode) =>
+        set(state => ({
+          slides: state.slides.map(slide => {
+            if (slide.slideId === slideId) {
+              slide = {
+                ...slide,
+                elements: slide.elements.map(el =>
+                  el.id === nodeIdToReplace ? newNode : el,
+                ),
               }
 
               return slide

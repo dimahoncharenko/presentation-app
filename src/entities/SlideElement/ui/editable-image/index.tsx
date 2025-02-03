@@ -7,13 +7,14 @@ import { ImageContextMenu } from './context-menu'
 
 type Props = ImageProps
 
-export const EditableImage = (props: Props) => {
+export const EditableImage = ({ id, ...props }: Props) => {
   const [attributes, setAttributes] = useImageAttributes()
 
   return (
     <ImageContextMenu
       changeFilter={filter => setAttributes(prev => ({ ...prev, filter }))}
       changeFrame={frame => setAttributes(prev => ({ ...prev, frame }))}
+      elementId={`${id}`}
     >
       <Image
         {...props}

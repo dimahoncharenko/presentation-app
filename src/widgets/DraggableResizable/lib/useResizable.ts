@@ -52,8 +52,6 @@ export const useResizable = ({
           const contentChild = content.firstChild as HTMLElement
 
           if (contentChild.tagName === 'IMG') {
-            console.log(contentChild)
-
             const img = contentChild as HTMLImageElement
             const maxWidth = 300
 
@@ -64,8 +62,6 @@ export const useResizable = ({
               height: (height * maxWidth) / width,
             }
             changeElementSize(size, newSize)
-
-            console.log('Changed ref: ', size)
 
             setInitialized(true)
             return

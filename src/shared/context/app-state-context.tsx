@@ -1,20 +1,42 @@
-import { createContext, Dispatch, SetStateAction, useState } from 'react'
+'use client'
+
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
+
+import { RevealContext } from './reveal-context'
 
 type AppStateContext = {
   openedSidenav: boolean
   setOpenedSidenav: Dispatch<SetStateAction<boolean>>
   selectedColor: { indexh: number; color: string }
   setSelectedColor: Dispatch<SetStateAction<{ indexh: number; color: string }>>
+  currentSlide: number
 }
 
 export const AppStateContext = createContext({} as AppStateContext)
+
+type DeckState = {
+  indexh: number
+  indexv: number
+}
 
 type Props = {
   children: React.ReactNode
 }
 
 export const AppStateProvider = ({ children }: Props) => {
+  const { deckRef } = useContext(RevealContext)
+
   const [openedSidenav, setOpenedSidenav] = useState(false)
+  const [currentSlide, setCurrentSlide] = useState(
+    deckRef.current?.getState().indexh || 0,
+  )
   const [selectedColor, setSelectedColor] = useState<{
     indexh: number
     color: string
@@ -23,6 +45,22 @@ export const AppStateProvider = ({ children }: Props) => {
     indexh: 0,
   })
 
+  useEffect(() => {
+    const handleSlideChanged = (event: Event) => {
+      const currentSlide = event as unknown as DeckState
+      setCurrentSlide(currentSlide.indexh)
+    }
+
+    if (deckRef.current) {
+      deckRef.current.sync()
+    }
+    deckRef.current?.on('slidechanged', handleSlideChanged)
+
+    return () => {
+      deckRef.current?.off('slidechanged', handleSlideChanged)
+    }
+  }, [deckRef.current])
+
   return (
     <AppStateContext
       value={{
@@ -30,6 +68,7 @@ export const AppStateProvider = ({ children }: Props) => {
         setOpenedSidenav,
         selectedColor,
         setSelectedColor,
+        currentSlide,
       }}
     >
       {children}

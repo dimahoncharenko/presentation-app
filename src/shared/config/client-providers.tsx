@@ -5,7 +5,6 @@ import { DndContext } from '@dnd-kit/core'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { SlidesStoreProvider } from '@/entities/Slide/lib/slide-store-provider'
-import { AppStateProvider } from '@/shared/context/app-state-context'
 import { SelectedNodesProvider } from '../context/selected-nodes'
 
 const RevealProvider = dynamic(
@@ -13,6 +12,12 @@ const RevealProvider = dynamic(
   {
     ssr: false,
   },
+)
+
+const AppStateProvider = dynamic(
+  async () =>
+    (await import('@/shared/context/app-state-context')).AppStateProvider,
+  { ssr: false },
 )
 
 const queryClient = new QueryClient()
@@ -26,11 +31,11 @@ export const ClientProviders = ({ children }: Props) => {
     <QueryClientProvider client={queryClient}>
       <SlidesStoreProvider>
         <SelectedNodesProvider>
-          <AppStateProvider>
-            <DndContext>
-              <RevealProvider>{children}</RevealProvider>
-            </DndContext>
-          </AppStateProvider>
+          <DndContext>
+            <RevealProvider>
+              <AppStateProvider>{children}</AppStateProvider>
+            </RevealProvider>
+          </DndContext>
         </SelectedNodesProvider>
       </SlidesStoreProvider>
     </QueryClientProvider>
