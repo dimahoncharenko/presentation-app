@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
-import { ChevronRight } from 'lucide-react'
+import Image from 'next/image'
+import { HoveredSubMenu } from '@/shared/ui/hovered-sub-menu'
 
 import { Button } from '@/shared/ui/bricks/common/Button'
 import {
@@ -9,17 +10,20 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@/shared/ui/bricks/common/context-menu'
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/shared/ui/bricks/common/hover-card'
+import { ImageAttributes } from '../../lib/useImageAttributes'
+import { parseFilterProperty, parseImageFrame } from '../../lib/utils'
 
 type Props = {
   children: ReactNode
+  changeFrame: (attr: ImageAttributes['frame']) => void
+  changeFilter: (attr: ImageAttributes['filter']) => void
 }
 
-export const ImageContextMenu = ({ children }: Props) => {
+export const ImageContextMenu = ({
+  children,
+  changeFilter,
+  changeFrame,
+}: Props) => {
   return (
     <ContextMenu>
       <ContextMenuTrigger>{children}</ContextMenuTrigger>
@@ -34,14 +38,73 @@ export const ImageContextMenu = ({ children }: Props) => {
         <ContextMenuSeparator />
         <ContextMenuItem>
           <Button variant='none'>Frames</Button>
-          <HoverCard>
-            <HoverCardTrigger className='ml-auto cursor-pointer'>
-              <ChevronRight />
-            </HoverCardTrigger>
-            <HoverCardContent className='absolute -right-[185px] -top-8 z-10 w-40 rounded-md border border-gray-200 bg-white p-2 shadow-sm'>
-              Border
-            </HoverCardContent>
-          </HoverCard>
+          <HoveredSubMenu>
+            <div
+              onClick={() => changeFrame('none')}
+              className='cursor-pointer'
+              title='none'
+            >
+              <Image
+                src='/images/image-placeholder.svg'
+                width={32}
+                height={32}
+                alt=''
+              />
+            </div>
+            {(['shadowed', 'bordered', 'rounded'] as const).map(
+              (frame, index) => (
+                <div
+                  key={index}
+                  onClick={() => changeFrame(frame)}
+                  title={frame}
+                  className='cursor-pointer'
+                >
+                  <Image
+                    src='/images/image-placeholder.svg'
+                    width={32}
+                    height={32}
+                    alt=''
+                    className={parseImageFrame(frame)}
+                  />
+                </div>
+              ),
+            )}
+          </HoveredSubMenu>
+        </ContextMenuItem>
+        <ContextMenuItem>
+          <Button variant='none'>Filters</Button>
+          <HoveredSubMenu>
+            <div
+              onClick={() => changeFilter('none')}
+              className='cursor-pointer'
+              title='none'
+            >
+              <Image
+                src='/images/image-placeholder.svg'
+                width={32}
+                height={32}
+                alt=''
+              />
+            </div>
+            {(['grayscale', 'sepia', 'hue-rotate(220deg)'] as const).map(
+              (filter, index) => (
+                <div
+                  key={index}
+                  onClick={() => changeFilter(filter)}
+                  title={filter}
+                  className='cursor-pointer'
+                >
+                  <Image
+                    src='/images/image-placeholder.svg'
+                    width={32}
+                    height={32}
+                    alt=''
+                    className={parseFilterProperty(filter)}
+                  />
+                </div>
+              ),
+            )}
+          </HoveredSubMenu>
         </ContextMenuItem>
         <ContextMenuSeparator />
       </ContextMenuContent>
