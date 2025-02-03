@@ -52,6 +52,8 @@ export const useResizable = ({
           const contentChild = content.firstChild as HTMLElement
 
           if (contentChild.tagName === 'IMG') {
+            console.log(contentChild)
+
             const img = contentChild as HTMLImageElement
             const maxWidth = 300
 
@@ -62,6 +64,8 @@ export const useResizable = ({
               height: (height * maxWidth) / width,
             }
             changeElementSize(size, newSize)
+
+            console.log('Changed ref: ', size)
 
             setInitialized(true)
             return
@@ -91,6 +95,8 @@ export const useResizable = ({
       const positionY = position.current.y
       const nodeWidth = size.current.width
       const nodeHeight = size.current.height
+
+      console.log('Is about to update: ', size)
 
       draggableRef.current.style.transform = `translate(${positionX || 500}px, ${positionY || 300}px)`
       draggableRef.current.style.width = `${nodeWidth}px`

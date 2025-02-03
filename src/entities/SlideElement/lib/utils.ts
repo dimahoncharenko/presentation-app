@@ -1,3 +1,5 @@
+import { ImageAttributes } from './useImageAttributes'
+
 export const filterParagraphContent = (input: string) => {
   const regex = /<p[^>]*>(.*?)<\/p>/ // Matches any <p> tag and captures its content
   const match = input.match(regex)
@@ -66,4 +68,30 @@ export const splitTextPreserveSpans = (htmlString: string): string[] => {
   })
 
   return result
+}
+
+export const parseFilterProperty = (filter: ImageAttributes['filter']) => {
+  switch (filter) {
+    case 'sepia':
+      return 'filter sepia'
+    case 'grayscale':
+      return 'filter grayscale'
+    case 'hue-rotate(220deg)':
+      return 'filter hue-rotate-[220deg]'
+    default:
+      return ''
+  }
+}
+
+export const parseImageFrame = (frame: ImageAttributes['frame']) => {
+  switch (frame) {
+    case 'rounded':
+      return 'rounded-lg'
+    case 'bordered':
+      return 'border-2 border-gray-500'
+    case 'shadowed':
+      return 'shadow-2xl'
+    default:
+      return ''
+  }
 }

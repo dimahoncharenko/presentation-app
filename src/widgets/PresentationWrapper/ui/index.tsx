@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useContext, useEffect, useRef } from 'react'
-import Image from 'next/image'
 import Selectable from 'react-selectable-box'
 
 import { DraggableResizable } from '@/widgets/DraggableResizable/ui'
@@ -14,6 +13,7 @@ import {
   EditableHighlightText,
   EditableText,
 } from '@/entities/SlideElement'
+import { EditableImage } from '@/entities/SlideElement/ui/editable-image'
 import { RevealContext } from '@/shared/context/reveal-context'
 import { SelectedContext, SelectedNode } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
@@ -129,12 +129,7 @@ export const PresentationWrapper = () => {
                                 }}
                                 type='common'
                               >
-                                <Image
-                                  src={el.content}
-                                  className='!m-0 !max-h-full !max-w-full select-none'
-                                  fill
-                                  alt={el.id}
-                                />
+                                <EditableImage src={el.content} alt={el.id} />
                               </DraggableResizable>
                             ) : el.type === 'text-node' ? (
                               <EditableText
@@ -224,7 +219,6 @@ export const PresentationWrapper = () => {
                 }}
               >
                 <div className='flex h-full items-center justify-center'>
-                  {/* 0 is the first slide, but for now there is no slides */}
                   <AddNewSlide currentSlideIndex={0} />
                 </div>
               </Slide>
