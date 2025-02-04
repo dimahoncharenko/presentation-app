@@ -21,8 +21,10 @@ import { parseFilterProperty, parseImageFrame } from '../../lib/utils'
 
 type Props = {
   children: ReactNode
-  changeFrame: (attr: ImageAttributes['frame']) => void
-  changeFilter: (attr: ImageAttributes['filter']) => void
+  changeFrame: (attr: ImageAttributes['frames'][number]) => void
+  changeFilter: (attr: ImageAttributes['filters'][number]) => void
+  clearFrames: () => void
+  clearFilters: () => void
   elementId: string
 }
 
@@ -31,6 +33,8 @@ export const ImageContextMenu = ({
   changeFilter,
   changeFrame,
   elementId,
+  clearFilters,
+  clearFrames,
 }: Props) => {
   const { currentSlide } = useContext(AppStateContext)
   const slidesState = useSlidesStore(state => state)
@@ -93,11 +97,7 @@ export const ImageContextMenu = ({
         <ContextMenuItem>
           <Button variant='none'>Frames</Button>
           <HoveredSubMenu>
-            <div
-              onClick={() => changeFrame('none')}
-              className='cursor-pointer'
-              title='none'
-            >
+            <div onClick={clearFrames} className='cursor-pointer' title='none'>
               <Image
                 src='/images/image-placeholder.svg'
                 width={32}
@@ -128,11 +128,7 @@ export const ImageContextMenu = ({
         <ContextMenuItem>
           <Button variant='none'>Filters</Button>
           <HoveredSubMenu>
-            <div
-              onClick={() => changeFilter('none')}
-              className='cursor-pointer'
-              title='none'
-            >
+            <div onClick={clearFilters} className='cursor-pointer' title='none'>
               <Image
                 src='/images/image-placeholder.svg'
                 width={32}

@@ -92,8 +92,6 @@ export const useResizable = ({
       const nodeWidth = size.current.width
       const nodeHeight = size.current.height
 
-      console.log('Is about to update: ', size)
-
       draggableRef.current.style.transform = `translate(${positionX || 500}px, ${positionY || 300}px)`
       draggableRef.current.style.width = `${nodeWidth}px`
       draggableRef.current.style.height = `${nodeHeight}px`

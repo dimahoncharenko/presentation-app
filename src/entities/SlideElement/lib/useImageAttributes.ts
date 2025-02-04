@@ -1,15 +1,50 @@
 import { useState } from 'react'
 
 export type ImageAttributes = {
-  frame: 'none' | 'shadowed' | 'bordered' | 'rounded'
-  filter: 'none' | 'grayscale' | 'sepia' | 'hue-rotate(220deg)'
+  frames: ('shadowed' | 'bordered' | 'rounded')[]
+  filters: ('grayscale' | 'sepia' | 'hue-rotate(220deg)')[]
 }
 
 export const useImageAttributes = () => {
   const [attributes, setAttributes] = useState<ImageAttributes>({
-    filter: 'none',
-    frame: 'none',
+    filters: [],
+    frames: [],
   })
 
-  return [attributes, setAttributes] as const
+  const toggleFrameAttribute = (attr: ImageAttributes['frames'][number]) => {
+    setAttributes(prev => ({
+      ...prev,
+      frames: prev.frames.includes(attr)
+        ? prev.frames.filter(frame => frame !== attr)
+        : [...prev.frames, attr],
+    }))
+  }
+
+  const toggleFilterAttribute = (attr: ImageAttributes['filters'][number]) => {
+    setAttributes(prev => ({
+      ...prev,
+      filters: prev.filters.includes(attr)
+        ? prev.filters.filter(filter => filter !== attr)
+        : [...prev.filters, attr],
+    }))
+  }
+
+  const clearFramesAttribute = () => {
+    setAttributes(prev => ({ ...prev, frames: [] }))
+  }
+
+  const clearFiltersAttribute = () => {
+    setAttributes(prev => ({ ...prev, filters: [] }))
+  }
+
+  return [
+    attributes,
+    setAttributes,
+    {
+      toggleFilterAttribute,
+      toggleFrameAttribute,
+      clearFiltersAttribute,
+      clearFramesAttribute,
+    },
+  ] as const
 }

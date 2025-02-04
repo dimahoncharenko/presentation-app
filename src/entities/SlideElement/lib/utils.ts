@@ -70,7 +70,9 @@ export const splitTextPreserveSpans = (htmlString: string): string[] => {
   return result
 }
 
-export const parseFilterProperty = (filter: ImageAttributes['filter']) => {
+export const parseFilterProperty = (
+  filter: ImageAttributes['filters'][number],
+) => {
   switch (filter) {
     case 'sepia':
       return 'filter sepia'
@@ -83,7 +85,7 @@ export const parseFilterProperty = (filter: ImageAttributes['filter']) => {
   }
 }
 
-export const parseImageFrame = (frame: ImageAttributes['frame']) => {
+export const parseImageFrame = (frame: ImageAttributes['frames'][number]) => {
   switch (frame) {
     case 'rounded':
       return 'rounded-lg'
@@ -94,4 +96,19 @@ export const parseImageFrame = (frame: ImageAttributes['frame']) => {
     default:
       return ''
   }
+}
+
+export const parseFiltersAttributeToClassname = (
+  filters: ImageAttributes['filters'],
+) => {
+  return filters.reduce(
+    (acc, prev) => acc + ' ' + parseFilterProperty(prev),
+    '',
+  )
+}
+
+export const parseFramesAttributeToClassname = (
+  filters: ImageAttributes['frames'],
+) => {
+  return filters.reduce((acc, prev) => acc + ' ' + parseImageFrame(prev), '')
 }

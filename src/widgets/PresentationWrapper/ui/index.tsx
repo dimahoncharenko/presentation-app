@@ -78,6 +78,7 @@ export const PresentationWrapper = () => {
         <Selectable
           disabled={selectDisabled}
           mode='add'
+          boxClassName='pointer-events-none'
           value={selectedNodes}
           dragContainer={() =>
             document.getElementById('presentation-wrapper') as HTMLElement
