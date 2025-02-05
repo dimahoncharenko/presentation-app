@@ -1,11 +1,13 @@
 'use client'
 
-import { InputHTMLAttributes, memo, useContext, useEffect, useRef } from 'react'
+import { InputHTMLAttributes, memo, useContext } from 'react'
 import { useCurrentAttributes } from '@/shared/hooks/useCurrentAttributes'
 import { CustomBubbleMenu } from '@/shared/ui/custom-bubble-menu'
 import { BubbleMenuContent } from '@/shared/ui/custom-bubble-menu/ui/Content'
-import { Editor, EditorContent } from '@tiptap/react'
+import { Editor } from '@tiptap/react'
 
+import { RichEdit } from '@/entities/RichEdit'
+import { Button } from '@/shared/ui/bricks/common/Button'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -13,16 +15,13 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@/shared/ui/bricks/common/context-menu'
-import { SelectedContext } from '@/shared/context/selected-nodes'
-import { cn } from '@/shared/lib/cn-merge'
+import { AppStateContext } from '@/shared/context/app-state-context'
 import { editorIsAvailable } from '../lib/utils'
 import { BulletListOptions } from './bullet-list-option'
-import classes from './classes.module.css'
 import { FancyRewriter } from './FancyRewriter'
 import { OrderedListOptions } from './ordered-list-option'
 
 export type WYSWYGProps = {
-  content: string
   editor: Editor | null
   id: string
   hideBubbleMenu?: boolean
@@ -68,36 +67,19 @@ const WYSWYG = memo(
     },
   }: WYSWYGProps) => {
     const attributes = useCurrentAttributes(editor)
-    const { setSelectDisabled } = useContext(SelectedContext)
-    const editorRef = useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-      if (editorRef.current) {
-        editorRef.current.addEventListener('mouseenter', () => {
-          setSelectDisabled(true)
-        })
-
-        editorRef.current.addEventListener('mouseleave', () => {
-          setSelectDisabled(false)
-        })
-      }
-    }, [editorRef])
-
-    useEffect(() => {
-      if (editor) {
-        editor.commands.updateAttributes('paragraph', { id })
-      }
-    }, [id, editor])
+    const {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      animated: [_, { addAnimation }],
+    } = useContext(AppStateContext)
 
     return (
       <ContextMenu>
         <ContextMenuTrigger>
-          <EditorContent
-            {...inputProps}
-            ref={editorRef}
-            id={id}
-            className={cn(classes.editor, classNames?.container)}
+          <RichEdit
             editor={editor}
+            id={id}
+            inputProps={{ ...inputProps }}
+            classNames={{ container: classNames?.container }}
           />
 
           {editorIsAvailable(editor) && (
@@ -146,6 +128,16 @@ const WYSWYG = memo(
               {editorIsAvailable(editor) && <FancyRewriter editor={editor} />}
             </ContextMenuItem>
           )}
+          <ContextMenuItem onSelect={handleSelect}>
+            <Button
+              variant='none'
+              onClick={() => {
+                addAnimation(id, 'pulse')
+              }}
+            >
+              Fade
+            </Button>
+          </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
     )

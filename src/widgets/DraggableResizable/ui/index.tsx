@@ -3,6 +3,7 @@
 import { memo, ReactNode, useContext, useEffect } from 'react'
 import { useSelectable } from 'react-selectable-box'
 
+import { AnimatedElement } from '@/entities/AnimatedElement'
 import { SelectedContext } from '@/shared/context/selected-nodes'
 import { cn } from '@/shared/lib/cn-merge'
 import { useDraggable } from '../lib/useDraggable'
@@ -79,7 +80,6 @@ const DraggableResizable = memo(
         id={id}
         ref={draggableRef}
         className='absolute left-0 top-0'
-        aria-label='draggable-resizable'
         onDoubleClick={() => {
           if (!isNodeSelected)
             handleSelectNode({
@@ -99,44 +99,43 @@ const DraggableResizable = memo(
           )}
           ref={setNodeRef}
         >
-          <div
+          <AnimatedElement
+            id={id}
             className={cn(
               'absolute h-full min-h-max w-full break-all',
               isNodeSelected && 'border-2 border-dashed border-opacity-85',
             )}
           >
-            {/* Resize handlers (corners) */}
-            <div
-              onMouseDown={e => resizeOnMouseDown(e, 'nw')}
-              aria-label='draggable-resizable-resizer-nw'
-              className='absolute -left-[2px] -top-[2px] z-10 size-[10px] cursor-nw-resize rounded-full'
-            ></div>
-            <div
-              onMouseDown={e => resizeOnMouseDown(e, 'ne')}
-              aria-label='draggable-resizable-resizer-ne'
-              className='absolute -right-[2px] -top-[2px] z-10 size-[10px] cursor-ne-resize rounded-full'
-            ></div>
-            <div
-              onMouseDown={e => resizeOnMouseDown(e, 'se')}
-              aria-label='draggable-resizable-resizer-se'
-              className='absolute -bottom-[2px] -right-[2px] z-10 size-[10px] cursor-se-resize rounded-full'
-            ></div>
-            <div
-              onMouseDown={e => resizeOnMouseDown(e, 'sw')}
-              aria-label='draggable-resizable-resizer-sw'
-              className='sw absolute -bottom-[0px] -left-[8px] z-10 size-[10px] cursor-sw-resize rounded-full'
-            ></div>
+            <>
+              {/* Resize handlers (corners) */}
+              <div
+                onMouseDown={e => resizeOnMouseDown(e, 'nw')}
+                aria-label='resizer-nw'
+                className='absolute -left-[2px] -top-[2px] z-10 size-[10px] cursor-nw-resize rounded-full'
+              ></div>
+              <div
+                onMouseDown={e => resizeOnMouseDown(e, 'ne')}
+                aria-label='resizer-ne'
+                className='absolute -right-[2px] -top-[2px] z-10 size-[10px] cursor-ne-resize rounded-full'
+              ></div>
+              <div
+                onMouseDown={e => resizeOnMouseDown(e, 'se')}
+                aria-label='resizer-se'
+                className='absolute -bottom-[2px] -right-[2px] z-10 size-[10px] cursor-se-resize rounded-full'
+              ></div>
+              <div
+                onMouseDown={e => resizeOnMouseDown(e, 'sw')}
+                aria-label='resizer-sw'
+                className='sw absolute -bottom-[0px] -left-[8px] z-10 size-[10px] cursor-sw-resize rounded-full'
+              ></div>
 
-            {/* Resizer content */}
-            <div
-              id='draggable-resizable-content-container'
-              aria-label='draggable-resizable-resizer-content'
-            >
-              {rest.type === 'advanced'
-                ? rest.children({ grabbed: !!isNodeSelected, isResizing })
-                : rest.children}
-            </div>
-          </div>
+              <div id='draggable-resizable-content-container'>
+                {rest.type === 'advanced'
+                  ? rest.children({ grabbed: !!isNodeSelected, isResizing })
+                  : rest.children}
+              </div>
+            </>
+          </AnimatedElement>
         </div>
       </div>
     )

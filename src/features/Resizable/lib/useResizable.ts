@@ -7,13 +7,13 @@ import {
   useState,
 } from 'react'
 
-import { SelectedContext } from '@/shared/context/selected-nodes'
 import {
   assignHeightWithinRange,
   changeElementSize,
   getChild,
   loadNaturalImageSize,
-} from './use-draggable-utils'
+} from '@/widgets/DraggableResizable/lib/use-draggable-utils'
+import { SelectedContext } from '@/shared/context/selected-nodes'
 
 type Props = {
   draggableRef: React.RefObject<HTMLElement>
@@ -43,16 +43,16 @@ export const useResizable = ({
   useLayoutEffect(() => {
     ;(async () => {
       if (draggableRef.current) {
+        console.log(draggableRef.current)
+
         const content = getChild(
           draggableRef.current,
-          '#draggable-resizable-content-container',
+          '[aria-label="element-content"]',
         )
 
         if (content) {
-          const contentChild = content.firstChild as HTMLElement
-
-          if (contentChild.tagName === 'IMG') {
-            const img = contentChild as HTMLImageElement
+          if (content.tagName === 'IMG') {
+            const img = content as HTMLImageElement
             const maxWidth = 300
 
             const { height, width } = await loadNaturalImageSize(img)
@@ -66,7 +66,7 @@ export const useResizable = ({
             setInitialized(true)
             return
           } else {
-            const { width, height } = contentChild.getBoundingClientRect()
+            const { width, height } = content.getBoundingClientRect()
 
             const newSize = {
               width: Math.max(width, 200),

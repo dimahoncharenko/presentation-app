@@ -6,6 +6,7 @@ import Selectable from 'react-selectable-box'
 import { DraggableResizable } from '@/widgets/DraggableResizable/ui'
 import { Sidenav } from '@/widgets/Sidenav'
 import { AddNewSlide } from '@/features/AddNewSlide'
+import { PresentationElement } from '@/entities/PresentationElement'
 import { useSlidesStore } from '@/entities/Slide/lib/slide-store-provider'
 import { Slide } from '@/entities/Slide/ui'
 import {
@@ -137,30 +138,31 @@ export const PresentationWrapper = () => {
                                 />
                               </DraggableResizable>
                             ) : el.type === 'text-node' ? (
-                              <EditableText
-                                element={el}
-                                onDelete={() =>
-                                  handleDelete(slide.slideId, el.id)
-                                }
-                                onChangedPosition={newPosition => {
-                                  selectedNodes.forEach(node => {
-                                    handleDragLeave(slide.slideId, node.id, {
-                                      x: newPosition.x,
-                                      y: newPosition.y,
-                                    })
-                                  })
-                                }}
-                                onChange={value => {
-                                  if (!value) return
+                              <PresentationElement id={el.id} />
+                            ) : // <EditableText
+                            //   element={el}
+                            //   onDelete={() =>
+                            //     handleDelete(slide.slideId, el.id)
+                            //   }
+                            //   onChangedPosition={newPosition => {
+                            //     selectedNodes.forEach(node => {
+                            //       handleDragLeave(slide.slideId, node.id, {
+                            //         x: newPosition.x,
+                            //         y: newPosition.y,
+                            //       })
+                            //     })
+                            //   }}
+                            //   onChange={value => {
+                            //     if (!value) return
 
-                                  slidesState.changeContent(
-                                    slide.slideId,
-                                    el.id,
-                                    value,
-                                  )
-                                }}
-                              />
-                            ) : el.type === 'text-highlight-node' ? (
+                            //     slidesState.changeContent(
+                            //       slide.slideId,
+                            //       el.id,
+                            //       value,
+                            //     )
+                            //   }}
+                            // />
+                            el.type === 'text-highlight-node' ? (
                               <DraggableResizable
                                 id={el.id}
                                 onDelete={() =>
