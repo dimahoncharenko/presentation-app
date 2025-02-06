@@ -8,9 +8,15 @@ type Props = {
   id: string
   className?: string
   children: ReactNode
+  disabled?: boolean
 }
 
-export const AnimatedElement = ({ className, children, id }: Props) => {
+export const AnimatedElement = ({
+  className,
+  children,
+  id,
+  disabled,
+}: Props) => {
   const {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     animated: [_, { queryAnimatedElementById }],
@@ -21,7 +27,10 @@ export const AnimatedElement = ({ className, children, id }: Props) => {
 
   return (
     <div
-      className={cn(className, isAnimated && parseAnimation(isAnimated.type))}
+      className={cn(
+        className,
+        isAnimated && !disabled && parseAnimation(isAnimated.type),
+      )}
     >
       {children}
     </div>

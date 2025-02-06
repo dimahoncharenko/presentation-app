@@ -14,6 +14,7 @@ type DraggableContext = {
   dragOnMouseDown: (
     e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
   ) => void
+  draggableRef: RefObject<HTMLElement>
 }
 
 export const DraggableContext = createContext<DraggableContext>(

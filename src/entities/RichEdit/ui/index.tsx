@@ -1,5 +1,4 @@
 import { InputHTMLAttributes, useContext, useEffect, useRef } from 'react'
-import { CustomBubbleMenu } from '@/shared/ui/custom-bubble-menu'
 import { Editor, EditorContent } from '@tiptap/react'
 
 import { SelectedContext } from '@/shared/context/selected-nodes'

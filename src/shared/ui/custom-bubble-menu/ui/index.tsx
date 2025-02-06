@@ -38,6 +38,7 @@ export const CustomBubbleMenu = ({
         editor={editor}
         classNames={{
           trigger: 'p-1 pr-0',
+          container: 'absolute left-0 -top-[82px]',
         }}
         attributes={attributes}
       />

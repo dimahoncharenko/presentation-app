@@ -1,16 +1,8 @@
-import {
-  MouseEvent,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react'
+import { MouseEvent, useContext, useEffect, useRef, useState } from 'react'
 
 import {
   assignHeightWithinRange,
   changeElementSize,
-  getChild,
   loadNaturalImageSize,
 } from '@/widgets/DraggableResizable/lib/use-draggable-utils'
 import { SelectedContext } from '@/shared/context/selected-nodes'
@@ -33,6 +25,11 @@ export const useResizable = ({
     width: 0,
   })
 
+  const naturalSize = useRef<{ width: number; height: number }>({
+    height: 0,
+    width: 0,
+  })
+
   const position = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
   useEffect(() => {
@@ -40,50 +37,46 @@ export const useResizable = ({
   }, [isResizing])
 
   // It's used to calculate the natural size of the element; only while mounting
-  useLayoutEffect(() => {
+  useEffect(() => {
+    if (!draggableRef.current) return
     ;(async () => {
-      if (draggableRef.current) {
-        console.log(draggableRef.current)
+      const content = draggableRef.current.children[0]
 
-        const content = getChild(
-          draggableRef.current,
-          '[aria-label="element-content"]',
-        )
+      if (content) {
+        if (content.tagName === 'IMG') {
+          const img = content as HTMLImageElement
+          const maxWidth = 300
 
-        if (content) {
-          if (content.tagName === 'IMG') {
-            const img = content as HTMLImageElement
-            const maxWidth = 300
+          const { height, width } = await loadNaturalImageSize(img)
 
-            const { height, width } = await loadNaturalImageSize(img)
-
-            const newSize = {
-              width: (width * maxWidth) / width,
-              height: (height * maxWidth) / width,
-            }
-            changeElementSize(size, newSize)
-
-            setInitialized(true)
-            return
-          } else {
-            const { width, height } = content.getBoundingClientRect()
-
-            const newSize = {
-              width: Math.max(width, 200),
-              height: assignHeightWithinRange({
-                height,
-                minHeight: 50,
-              }),
-            }
-
-            changeElementSize(size, newSize)
-
-            setInitialized(true)
+          const newSize = {
+            width: (width * maxWidth) / width,
+            height: (height * maxWidth) / width,
           }
+          changeElementSize(naturalSize, newSize)
+          changeElementSize(size, newSize)
+
+          setInitialized(true)
+          return
+        } else {
+          const { width, height } = content.getBoundingClientRect()
+
+          const newSize = {
+            width: Math.max(width, 200),
+            height: assignHeightWithinRange({
+              height,
+              minHeight: 50,
+            }),
+          }
+
+          changeElementSize(naturalSize, newSize)
+          changeElementSize(size, newSize)
+
+          setInitialized(true)
         }
       }
     })()
-  }, [draggableRef])
+  }, [draggableRef.current])
 
   useEffect(() => {
     if (draggableRef.current && initialized) {
@@ -140,7 +133,7 @@ export const useResizable = ({
 
             size.current = {
               width: rect.width + (event.clientX - prevX),
-              height: size.current.height,
+              height: Math.max(size.current.height, naturalSize.current.height),
             }
           } else if (direction === 'sw') {
             if (heightResizable) {
@@ -154,7 +147,7 @@ export const useResizable = ({
 
             size.current = {
               width: rect.width - (event.clientX - prevX),
-              height: size.current.height,
+              height: Math.max(size.current.height, naturalSize.current.height),
             }
           } else if (direction === 'ne') {
             if (heightResizable) {
@@ -168,7 +161,7 @@ export const useResizable = ({
 
             size.current = {
               width: rect.width + (event.clientX - prevX),
-              height: size.current.height,
+              height: Math.max(size.current.height, naturalSize.current.height),
             }
           } else if (direction === 'nw') {
             if (heightResizable)
@@ -181,7 +174,7 @@ export const useResizable = ({
 
             size.current = {
               width: rect.width - (event.clientX - prevX),
-              height: size.current.height,
+              height: Math.max(size.current.height, naturalSize.current.height),
             }
           }
 

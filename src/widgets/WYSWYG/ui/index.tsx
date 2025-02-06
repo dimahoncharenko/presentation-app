@@ -1,6 +1,6 @@
 'use client'
 
-import { InputHTMLAttributes, memo, useContext } from 'react'
+import { InputHTMLAttributes, memo, useContext, useEffect } from 'react'
 import { useCurrentAttributes } from '@/shared/hooks/useCurrentAttributes'
 import { CustomBubbleMenu } from '@/shared/ui/custom-bubble-menu'
 import { BubbleMenuContent } from '@/shared/ui/custom-bubble-menu/ui/Content'
@@ -52,6 +52,10 @@ const handleSelect = (e: Event) => {
   e.preventDefault()
 }
 
+const removeTextSelection = (editor: Editor | null) => {
+  editor?.commands.blur()
+}
+
 const WYSWYG = memo(
   ({
     editor,
@@ -71,6 +75,10 @@ const WYSWYG = memo(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       animated: [_, { addAnimation }],
     } = useContext(AppStateContext)
+
+    useEffect(() => {
+      if (hideBubbleMenu) removeTextSelection(editor)
+    }, [hideBubbleMenu])
 
     return (
       <ContextMenu>

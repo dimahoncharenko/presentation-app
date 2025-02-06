@@ -45,5 +45,6 @@ export const useDraggable = (props: Props) => {
     dragOnMouseDown,
     isDragging,
     setIsDragging,
+    draggableRef: props.ref,
   }
 }

@@ -44,7 +44,6 @@ export const InputSlot = ({
                     container: 'flex',
                   }}
                   editor={editor}
-                  content={content}
                   id='flip-words-editor'
                 />
                 <Button

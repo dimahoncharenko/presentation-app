@@ -24,7 +24,6 @@ export const InputSlot = ({
         <div className='flex'>
           <WYSWYG
             editor={editor}
-            content={content}
             id='highlight-text-editor'
             contextMenu={{
               bulletList: false,
