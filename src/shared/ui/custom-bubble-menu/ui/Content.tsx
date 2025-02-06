@@ -83,6 +83,10 @@ export const BubbleMenuContent = ({
         'flex flex-wrap gap-[2px] rounded-sm border bg-white p-[2px]',
         classNames?.container,
       )}
+      style={{
+        animation: 'none',
+        transform: 'none',
+      }}
     >
       {features.font && (
         <Select

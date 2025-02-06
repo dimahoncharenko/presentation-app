@@ -14,8 +14,6 @@ export const ColorPicker = ({ editor }: Props) => {
   }, [editor, color])
 
   const handleChange = (newColor: string) => {
-    console.log('COLOR: ', color)
-
     setColor(newColor)
   }
 

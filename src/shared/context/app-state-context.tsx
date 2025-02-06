@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react'
 
+import { useAnimated } from '@/entities/AnimatedElement/lib/useAnimated'
 import { RevealContext } from './reveal-context'
 
 type AppStateContext = {
@@ -17,6 +18,7 @@ type AppStateContext = {
   selectedColor: { indexh: number; color: string }
   setSelectedColor: Dispatch<SetStateAction<{ indexh: number; color: string }>>
   currentSlide: number
+  animated: ReturnType<typeof useAnimated>
 }
 
 export const AppStateContext = createContext({} as AppStateContext)
@@ -32,6 +34,7 @@ type Props = {
 
 export const AppStateProvider = ({ children }: Props) => {
   const { deckRef } = useContext(RevealContext)
+  const animated = useAnimated()
 
   const [openedSidenav, setOpenedSidenav] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(
@@ -69,6 +72,7 @@ export const AppStateProvider = ({ children }: Props) => {
         selectedColor,
         setSelectedColor,
         currentSlide,
+        animated: [...animated],
       }}
     >
       {children}

@@ -187,9 +187,6 @@ export const createSlidesStore = (
               return el
             })
 
-            console.log('CANDIDATE', candidate)
-            console.log('UPDATED: ', updatedSlides)
-
             const newSlides = [
               ...updatedSlides.slice(0, candidate),
               {

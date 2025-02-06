@@ -63,7 +63,6 @@ export const RevealProvider = ({ children, deckElRef }: Props) => {
   useEffect(() => {
     if (deckRef.current) {
       deckRef.current.configure(options)
-      console.log('Options changed')
     }
   }, [options])
 
